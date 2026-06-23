@@ -1,0 +1,7 @@
+# OpenSpec project config — Investment Agent
+# See docs/GOVERNANCE.md for canonical docs policy.
+
+canonical_docs: docs/
+archive_merge_target: docs/
+superpowers_plans_dir: docs/superpowers/plans/
+forbid_canonical_writes_without_change: true

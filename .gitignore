@@ -1,0 +1,36 @@
+# Superpowers 临时计划（非契约真源）
+docs/superpowers/plans/
+
+# Local agent worktrees
+.claude/worktrees/
+
+# OS / IDE
+.DS_Store
+.idea/
+*.swp
+
+# Go / Node（实现后由各自模块补充）
+bin/
+dist/
+node_modules/
+web/dist/
+data/
+tmp/
+.vite/
+.playwright-mcp/
+playwright-report/
+test-results/
+web/playwright-report/
+web/test-results/
+
+# Generated UI acceptance screenshots/logs are referenced by Markdown evidence,
+# but new raw assets should stay out of the public source repo.
+docs/release/ui-audit-assets/
+
+# Local secrets / real smoke config
+.env
+.env.*
+!.env.example
+.investment-agent/
+configs/config.local.yaml
+configs/*.local.yaml

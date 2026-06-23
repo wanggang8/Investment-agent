@@ -1,0 +1,9 @@
+id: p90-capital-flow-provider-closure
+status: proposed
+owners:
+  - codex
+created: 2026-06-22
+scope:
+  - release-governance
+  - data-source
+  - frontend-acceptance

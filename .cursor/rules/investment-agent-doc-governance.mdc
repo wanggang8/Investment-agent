@@ -1,0 +1,36 @@
+---
+description: 文档治理与 OpenSpec 变更流程；契约真源在 docs/
+alwaysApply: true
+---
+
+# 文档治理（Investment Agent）
+
+## 真源
+
+- L1 契约：`docs/requirements.md`、`docs/data-model.md`、`docs/api.md`、`docs/workflow.md`、`docs/frontend-contract.md`
+- 治理规则：`docs/GOVERNANCE.md`、`openspec/project.md`
+
+## 必须
+
+1. 实现前检查 `openspec/changes/<active-change>/tasks.md`；无活跃 change 时先 `/opsx:propose` 或 `openspec new change`。
+2. 修改 L1 契约只在 change 的 `specs/**/*.md` 写 **delta**（ADDED/MODIFIED/REMOVED）；archive 时再合并到 `docs/`。
+3. 任务清单以 change 的 `tasks.md` 为准，不用 `writing-plans` 写入 `docs/superpowers/plans/`。
+
+## 禁止
+
+- 直接编辑 L1 契约（无 change、无 delta）
+- 将 `docs/superpowers/plans/`、未归档的 `design.md` 当作验收依据
+- 在 `openspec/specs/` 维护与 `docs/` 全文重复的第二套 API/数据模型
+
+## OpenSpec
+
+使用 `/opsx:propose`、`/opsx:apply`、`/opsx:archive`。详见 `AGENTS.md`。
+
+### 无参数的 propose
+
+用户只发 `/opsx:propose` 时：
+
+1. 读 `openspec/PROGRESS.md` 与 `docs/development-plan.md`
+2. 若 `openspec/changes/` 有未归档活跃 change → 禁止新建，提示 `/opsx:apply` 或 `/opsx:archive`
+3. 否则用 `next_change_id` 创建 change，tasks 对齐该阶段 plan 全文
+4. `/opsx:archive` 完成后更新 `openspec/PROGRESS.md` 阶段状态

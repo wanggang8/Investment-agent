@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+"""Validate the P89 inventory against the P88 closure matrix."""
+
+from __future__ import annotations
+
+import json
+from collections import defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SOURCE_MATRIX = ROOT / "docs/release/acceptance/2026-06-22-p88-remaining-full-release-blockers-matrix.md"
+ARTIFACT_DIR = ROOT / "docs/release/ui-audit-assets/2026-06-22-p89-real-provider-dynamic-probability"
+ARTIFACT = ARTIFACT_DIR / "p89-inventory.json"
+
+EXPECTED_P89_ROWS = {
+    "REQ-04-016",
+    "REQ-05-003",
+    "REQ-05-004",
+    "REQ-05-005",
+    "REQ-08-004",
+    "REQ-08-023",
+    "REQ-09-004",
+    "REQ-09-023",
+    "REQ-09-024",
+    "REQ-09-025",
+}
+
+
+def split_markdown_row(line: str) -> list[str]:
+    cells: list[str] = []
+    current: list[str] = []
+    escaped = False
+    for char in line.rstrip("\n")[1:-1]:
+        if escaped:
+            current.append(char)
+            escaped = False
+        elif char == "\\":
+            escaped = True
+        elif char == "|":
+            cells.append("".join(current).strip())
+            current = []
+        else:
+            current.append(char)
+    cells.append("".join(current).strip())
+    return cells
+
+
+def read_matrix(path: Path) -> list[dict[str, str]]:
+    header: list[str] | None = None
+    rows: list[dict[str, str]] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if not line.startswith("|"):
+            continue
+        cells = split_markdown_row(line)
+        if header is None:
+            if cells and cells[0] == "requirement_id":
+                header = cells
+            continue
+        if set("".join(cells)) <= {"-", ":"}:
+            continue
+        if len(cells) != len(header):
+            raise SystemExit(f"Invalid matrix row column count: expected={len(header)} got={len(cells)}")
+        rows.append(dict(zip(header, cells)))
+    if header is None:
+        raise SystemExit(f"Matrix header not found: {path}")
+    return rows
+
+
+def main() -> None:
+    rows = read_matrix(SOURCE_MATRIX)
+    remaining = {
+        row["requirement_id"]
+        for row in rows
+        if row.get("full_release_required") == "True" and row.get("p88_status") != "real_pass"
+    }
+    missing = sorted(EXPECTED_P89_ROWS - remaining)
+    unexpected = sorted(remaining - EXPECTED_P89_ROWS)
+    by_section: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in rows:
+        if row["requirement_id"] in EXPECTED_P89_ROWS:
+            by_section[row["requirement_id"].split("-")[1]].append(
+                {
+                    "requirement_id": row["requirement_id"],
+                    "source_section": row["source_section"],
+                    "source_start_line": row["source_start_line"],
+                    "requirement_text": row["requirement_text"],
+                    "p88_remaining_gap": row.get("p88_remaining_gap", ""),
+                    "p88_next_action": row.get("p88_next_action", ""),
+                }
+            )
+
+    passed = not missing and not unexpected and len(remaining) == 10
+    payload = {
+        "status": "passed" if passed else "failed",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source_matrix": str(SOURCE_MATRIX.relative_to(ROOT)),
+        "remaining_full_release_required_non_real_pass_rows": len(remaining),
+        "p89_owned_rows": len(EXPECTED_P89_ROWS),
+        "missing_expected_rows": missing,
+        "unexpected_remaining_rows": unexpected,
+        "rows_by_section": {key: value for key, value in sorted(by_section.items())},
+    }
+    ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    ARTIFACT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if not passed:
+        raise SystemExit(
+            "p89_inventory:status=failed:"
+            f"remaining={len(remaining)}:missing={missing}:unexpected={unexpected}:artifact={ARTIFACT}"
+        )
+    print(f"p89_inventory:status=passed:remaining=10:p89=10:artifact={ARTIFACT}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,10 @@
+id: p89-real-provider-and-dynamic-probability-closure
+status: proposed
+owners:
+  - codex
+created: 2026-06-22
+scope:
+  - release-governance
+  - data-source
+  - expected-return
+  - frontend-acceptance

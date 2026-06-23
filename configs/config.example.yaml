@@ -1,0 +1,55 @@
+server:
+  host: "127.0.0.1"
+  port: 8080
+
+sqlite:
+  path: "./data/investment-agent.db"
+
+veclite:
+  path: "./data/veclite"
+
+deepseek:
+  api_key: ""
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  timeout_seconds: 15
+
+data_sources:
+  enabled:
+    - "stub"
+  use_stub: true
+  # 可配置公开 HTTP JSON endpoint；系统会附加 ?symbol= 标的代码。
+  # 示例响应支持标准 MarketDataPoint 或 {"data":{"close":4.56,"valuation":{"pe_percentile":63}}} 形态。
+  market_endpoint: ""
+  intelligence_endpoint: ""
+  public_evidence:
+    enabled: false
+    sources:
+      - "cninfo"
+      - "szse"
+      - "csrc"
+    cninfo_base_url: "https://www.cninfo.com.cn"
+    cninfo_org_ids:
+      "510300": "9900000091"
+      "000001": "gssz0000001"
+    szse_base_url: "https://www.szse.cn"
+    csrc_base_url: "https://www.csrc.gov.cn"
+  market_collectors:
+    enabled: false
+    sources:
+      - "csindex"
+      - "eastmoney_fund"
+    csindex_base_url: "https://www.csindex.com.cn"
+    eastmoney_fund_base_url: "https://fund.eastmoney.com"
+
+daily_auto_run:
+  enabled: false
+  run_time: "08:30"
+  timezone: "Asia/Shanghai"
+  scope: "holdings"
+  retry: 1
+  timeout_seconds: 900
+  max_symbols: 20
+
+log:
+  level: "info"

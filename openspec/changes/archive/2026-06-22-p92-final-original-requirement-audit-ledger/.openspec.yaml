@@ -1,0 +1,9 @@
+id: p92-final-original-requirement-audit-ledger
+status: proposed
+owners:
+  - codex
+created: 2026-06-22
+scope:
+  - release-governance
+  - original-requirements
+  - acceptance-ledger

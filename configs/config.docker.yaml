@@ -1,0 +1,44 @@
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+sqlite:
+  path: "/data/sqlite/investment-agent.db"
+
+veclite:
+  path: "/data/veclite"
+
+deepseek:
+  api_key: ""
+  base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+  timeout_seconds: 30
+
+data_sources:
+  enabled: []
+  use_stub: false
+  market_endpoint: ""
+  intelligence_endpoint: ""
+  public_evidence:
+    enabled: false
+    sources:
+      - "cninfo"
+    cninfo_base_url: "https://www.cninfo.com.cn"
+    szse_base_url: "https://www.szse.cn"
+    csrc_base_url: "https://www.csrc.gov.cn"
+  market_collectors:
+    enabled: true
+    sources:
+      - "p89_structured_public"
+
+daily_auto_run:
+  enabled: false
+  run_time: "08:30"
+  timezone: "Asia/Shanghai"
+  scope: "holdings"
+  retry: 1
+  timeout_seconds: 900
+  max_symbols: 20
+
+log:
+  level: "info"

@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "codex/**"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25.x"
+          cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install OpenSpec
+        run: npm install -g @fission-ai/openspec@latest
+      - name: Install frontend dependencies
+        run: npm ci --prefix web
+      - name: OpenSpec validation
+        run: openspec validate --all --strict
+      - name: Go vet
+        run: go vet ./...
+      - name: Go lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          args: --timeout=5m --enable-only=govet,ineffassign,staticcheck,unused ./...
+      - name: Go tests
+        run: go test ./...
+      - name: Frontend lint
+        run: npm --prefix web run lint
+      - name: Frontend tests
+        run: npm --prefix web test
+      - name: Frontend build
+        run: npm --prefix web run build
+      - name: P91 deployment checks
+        run: python3 scripts/p91_deployment_check.py
+      - name: P92 requirement audit check
+        run: python3 scripts/p92_final_requirement_audit.py --check
+      - name: P93 code reality audit check
+        run: python3 scripts/p93_code_reality_audit.py --check
+      - name: Release package smoke
+        run: |
+          bash scripts/local-release-package.sh --release-label ci-smoke --output-dir tmp/ci-release
+          ARCHIVE="$(find tmp/ci-release -name 'investment-agent-ci-smoke.tar.gz' -print | head -n 1)"
+          test -n "$ARCHIVE"
+          bash scripts/local-release-package.sh --verify "$ARCHIVE" --output-dir tmp/ci-release
+      - name: Whitespace check
+        run: git diff --check

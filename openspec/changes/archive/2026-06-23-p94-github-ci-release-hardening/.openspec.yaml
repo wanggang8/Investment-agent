@@ -1,0 +1,9 @@
+id: p94-github-ci-release-hardening
+status: proposed
+owners:
+  - codex
+created: 2026-06-23
+scope:
+  - release-governance
+  - github-actions
+  - quality-gates

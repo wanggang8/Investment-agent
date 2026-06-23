@@ -1,0 +1,33 @@
+services:
+  investment-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: investment-agent:${INVESTMENT_AGENT_IMAGE_TAG:-local}
+    container_name: ${COMPOSE_PROJECT_NAME:-investment-agent}-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      INVESTMENT_AGENT_CONFIG: /app/configs/config.docker.yaml
+      INVESTMENT_AGENT_SQLITE_PATH: /data/sqlite/investment-agent.db
+      INVESTMENT_AGENT_VECLITE_PATH: /data/veclite
+      INVESTMENT_AGENT_SERVER_PORT: "8080"
+      INVESTMENT_AGENT_LOG_LEVEL: ${INVESTMENT_AGENT_LOG_LEVEL:-info}
+      INVESTMENT_AGENT_USE_STUB_DATA: ${INVESTMENT_AGENT_USE_STUB_DATA:-false}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-https://api.deepseek.com}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-chat}
+      DEEPSEEK_TIMEOUT_SECONDS: ${DEEPSEEK_TIMEOUT_SECONDS:-30}
+    ports:
+      - "127.0.0.1:${INVESTMENT_AGENT_WEB_PORT:-4173}:4173"
+      - "127.0.0.1:${INVESTMENT_AGENT_SERVER_PORT:-8080}:8080"
+    volumes:
+      - ${INVESTMENT_AGENT_DATA_DIR:-./.investment-agent}/data:/data
+      - ${INVESTMENT_AGENT_DATA_DIR:-./.investment-agent}/logs:/logs
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/investment-agent-healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s

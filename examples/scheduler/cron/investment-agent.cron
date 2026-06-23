@@ -1,0 +1,15 @@
+# Investment Agent local scheduler example.
+# 默认不会执行交易，不会自动应用规则；安装前需用户显式编辑路径并执行 crontab。
+# Replace /ABSOLUTE/PATH/TO/Investment-agent with your local repository path.
+
+SHELL=/bin/zsh
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml
+
+# Market refresh on weekday evenings.
+30 18 * * 1-5 cd /ABSOLUTE/PATH/TO/Investment-agent && /usr/bin/env go run ./cmd/agent --task market-refresh >> /ABSOLUTE/PATH/TO/Investment-agent/data/logs/agent-cron.log 2>&1
+
+# Evidence index rebuild once per day.
+0 19 * * * cd /ABSOLUTE/PATH/TO/Investment-agent && /usr/bin/env go run ./cmd/agent --task evidence-index >> /ABSOLUTE/PATH/TO/Investment-agent/data/logs/agent-cron.log 2>&1
+
+# Monthly review summary.
+0 20 1 * * cd /ABSOLUTE/PATH/TO/Investment-agent && /usr/bin/env go run ./cmd/agent --task review --period monthly >> /ABSOLUTE/PATH/TO/Investment-agent/data/logs/agent-cron.log 2>&1

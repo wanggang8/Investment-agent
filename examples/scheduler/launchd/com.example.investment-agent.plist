@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.example.investment-agent</string>
+
+  <key>WorkingDirectory</key>
+  <string>/ABSOLUTE/PATH/TO/Investment-agent</string>
+
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>INVESTMENT_AGENT_CONFIG</key>
+    <string>/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml</string>
+  </dict>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/env</string>
+    <string>go</string>
+    <string>run</string>
+    <string>./cmd/agent</string>
+    <string>--task</string>
+    <string>market-refresh</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key>
+    <integer>18</integer>
+    <key>Minute</key>
+    <integer>30</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/ABSOLUTE/PATH/TO/Investment-agent/data/logs/agent-launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/ABSOLUTE/PATH/TO/Investment-agent/data/logs/agent-launchd.err.log</string>
+
+  <!-- 默认不会执行交易，不会自动应用规则；安装前需用户显式复制到 LaunchAgents。 -->
+</dict>
+</plist>
