@@ -1,6 +1,7 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
 import { Button, Field, SummaryCard, type UITone } from '../components/ui'
 import { buildLocalOpsModel } from '../features/governance'
+import { redactSensitiveText } from '../shared/utils'
 
 type StepSummary = {
   name: string
@@ -54,15 +55,14 @@ deepseek:
 }
 
 function redactInstallText(value: string | null | undefined) {
-  if (!value) {
-    return value ?? ''
-  }
-  return value
-    .replace(/sk-[A-Za-z0-9]+/g, '[REDACTED_KEY]')
-    .replace(/\b(select|insert|update|delete|drop|alter|create)\b[\s\S]*/gi, 'SQL redacted')
-    .replace(/\bprompt\s*[:=][^\n\r]+/gi, 'prompt redacted')
-    .replace(/raw\s+(vendor|http|stack)[^\n\r]*/gi, 'raw diagnostic redacted')
-    .replace(/(?:[A-Za-z]:\\Users\\|[A-Za-z]:\\|\/)[^\s"']+/g, '<local-path>')
+  return redactSensitiveText(value, {
+    key: '[REDACTED_KEY]',
+    sql: 'SQL redacted',
+    prompt: 'prompt redacted',
+    raw: 'raw diagnostic redacted',
+    stack: 'redacted stack summary',
+    path: '<local-path>',
+  })
 }
 
 function redactInstallSummary(summary: InstallSummary): InstallSummary {

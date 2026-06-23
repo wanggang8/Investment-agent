@@ -33,6 +33,7 @@ Required or common settings:
 - `DEEPSEEK_BASE_URL`: default `https://api.deepseek.com`.
 - `DEEPSEEK_MODEL`: default `deepseek-chat`.
 - `DEEPSEEK_TIMEOUT_SECONDS`: default `30`.
+- `INVESTMENT_AGENT_RUNTIME_MODE`: default `release`; release mode rejects `INVESTMENT_AGENT_USE_STUB_DATA=true`.
 - `INVESTMENT_AGENT_WEB_PORT`: default `4173`.
 - `INVESTMENT_AGENT_SERVER_PORT`: default `8080`.
 - `INVESTMENT_AGENT_DATA_DIR`: persistent local data directory.

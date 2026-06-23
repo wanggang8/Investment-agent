@@ -24,6 +24,7 @@ export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
 
 | 字段 | 说明 | 默认示例 |
 | --- | --- | --- |
+| `runtime.mode` | 运行 profile：`development` / `test` / `release`；`release` 会拒绝 `data_sources.use_stub=true` | `development` |
 | `server.host` / `server.port` | HTTP 监听地址 | `127.0.0.1:8080` |
 | `sqlite.path` | SQLite 数据文件路径 | `./data/investment-agent.db` |
 | `veclite.path` | VecLite 索引文件或目录路径 | `./data/veclite` |
@@ -47,6 +48,7 @@ export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
 | 变量 | 覆盖字段 | 说明 |
 | --- | --- | --- |
 | `INVESTMENT_AGENT_CONFIG` | 配置文件路径 | 优先于默认 `configs/config.yaml` 的显式本地 YAML 配置文件 |
+| `INVESTMENT_AGENT_RUNTIME_MODE` | `runtime.mode` | 运行 profile；Docker/发布路径使用 `release`，本地模板使用 `development` |
 | `INVESTMENT_AGENT_SERVER_PORT` | `server.port` | 本地 HTTP 服务端口 |
 | `INVESTMENT_AGENT_SQLITE_PATH` | `sqlite.path` | SQLite 数据文件路径 |
 | `INVESTMENT_AGENT_VECLITE_PATH` | `veclite.path` | VecLite 索引文件或目录路径 |
@@ -75,7 +77,7 @@ export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
 
 ### 默认与接入方式
 
-`configs/config.example.yaml` 使用 `data_sources.use_stub=true` 的 stub 数据源作为模板默认值；真实本机运行建议复制到 `configs/config.yaml` 后切换到只读公开源或结构化公开 collector。接入方式：
+`configs/config.example.yaml` 使用 `runtime.mode=development` 与 `data_sources.use_stub=true` 的 stub 数据源作为模板默认值；真实本机运行建议复制到 `configs/config.yaml` 后切换到只读公开源或结构化公开 collector。Docker/发布路径使用 `runtime.mode=release`，并会拒绝 `data_sources.use_stub=true`。接入方式：
 
 1. 准备只读 HTTP JSON 数据源 endpoint。
 2. 在配置中设置 `data_sources.use_stub=false`，并填写 endpoint，例如：

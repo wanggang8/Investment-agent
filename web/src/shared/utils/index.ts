@@ -36,3 +36,5 @@ export function formatDateTime(value?: string) {
   if (Number.isNaN(date.getTime())) return value
   return date.toLocaleString('zh-CN', { hour12: false })
 }
+
+export { redactSensitiveText, type RedactionLabels } from './redaction'

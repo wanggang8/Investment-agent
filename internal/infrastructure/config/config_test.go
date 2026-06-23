@@ -301,6 +301,40 @@ func TestValidateAcceptsStubLocalRuntimeConfig(t *testing.T) {
 	}
 }
 
+func TestValidateRejectsReleaseRuntimeWithStubData(t *testing.T) {
+	cfg := Config{Runtime: RuntimeConfig{Mode: "release"}, Server: ServerConfig{Host: "127.0.0.1", Port: 8080}, SQLite: SQLiteConfig{Path: "./data/agent.db"}, VecLite: VecLiteConfig{Path: "./data/veclite"}, DataSources: DataSourceConfig{Enabled: []string{"stub"}, UseStub: true}, Log: LogConfig{Level: "info"}}
+
+	err := cfg.Validate()
+
+	if err == nil {
+		t.Fatal("expected release runtime with stub data to fail validation")
+	}
+	if !strings.Contains(err.Error(), "runtime.mode=release") || !strings.Contains(err.Error(), "data_sources.use_stub") {
+		t.Fatalf("expected validation error to mention release runtime and stub data, got %v", err)
+	}
+}
+
+func TestValidateAcceptsReleaseRuntimeWithStructuredPublicCollector(t *testing.T) {
+	cfg := Config{
+		Runtime: RuntimeConfig{Mode: "release"},
+		Server:  ServerConfig{Host: "127.0.0.1", Port: 8080},
+		SQLite:  SQLiteConfig{Path: "./data/agent.db"},
+		VecLite: VecLiteConfig{Path: "./data/veclite"},
+		DataSources: DataSourceConfig{
+			UseStub: false,
+			MarketCollectors: MarketCollectorSourceConfig{
+				Enabled: true,
+				Sources: []string{"p89_structured_public"},
+			},
+		},
+		Log: LogConfig{Level: "info"},
+	}
+
+	if err := cfg.Validate(); err != nil {
+		t.Fatalf("Validate: %v", err)
+	}
+}
+
 func TestValidateRejectsInvalidPublicEvidenceConfig(t *testing.T) {
 	cfg := Config{Server: ServerConfig{Host: "127.0.0.1", Port: 8080}, SQLite: SQLiteConfig{Path: "./data/agent.db"}, VecLite: VecLiteConfig{Path: "./data/veclite"}, DataSources: DataSourceConfig{Enabled: []string{"stub"}, UseStub: true, PublicEvidence: PublicEvidenceSourceConfig{Enabled: true, Sources: []string{"cninfo", "cnifno"}, CNInfoBaseURL: "not a url"}}, Log: LogConfig{Level: "info"}}
 

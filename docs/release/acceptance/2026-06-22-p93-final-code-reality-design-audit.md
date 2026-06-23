@@ -111,13 +111,13 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | classification | count |
 | --- | --- |
 | audit-tool | 44 |
-| config-gated-fallback | 28 |
-| contextual | 67 |
+| config-gated-fallback | 29 |
+| contextual | 69 |
 | dev-config | 2 |
 | release-config | 3 |
 | safety-gate | 12 |
 | sql-bind-markers | 9 |
-| test-only | 577 |
+| test-only | 583 |
 | ui-empty-state | 11 |
 
 ## Suspicious Token Samples
@@ -143,9 +143,10 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | config-gated-fallback | internal/application/workflow/dependencies.go:88 | return StubIntelligenceSource{} | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/workflow/expected_return.go:53 | if status == "fresh" \|\| status == "stubbed" { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/workflow/steps.go:545 | if freshness == "fresh" \|\| freshness == "stubbed" { | Stub path is gated by config or freshness classification and is not the Docker release default. |
-| config-gated-fallback | internal/infrastructure/config/config.go:53 | UseStub              bool                        `yaml:"use_stub"` | Stub path is gated by config or freshness classification and is not the Docker release default. |
-| config-gated-fallback | internal/infrastructure/config/config.go:193 | cfg.DataSources.UseStub = v == "true" \|\| v == "1" | Stub path is gated by config or freshness classification and is not the Docker release default. |
-| config-gated-fallback | internal/infrastructure/config/config.go:212 | if !c.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
+| config-gated-fallback | internal/infrastructure/config/config.go:60 | UseStub              bool                        `yaml:"use_stub"` | Stub path is gated by config or freshness classification and is not the Docker release default. |
+| config-gated-fallback | internal/infrastructure/config/config.go:203 | cfg.DataSources.UseStub = v == "true" \|\| v == "1" | Stub path is gated by config or freshness classification and is not the Docker release default. |
+| config-gated-fallback | internal/infrastructure/config/config.go:222 | if runtimeMode == "release" && c.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
+| config-gated-fallback | internal/infrastructure/config/config.go:234 | if !c.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/infrastructure/wiring/workflow.go:22 | if cfg.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/infrastructure/wiring/workflow.go:23 | deps.MarketDataSource = workflow.StubMarketDataSource{} | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/infrastructure/wiring/workflow.go:24 | deps.IntelligenceSource = workflow.StubIntelligenceSource{} | Stub path is gated by config or freshness classification and is not the Docker release default. |
@@ -184,11 +185,11 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | ui-empty-state | web/src/pages/LocalKnowledgePage.tsx:112 | <p className="page-placeholder"> | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
 | ui-empty-state | web/src/pages/RulesPage.tsx:70 | {message && <div className="page-placeholder">{message}</div>} | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
 | ui-empty-state | web/src/styles/global.css:131 | .page-placeholder { | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
-| dev-config | configs/config.example.yaml:19 | - "stub" | Example config intentionally supports local stub mode; release Docker config disables it. |
-| dev-config | configs/config.example.yaml:20 | use_stub: true | Example config intentionally supports local stub mode; release Docker config disables it. |
-| release-config | .env.example:24 | INVESTMENT_AGENT_USE_STUB_DATA=false | Release configuration is checked separately for no secrets and real-data defaults. |
-| release-config | configs/config.docker.yaml:19 | use_stub: false | Release configuration is checked separately for no secrets and real-data defaults. |
-| release-config | docker-compose.yml:17 | INVESTMENT_AGENT_USE_STUB_DATA: ${INVESTMENT_AGENT_USE_STUB_DATA:-false} | Release configuration is checked separately for no secrets and real-data defaults. |
+| dev-config | configs/config.example.yaml:22 | - "stub" | Example config intentionally supports local stub mode; release Docker config disables it. |
+| dev-config | configs/config.example.yaml:23 | use_stub: true | Example config intentionally supports local stub mode; release Docker config disables it. |
+| release-config | .env.example:25 | INVESTMENT_AGENT_USE_STUB_DATA=false | Release configuration is checked separately for no secrets and real-data defaults. |
+| release-config | configs/config.docker.yaml:22 | use_stub: false | Release configuration is checked separately for no secrets and real-data defaults. |
+| release-config | docker-compose.yml:18 | INVESTMENT_AGENT_USE_STUB_DATA: ${INVESTMENT_AGENT_USE_STUB_DATA:-false} | Release configuration is checked separately for no secrets and real-data defaults. |
 | audit-tool | scripts/p93_code_reality_audit.py:55 | r"TODO\|FIXME\|HACK\|demo\|mock\|stub\|fake\|dummy\|placeholder\|hard.?code\|temporary\|临时\|演示\|占位\|写死\|伪", | The P93 audit tool necessarily names the suspicious patterns it scans and reports. |
 | audit-tool | scripts/p93_code_reality_audit.py:159 | return "test-only", "Test or E2E code may use mocks, fixtures, sample data, and deterministic stubs." | The P93 audit tool necessarily names the suspicious patterns it scans and reports. |
 | audit-tool | scripts/p93_code_reality_audit.py:161 | return "documentation", "Documentation and archived evidence may discuss prior gaps or mock/stub exclusions." | The P93 audit tool necessarily names the suspicious patterns it scans and reports. |
@@ -203,7 +204,6 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | audit-tool | scripts/p93_code_reality_audit.py:177 | return "sql-bind-markers", "SQL placeholder markers are parameter bind markers, not placeholder/demo product behavior." | The P93 audit tool necessarily names the suspicious patterns it scans and reports. |
 | audit-tool | scripts/p93_code_reality_audit.py:178 | if "placeholder" in lowered or "占位" in lowered or "后续阶段" in lowered: | The P93 audit tool necessarily names the suspicious patterns it scans and reports. |
 | audit-tool | scripts/p93_code_reality_audit.py:179 | return "requires-review", "Potential placeholder/demo wording in production source." | The P93 audit tool necessarily names the suspicious patterns it scans and reports. |
-| audit-tool | scripts/p93_code_reality_audit.py:180 | if "temporary" in lowered or "临时" in lowered: | The P93 audit tool necessarily names the suspicious patterns it scans and reports. |
 
 ## Design Reasonableness Review
 

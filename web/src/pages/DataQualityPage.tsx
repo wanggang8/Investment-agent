@@ -11,7 +11,7 @@ import { createDataQualityGateResolution, getDataQualityGateResolution, getDataS
 import { getKnowledgeReadiness } from '../services/knowledgeReadiness'
 import { opsStatusText, sourceCategoryText, sourceHealthStatusText, systemStatusText, textOrRaw, verificationStatusText } from '../shared/mappers/statusText'
 import type { PageErrorState } from '../shared/utils'
-import { toPageErrorState } from '../shared/utils'
+import { redactSensitiveText, toPageErrorState } from '../shared/utils'
 import type { PageResult } from '../types/api'
 import type { EvidenceItem, SourceVerification } from '../types/evidence'
 import type { MarketSnapshot, SourceHealthItem } from '../types/market'
@@ -582,12 +582,14 @@ function resolutionTypeText(value?: string) {
 }
 
 function safePolicyReason(value: string) {
-  return value
-    .replace(/sk-[A-Za-z0-9_-]+/g, '[REDACTED_KEY]')
-    .replace(/\/Users\/[A-Za-z0-9._-]+[^\s，。；;]*/g, '[REDACTED_PATH]')
-    .replace(/\bSELECT\s+\*\s+FROM\b/gi, 'SELECT [REDACTED]')
-    .replace(/prompt\s*:/gi, 'prompt [REDACTED]')
-    .replace(/raw\s+(vendor|provider|HTTP)[^\s，。；;]*/gi, 'raw [REDACTED]')
+  return redactSensitiveText(value, {
+    key: '[REDACTED_KEY]',
+    sql: 'SELECT [REDACTED]',
+    prompt: 'prompt [REDACTED]',
+    raw: 'raw [REDACTED]',
+    stack: '[REDACTED_STACK]',
+    path: '[REDACTED_PATH]',
+  })
 }
 
 function readinessStatusText(value?: string) {

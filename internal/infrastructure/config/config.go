@@ -14,6 +14,7 @@ import (
 // Config 是后端运行配置的总入口，对应本地 configs/config.yaml。
 // 当前只保存本地服务、SQLite、VecLite、DeepSeek 与日志配置。
 type Config struct {
+	Runtime     RuntimeConfig     `yaml:"runtime"`
 	Server       ServerConfig       `yaml:"server"`
 	SQLite       SQLiteConfig       `yaml:"sqlite"`
 	VecLite      VecLiteConfig      `yaml:"veclite"`
@@ -21,6 +22,12 @@ type Config struct {
 	DataSources  DataSourceConfig   `yaml:"data_sources"`
 	DailyAutoRun DailyAutoRunConfig `yaml:"daily_auto_run"`
 	Log          LogConfig          `yaml:"log"`
+}
+
+// RuntimeConfig declares the local runtime profile. Release mode adds stricter
+// validation so packaged deployments cannot accidentally use local stub data.
+type RuntimeConfig struct {
+	Mode string `yaml:"mode"`
 }
 
 // ServerConfig 描述本地 HTTP 服务监听地址。
@@ -138,6 +145,9 @@ func resolveConfigPath(path string) string {
 }
 
 func applyDefaults(cfg *Config) {
+	if strings.TrimSpace(cfg.Runtime.Mode) == "" {
+		cfg.Runtime.Mode = "development"
+	}
 	if strings.TrimSpace(cfg.DeepSeek.BaseURL) == "" {
 		cfg.DeepSeek.BaseURL = "https://api.deepseek.com"
 	}
@@ -192,6 +202,9 @@ func applyEnvOverrides(cfg *Config) {
 	if v := os.Getenv("INVESTMENT_AGENT_USE_STUB_DATA"); v != "" {
 		cfg.DataSources.UseStub = v == "true" || v == "1"
 	}
+	if v := os.Getenv("INVESTMENT_AGENT_RUNTIME_MODE"); v != "" {
+		cfg.Runtime.Mode = v
+	}
 	if v := os.Getenv("INVESTMENT_AGENT_LOG_LEVEL"); v != "" {
 		cfg.Log.Level = v
 	}
@@ -200,6 +213,15 @@ func applyEnvOverrides(cfg *Config) {
 // Validate 检查本地运行所需的关键配置，返回聚合错误便于 CLI 诊断。
 func (c Config) Validate() error {
 	var problems []string
+	runtimeMode := strings.TrimSpace(c.Runtime.Mode)
+	switch runtimeMode {
+	case "", "development", "test", "release":
+	default:
+		problems = append(problems, "runtime.mode must be development, test or release")
+	}
+	if runtimeMode == "release" && c.DataSources.UseStub {
+		problems = append(problems, "runtime.mode=release requires data_sources.use_stub=false")
+	}
 	if c.Server.Port < 0 || c.Server.Port > 65535 {
 		problems = append(problems, "server.port must be between 0 and 65535")
 	}

@@ -115,6 +115,7 @@
 | P95 | `p95-architecture-api-engineering-hardening` | `done` |
 | P96 | `p96-public-docs-readme-productization` | `done` |
 | P97 | `p97-default-local-config-file` | `done` |
+| P98 | `p98-runtime-hardening-and-code-reuse-cleanup` | `done` |
 
 状态枚举：`pending` | `in_progress` | `executed_scoped_gaps` | `ready_for_archive` | `done` | `idle`
 
@@ -199,6 +200,7 @@
 | 架构/API/工程加固 | P95 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p95-architecture-api-engineering-hardening/`；已完成 Go package helper、P93 source inventory、API route contract check、SQLite per-connection PRAGMA hook、Docker secret-file 配置、架构文档和 package manifest 修复；GitHub CI `054d270` run `28001447118` 已通过 full backend `Go tests`，Security Scan run `28001447137` 已通过 |
 | Public docs/README 产品化 | P96 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p96-public-docs-readme-productization/`；已新增 GitHub-facing root README、产品概览、quickstart、简洁 docs map，并将长阶段历史拆到 `docs/release/history.md`；保持 release caveats、安全边界和需求真源链接，不新增运行时能力 |
 | 默认本地配置文件修正 | P97 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p97-default-local-config-file/`；本机运行默认优先读取 ignored `configs/config.yaml`，缺失时回退 `configs/config.example.yaml`；文档和本地诊断脚本已同步，不新增运行时投资能力 |
+| 运行时边界与前端复用加固 | P98 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup/`；已新增 `runtime.mode` release guardrail，发布模式拒绝 stub 数据；Docker/`.env.example` 显式 release mode；前端 key/SQL/prompt/raw/path/stack redaction 已收敛到共享 `redactSensitiveText`；验收记录见 `docs/release/acceptance/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup.md`；不新增运行时投资能力 |
 
 全量需求真源：`docs/requirements.md`。文档地图：`docs/README.md`。分阶段任务：`docs/development-plan.md` §1.1、§3。
 
