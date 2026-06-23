@@ -117,14 +117,14 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | release-config | 3 |
 | safety-gate | 12 |
 | sql-bind-markers | 9 |
-| test-only | 575 |
+| test-only | 577 |
 | ui-empty-state | 11 |
 
 ## Suspicious Token Samples
 
 | classification | location | text | rationale |
 | --- | --- | --- | --- |
-| config-gated-fallback | cmd/agent/main.go:458 | if cfg.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
+| config-gated-fallback | cmd/agent/main.go:461 | if cfg.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/service/data_source_quality.go:364 | if freshness == "fresh" \|\| freshness == "stubbed" { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/service/data_source_quality.go:707 | if freshness != "fresh" && freshness != "stubbed" { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/service/data_source_quality.go:742 | case "fresh", "stubbed", "no_data", "source_unavailable", "parse_error", "stale", "missing", "unknown": | Stub path is gated by config or freshness classification and is not the Docker release default. |
@@ -144,8 +144,8 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | config-gated-fallback | internal/application/workflow/expected_return.go:53 | if status == "fresh" \|\| status == "stubbed" { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/workflow/steps.go:545 | if freshness == "fresh" \|\| freshness == "stubbed" { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/infrastructure/config/config.go:53 | UseStub              bool                        `yaml:"use_stub"` | Stub path is gated by config or freshness classification and is not the Docker release default. |
-| config-gated-fallback | internal/infrastructure/config/config.go:185 | cfg.DataSources.UseStub = v == "true" \|\| v == "1" | Stub path is gated by config or freshness classification and is not the Docker release default. |
-| config-gated-fallback | internal/infrastructure/config/config.go:204 | if !c.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
+| config-gated-fallback | internal/infrastructure/config/config.go:193 | cfg.DataSources.UseStub = v == "true" \|\| v == "1" | Stub path is gated by config or freshness classification and is not the Docker release default. |
+| config-gated-fallback | internal/infrastructure/config/config.go:212 | if !c.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/infrastructure/wiring/workflow.go:22 | if cfg.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/infrastructure/wiring/workflow.go:23 | deps.MarketDataSource = workflow.StubMarketDataSource{} | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/infrastructure/wiring/workflow.go:24 | deps.IntelligenceSource = workflow.StubIntelligenceSource{} | Stub path is gated by config or freshness classification and is not the Docker release default. |

@@ -11,7 +11,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-// Config 是后端运行配置的总入口，对应 configs/config.example.yaml。
+// Config 是后端运行配置的总入口，对应本地 configs/config.yaml。
 // 当前只保存本地服务、SQLite、VecLite、DeepSeek 与日志配置。
 type Config struct {
 	Server       ServerConfig       `yaml:"server"`
@@ -105,14 +105,9 @@ func (c ServerConfig) Addr() string {
 }
 
 // Load 读取 YAML 配置，并叠加环境变量覆盖项。
-// path 为空时依次使用 INVESTMENT_AGENT_CONFIG 与示例配置文件。
+// path 为空时依次使用 INVESTMENT_AGENT_CONFIG、configs/config.yaml 与示例配置文件。
 func Load(path string) (*Config, error) {
-	if path == "" {
-		path = os.Getenv("INVESTMENT_AGENT_CONFIG")
-	}
-	if path == "" {
-		path = "configs/config.example.yaml"
-	}
+	path = resolveConfigPath(path)
 
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -127,6 +122,19 @@ func Load(path string) (*Config, error) {
 	applyEnvOverrides(&cfg)
 	applyDefaults(&cfg)
 	return &cfg, nil
+}
+
+func resolveConfigPath(path string) string {
+	if strings.TrimSpace(path) != "" {
+		return path
+	}
+	if env := strings.TrimSpace(os.Getenv("INVESTMENT_AGENT_CONFIG")); env != "" {
+		return env
+	}
+	if _, err := os.Stat("configs/config.yaml"); err == nil {
+		return "configs/config.yaml"
+	}
+	return "configs/config.example.yaml"
 }
 
 func applyDefaults(cfg *Config) {

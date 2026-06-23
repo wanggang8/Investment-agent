@@ -32,5 +32,6 @@ docs/release/ui-audit-assets/
 .env.*
 !.env.example
 .investment-agent/
+configs/config.yaml
 configs/config.local.yaml
 configs/*.local.yaml

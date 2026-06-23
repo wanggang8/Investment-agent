@@ -77,6 +77,8 @@
 
 当前活跃变更：无。
 
+P97 已归档到 `openspec/changes/archive/2026-06-23-p97-default-local-config-file/`。P97 已完成默认本地配置文件修正：`config.Load("")` 默认顺序为 `INVESTMENT_AGENT_CONFIG`、ignored `configs/config.yaml`、`configs/config.example.yaml` fallback；`cmd/agent` 帮助、配置文档、quickstart、本地诊断脚本和 `.gitignore` 已同步。P97 不新增投资运行时能力，不声称券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。
+
 P95 已归档到 `openspec/changes/archive/2026-06-23-p95-architecture-api-engineering-hardening/`。P95 已完成架构/API/工程加固：新增 `scripts/go-packages.sh` 并将 CI/release Go gates 限定到项目后端包，P93 source inventory 改为 tracked + nonignored untracked release-relevant source files，新增 API route contract check，SQLite 改为每条连接的 PRAGMA hook，支持 `DEEPSEEK_API_KEY_FILE`，修复 release manifest backend test 命令，并更新架构/部署/API 文档。GitHub CI commit `054d2708440da925e2e4cc4ae65065ac002b8905` run `https://github.com/wanggang8/Investment-agent/actions/runs/28001447118` 已通过 full backend `Go tests`；Security Scan run `https://github.com/wanggang8/Investment-agent/actions/runs/28001447137` 已通过。P95 不新增投资运行时能力，不声称物理第二机器复验、券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。
 
 P96 已归档到 `openspec/changes/archive/2026-06-23-p96-public-docs-readme-productization/`。P96 已完成 public README/docs 产品化：新增 root `README.md`、`docs/product-overview.md`、`docs/quickstart.md`，将 `docs/README.md` 收敛为文档地图，并把长阶段历史拆到 `docs/release/history.md`；验收记录见 `docs/release/acceptance/2026-06-23-p96-public-docs-readme-productization.md`。P96 不修改运行时代码，不新增券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。

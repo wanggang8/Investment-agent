@@ -230,7 +230,7 @@ investment-agent/
 
 ## 8. 配置设计
 
-配置文件建议使用 `config.yaml`，敏感字段通过环境变量注入。
+配置文件默认优先读取 `configs/config.yaml`，该文件被 Git 忽略；`configs/config.example.yaml` 仅作为模板和 fresh-checkout fallback。敏感字段可写入本地私有配置或通过环境变量注入。
 
 ```yaml
 server:

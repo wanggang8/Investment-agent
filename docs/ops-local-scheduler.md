@@ -17,7 +17,7 @@
 1. 准备本地配置文件，并用环境变量指向它：
 
 ```bash
-export INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml
+export INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml
 ```
 
 2. 确认帮助输出：
@@ -31,9 +31,9 @@ go run ./cmd/agent --help
 
 ```bash
 cd /ABSOLUTE/PATH/TO/Investment-agent
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --validate-config
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --preflight --diagnostics /ABSOLUTE/PATH/TO/Investment-agent/tmp/preflight.json
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --task market-refresh
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --validate-config
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --preflight --diagnostics /ABSOLUTE/PATH/TO/Investment-agent/tmp/preflight.json
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --task market-refresh
 ```
 
 ## P40 本地预检
@@ -42,7 +42,7 @@ INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.exampl
 
 ```bash
 cd /ABSOLUTE/PATH/TO/Investment-agent
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --preflight --diagnostics /ABSOLUTE/PATH/TO/Investment-agent/tmp/preflight.json
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --preflight --diagnostics /ABSOLUTE/PATH/TO/Investment-agent/tmp/preflight.json
 ```
 
 预检输出状态枚举为 `pass`、`warning`、`failed`、`skipped`。诊断文件只写本地 JSON，不包含 key 原文；失败项应先按修复提示处理，再启动 server 或本地任务。预检只读取本地状态，不会执行交易，不外部推送，也不会自动应用规则。
@@ -83,20 +83,20 @@ bash scripts/local-install-diagnostics.sh --output-dir /ABSOLUTE/PATH/TO/Investm
 
 ```bash
 cd /ABSOLUTE/PATH/TO/Investment-agent
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --release-upgrade-check --target-version vNEXT --diagnostics /ABSOLUTE/PATH/TO/Investment-agent/tmp/release-upgrade.json
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --release-upgrade-check --target-version vNEXT --diagnostics /ABSOLUTE/PATH/TO/Investment-agent/tmp/release-upgrade.json
 bash scripts/local-release-upgrade-check.sh --target-version vNEXT --skip-preflight
 ```
 
 升级检查只读本地配置和迁移文件状态，不会执行升级、不会运行迁移、不会创建备份、不会恢复或覆盖数据库。若报告提示 `backup_reminder:warning`，应在升级前手动执行：
 
 ```bash
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --backup /ABSOLUTE/PATH/TO/Investment-agent/data/backups
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --backup /ABSOLUTE/PATH/TO/Investment-agent/data/backups
 ```
 
 升级后建议手动运行：
 
 ```bash
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --preflight --diagnostics /ABSOLUTE/PATH/TO/Investment-agent/tmp/preflight-after-upgrade.json
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --preflight --diagnostics /ABSOLUTE/PATH/TO/Investment-agent/tmp/preflight-after-upgrade.json
 bash scripts/recovery-smoke.sh
 bash scripts/e2e-smoke.sh
 bash scripts/local-install-diagnostics.sh --skip-e2e --include-release-upgrade --target-version vNEXT
@@ -168,14 +168,14 @@ crontab -r
 
 ```bash
 cd /ABSOLUTE/PATH/TO/Investment-agent
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --backup /ABSOLUTE/PATH/TO/Investment-agent/data/backups
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --backup /ABSOLUTE/PATH/TO/Investment-agent/data/backups
 ```
 
 恢复时先停止服务；若 `sqlite.path` 已存在，先把旧库移动到安全位置，再显式确认恢复到该路径：
 
 ```bash
 cd /ABSOLUTE/PATH/TO/Investment-agent
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --restore /ABSOLUTE/PATH/TO/Investment-agent/data/backups/agent-YYYYMMDDTHHMMSSZ.db --restore-confirm
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --restore /ABSOLUTE/PATH/TO/Investment-agent/data/backups/agent-YYYYMMDDTHHMMSSZ.db --restore-confirm
 ```
 
 不带 `--restore-confirm` 时恢复会拒绝执行；目标 `sqlite.path` 已存在时也会拒绝覆盖，需要先手动移走旧库。
@@ -201,7 +201,7 @@ RECOVERY_SMOKE_SERVER_PORT=18181 bash scripts/recovery-smoke.sh
 
 ```bash
 cd /ABSOLUTE/PATH/TO/Investment-agent
-INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.example.yaml go run ./cmd/agent --task evidence-index
+INVESTMENT_AGENT_CONFIG=/ABSOLUTE/PATH/TO/Investment-agent/configs/config.yaml go run ./cmd/agent --task evidence-index
 ```
 
 索引是可重建辅助数据；事实数据以 SQLite 中的摘要、文本块和审计记录为准。

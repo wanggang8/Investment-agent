@@ -21,7 +21,7 @@ go run ./cmd/server
 
 执行链路：
 
-1. `configs/config.example.yaml` 或 `INVESTMENT_AGENT_CONFIG` 提供配置。
+1. `configs/config.yaml`、`INVESTMENT_AGENT_CONFIG` 或 fresh-checkout fallback `configs/config.example.yaml` 提供配置。
 2. `INVESTMENT_AGENT_SQLITE_PATH` 可覆盖 `sqlite.path`。
 3. `cmd/server/main.go` 调用 `sqlite.Open(cfg.SQLite.Path)`。
 4. `sqlite.Migrate(ctx, db)` 按文件名顺序执行 `migration/*.sql`。

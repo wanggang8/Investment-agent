@@ -114,6 +114,7 @@
 | P94 | `p94-github-ci-release-hardening` | `done` |
 | P95 | `p95-architecture-api-engineering-hardening` | `done` |
 | P96 | `p96-public-docs-readme-productization` | `done` |
+| P97 | `p97-default-local-config-file` | `done` |
 
 状态枚举：`pending` | `in_progress` | `executed_scoped_gaps` | `ready_for_archive` | `done` | `idle`
 
@@ -197,6 +198,7 @@
 | GitHub CI/CD hardening | P94 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p94-github-ci-release-hardening/`；已补齐 PR/main CI 的 OpenSpec、`go vet`、bounded `golangci-lint`、Go tests、frontend lint/test/build、P91/P92/P93 checks、release package smoke 和 whitespace check；tag `v*` release workflow 会在 preflight 后打包上传 package/manifest；security scan 覆盖 `govulncheck`、frontend production audit 和 P93 code reality / secret scan；不创建 tag、不发布 GitHub Release、不新增运行时能力 |
 | 架构/API/工程加固 | P95 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p95-architecture-api-engineering-hardening/`；已完成 Go package helper、P93 source inventory、API route contract check、SQLite per-connection PRAGMA hook、Docker secret-file 配置、架构文档和 package manifest 修复；GitHub CI `054d270` run `28001447118` 已通过 full backend `Go tests`，Security Scan run `28001447137` 已通过 |
 | Public docs/README 产品化 | P96 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p96-public-docs-readme-productization/`；已新增 GitHub-facing root README、产品概览、quickstart、简洁 docs map，并将长阶段历史拆到 `docs/release/history.md`；保持 release caveats、安全边界和需求真源链接，不新增运行时能力 |
+| 默认本地配置文件修正 | P97 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p97-default-local-config-file/`；本机运行默认优先读取 ignored `configs/config.yaml`，缺失时回退 `configs/config.example.yaml`；文档和本地诊断脚本已同步，不新增运行时投资能力 |
 
 全量需求真源：`docs/requirements.md`。文档地图：`docs/README.md`。分阶段任务：`docs/development-plan.md` §1.1、§3。
 

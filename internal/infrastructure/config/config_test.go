@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -32,6 +33,76 @@ func TestLoadExampleConfig(t *testing.T) {
 	}
 	if cfg.DeepSeek.TimeoutSeconds != 15 {
 		t.Fatalf("deepseek timeout_seconds = %d, want 15", cfg.DeepSeek.TimeoutSeconds)
+	}
+}
+
+func TestLoadDefaultsToLocalConfigYAMLWhenPresent(t *testing.T) {
+	dir := t.TempDir()
+	configsDir := filepath.Join(dir, "configs")
+	if err := os.MkdirAll(configsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeConfigFile(t, filepath.Join(configsDir, "config.yaml"), 18080, "local-model")
+	writeConfigFile(t, filepath.Join(configsDir, "config.example.yaml"), 28080, "example-model")
+	withWorkingDir(t, dir)
+
+	cfg, err := Load("")
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	if cfg.Server.Port != 18080 {
+		t.Fatalf("port=%d, want local config port", cfg.Server.Port)
+	}
+	if cfg.DeepSeek.Model != "local-model" {
+		t.Fatalf("model=%q, want local-model", cfg.DeepSeek.Model)
+	}
+}
+
+func TestLoadFallsBackToExampleConfigWhenLocalConfigMissing(t *testing.T) {
+	dir := t.TempDir()
+	configsDir := filepath.Join(dir, "configs")
+	if err := os.MkdirAll(configsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeConfigFile(t, filepath.Join(configsDir, "config.example.yaml"), 28080, "example-model")
+	withWorkingDir(t, dir)
+
+	cfg, err := Load("")
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	if cfg.Server.Port != 28080 {
+		t.Fatalf("port=%d, want example config port", cfg.Server.Port)
+	}
+	if cfg.DeepSeek.Model != "example-model" {
+		t.Fatalf("model=%q, want example-model", cfg.DeepSeek.Model)
+	}
+}
+
+func TestLoadEnvConfigOverridesDefaultLocalConfig(t *testing.T) {
+	dir := t.TempDir()
+	configsDir := filepath.Join(dir, "configs")
+	if err := os.MkdirAll(configsDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	writeConfigFile(t, filepath.Join(configsDir, "config.yaml"), 18080, "local-model")
+	envConfigPath := filepath.Join(dir, "override.yaml")
+	writeConfigFile(t, envConfigPath, 38080, "env-model")
+	t.Setenv("INVESTMENT_AGENT_CONFIG", envConfigPath)
+	withWorkingDir(t, dir)
+
+	cfg, err := Load("")
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	if cfg.Server.Port != 38080 {
+		t.Fatalf("port=%d, want env config port", cfg.Server.Port)
+	}
+	if cfg.DeepSeek.Model != "env-model" {
+		t.Fatalf("model=%q, want env-model", cfg.DeepSeek.Model)
 	}
 }
 
@@ -72,6 +143,48 @@ log:
 	if cfg.DeepSeek.TimeoutSeconds != 7 {
 		t.Fatalf("timeout_seconds = %d, want 7", cfg.DeepSeek.TimeoutSeconds)
 	}
+}
+
+func writeConfigFile(t *testing.T, path string, port int, model string) {
+	t.Helper()
+	content := fmt.Sprintf(`server:
+  host: 127.0.0.1
+  port: %d
+sqlite:
+  path: ./data/agent.db
+veclite:
+  path: ./data/veclite
+deepseek:
+  api_key: ""
+  base_url: https://api.deepseek.com
+  model: %s
+  timeout_seconds: 15
+data_sources:
+  enabled:
+    - stub
+  use_stub: true
+log:
+  level: info
+`, port, model)
+	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+}
+
+func withWorkingDir(t *testing.T, dir string) {
+	t.Helper()
+	previous, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		if err := os.Chdir(previous); err != nil {
+			t.Fatalf("restore working dir: %v", err)
+		}
+	})
 }
 
 func TestLoadDeepSeekDeploymentEnvOverrides(t *testing.T) {

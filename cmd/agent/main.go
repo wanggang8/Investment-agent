@@ -50,7 +50,7 @@ func main() {
 func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("agent", flag.ContinueOnError)
 	fs.SetOutput(stderr)
-	configPath := fs.String("config", "", "配置文件路径，默认读取 INVESTMENT_AGENT_CONFIG 或 configs/config.example.yaml")
+	configPath := fs.String("config", "", "配置文件路径，默认读取 INVESTMENT_AGENT_CONFIG、configs/config.yaml 或 configs/config.example.yaml")
 	task := fs.String("task", "", "手动任务：daily、market-refresh、evidence-index、public-evidence-refresh、p34-expanded-refresh、llm-smoke、retrieval-quality-smoke、data-source-quality-regression、data-source-quality-resolution-check、review")
 	period := fs.String("period", "monthly", "复盘周期：monthly 或 quarterly")
 	source := fs.String("source", "", "P34 扩展数据源或 P48 回归模式：sentiment_proxy_fixture、configured、fixture、current")
@@ -263,6 +263,9 @@ func resolveConfigPath(configPath string) string {
 	}
 	if env := os.Getenv("INVESTMENT_AGENT_CONFIG"); strings.TrimSpace(env) != "" {
 		return env
+	}
+	if _, err := os.Stat("configs/config.yaml"); err == nil {
+		return "configs/config.yaml"
 	}
 	return "configs/config.example.yaml"
 }

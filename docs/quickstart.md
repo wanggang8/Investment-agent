@@ -103,6 +103,14 @@ DELETE INVESTMENT AGENT DATA
 
 ## Source Development
 
+Create a local runtime config first:
+
+```bash
+cp configs/config.example.yaml configs/config.yaml
+```
+
+Edit `configs/config.yaml` for local ports, SQLite/VecLite paths, data sources, and optional LLM key. `configs/config.yaml` is ignored by Git; `configs/config.example.yaml` stays as the committed template.
+
 For backend work:
 
 ```bash

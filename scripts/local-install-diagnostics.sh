@@ -3,7 +3,11 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONFIG_PATH="${ROOT_DIR}/configs/config.example.yaml"
+if [[ -f "${ROOT_DIR}/configs/config.yaml" ]]; then
+  CONFIG_PATH="${ROOT_DIR}/configs/config.yaml"
+else
+  CONFIG_PATH="${ROOT_DIR}/configs/config.example.yaml"
+fi
 OUTPUT_DIR="${ROOT_DIR}/tmp/local-install-diagnostics"
 RUN_RECOVERY="1"
 RUN_E2E="1"
@@ -42,7 +46,7 @@ while [[ $# -gt 0 ]]; do
 Usage: bash scripts/local-install-diagnostics.sh [options]
 
 Options:
-  --config PATH         使用的配置文件路径（默认: configs/config.example.yaml）
+  --config PATH         使用的配置文件路径（默认: configs/config.yaml，缺失时回退 configs/config.example.yaml）
   --output-dir PATH     输出目录（默认: tmp/local-install-diagnostics）
   --skip-recovery       跳过 scripts/recovery-smoke.sh
   --skip-e2e            跳过 scripts/e2e-smoke.sh

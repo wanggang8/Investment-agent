@@ -6,7 +6,15 @@
 
 ## 配置文件
 
-默认读取 `configs/config.example.yaml`。可通过环境变量覆盖路径：
+默认读取本地 `configs/config.yaml`。首次本机启动前从示例复制：
+
+```bash
+cp configs/config.example.yaml configs/config.yaml
+```
+
+`configs/config.yaml` 会被 Git 忽略，可放本机端口、SQLite/VecLite 路径和可选 LLM key。`configs/config.example.yaml` 只作为提交到仓库的模板；如果本地 `configs/config.yaml` 不存在，程序会回退读取 example，方便 fresh checkout smoke。
+
+可通过环境变量覆盖路径：
 
 ```bash
 export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
@@ -38,7 +46,7 @@ export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
 
 | 变量 | 覆盖字段 | 说明 |
 | --- | --- | --- |
-| `INVESTMENT_AGENT_CONFIG` | 配置文件路径 | 指向本地 YAML 配置文件 |
+| `INVESTMENT_AGENT_CONFIG` | 配置文件路径 | 优先于默认 `configs/config.yaml` 的显式本地 YAML 配置文件 |
 | `INVESTMENT_AGENT_SERVER_PORT` | `server.port` | 本地 HTTP 服务端口 |
 | `INVESTMENT_AGENT_SQLITE_PATH` | `sqlite.path` | SQLite 数据文件路径 |
 | `INVESTMENT_AGENT_VECLITE_PATH` | `veclite.path` | VecLite 索引文件或目录路径 |
@@ -67,7 +75,7 @@ export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
 
 ### 默认与接入方式
 
-当前本地工程默认使用 `data_sources.use_stub=true` 的 stub 数据源；也可以切换到只读公开 HTTP JSON endpoint。接入方式：
+`configs/config.example.yaml` 使用 `data_sources.use_stub=true` 的 stub 数据源作为模板默认值；真实本机运行建议复制到 `configs/config.yaml` 后切换到只读公开源或结构化公开 collector。接入方式：
 
 1. 准备只读 HTTP JSON 数据源 endpoint。
 2. 在配置中设置 `data_sources.use_stub=false`，并填写 endpoint，例如：
@@ -197,7 +205,7 @@ bash scripts/local-install-diagnostics.sh --output-dir /tmp/investment-agent-dia
 可选参数：
 
 ```bash
---config PATH          配置文件路径（默认：configs/config.example.yaml）
+--config PATH          配置文件路径（默认：configs/config.yaml，缺失时回退 configs/config.example.yaml）
 --output-dir PATH      输出目录（默认：tmp/local-install-diagnostics）
 --skip-recovery        跳过 scripts/recovery-smoke.sh
 --skip-e2e             跳过 scripts/e2e-smoke.sh

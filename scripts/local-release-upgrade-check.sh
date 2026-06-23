@@ -3,7 +3,11 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONFIG_PATH="${ROOT_DIR}/configs/config.example.yaml"
+if [[ -f "${ROOT_DIR}/configs/config.yaml" ]]; then
+  CONFIG_PATH="${ROOT_DIR}/configs/config.yaml"
+else
+  CONFIG_PATH="${ROOT_DIR}/configs/config.example.yaml"
+fi
 OUTPUT_DIR="${ROOT_DIR}/tmp/local-release-upgrade"
 TARGET_VERSION=""
 RUN_PREFLIGHT="1"
@@ -32,7 +36,7 @@ while [[ $# -gt 0 ]]; do
 Usage: bash scripts/local-release-upgrade-check.sh [options]
 
 Options:
-  --config PATH           使用的配置文件路径（默认: configs/config.example.yaml）
+  --config PATH           使用的配置文件路径（默认: configs/config.yaml，缺失时回退 configs/config.example.yaml）
   --target-version VALUE  目标版本或 release label
   --output-dir PATH       输出目录（默认: tmp/local-release-upgrade）
   --skip-preflight        跳过 cmd/agent --preflight
