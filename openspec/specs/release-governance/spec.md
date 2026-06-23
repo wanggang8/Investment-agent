@@ -3,6 +3,17 @@
 ## Purpose
 定义发布状态治理规则：在 P66 当前数据 strict gate 与 P67 本地处置记录之后，发布材料必须明确 release-ready 的适用范围、当前数据 clean claim 边界、候选包证据新鲜度和后续 clean-tree package refresh 要求。
 ## Requirements
+### Requirement: Initial release version marker
+
+The repository SHALL declare a single initial release version marker for release-facing handoff materials.
+
+#### Scenario: Initial version is recorded
+
+- **GIVEN** the project is prepared for a local release handoff
+- **WHEN** a user or packaging operator inspects the repository version marker
+- **THEN** the root `VERSION` file SHALL contain `v0.1.0`
+- **AND** release materials SHALL describe `v0.1.0` as an initial local release version, not as proof of a Git tag, remote release publication, physical second-machine validation, final distribution package refresh, or expanded runtime investment capability.
+
 ### Requirement: Post-P67 release readiness decision
 
 After P67, release materials SHALL include a P68 release readiness decision before any new final release handoff claim is made.

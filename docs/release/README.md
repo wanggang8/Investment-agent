@@ -4,6 +4,10 @@
 
 This directory contains release-facing materials derived from actual acceptance runs. It does not contain temporary SQLite databases, raw logs, full prompts, raw HTTP responses, private paths, or complete API keys.
 
+Initial release version: `v0.1.0`.
+
+`v0.1.0` is the initial local release version marker recorded by P99. It is not a Git tag, not a GitHub Release publication, not a fresh package refresh, and not physical second-machine validation.
+
 ## 2026-06-18 Release Candidate And Package
 
 | Document | Purpose |
@@ -49,6 +53,8 @@ This directory contains release-facing materials derived from actual acceptance 
 | `docs/release/acceptance/2026-06-22-p86-core-goal-knowledge-safety-final-closure.md` | P86 final integrated evidence layer: P74/P81/P82/P83/P84/P85/P87 real UI/API/SQLite/Go evidence replayed, 110 additional rows upgraded, 27 full-release-required rows still non-real-pass. |
 | `docs/release/acceptance/2026-06-22-p86-core-goal-knowledge-safety-final-matrix.md` | P86 row-level matrix derived from the P87 matrix without rewriting P75-P87 history. |
 | `docs/release/acceptance/2026-06-23-p94-github-ci-release-hardening.md` | P94 GitHub CI/CD hardening evidence: PR/main quality gates, tag release workflow, security scan workflow, frontend lint closure, Go lint closure, and local CI-equivalent validation. |
+| `docs/release/acceptance/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup.md` | P98 runtime hardening and redaction reuse evidence: release mode rejects stub data, Docker uses release mode, and frontend diagnostic redaction is shared. |
+| `docs/release/acceptance/2026-06-23-p99-initial-release-version.md` | P99 initial release version evidence: root `VERSION` is `v0.1.0`, frontend package metadata is `0.1.0`, and release-claim boundaries remain unchanged. |
 | `docs/release/acceptance-repeatability.md` | Rules for repeating acceptance consistently. |
 
 Current release status: `release_ready_scoped_with_p86_final_integrated_progress`.

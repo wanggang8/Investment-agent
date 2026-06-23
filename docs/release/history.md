@@ -59,6 +59,11 @@ This page preserves the long phase status narrative that previously lived in `do
 - P92: archived at `openspec/changes/archive/2026-06-22-p92-final-original-requirement-audit-ledger/`; final independent original-requirement ledger confirmed 330 full-release-required rows as `real_pass` and 11 appendix/reference rows as `reference_only`.
 - P93: archived at `openspec/changes/archive/2026-06-22-p93-final-code-reality-design-audit/`; final code-reality and design audit found release-blocking findings count 0 and removed unused placeholder/wrapper/helper code.
 - P94: archived at `openspec/changes/archive/2026-06-23-p94-github-ci-release-hardening/`; hardened GitHub CI/CD, release preflight, package smoke, and security scan workflows without creating tags or publishing releases.
+- P95: archived at `openspec/changes/archive/2026-06-23-p95-architecture-api-engineering-hardening/`; hardened Go package gates, API route contract checks, SQLite PRAGMA setup, Docker secret-file configuration, and release package test metadata.
+- P96: archived at `openspec/changes/archive/2026-06-23-p96-public-docs-readme-productization/`; productized public README and documentation entry points without changing runtime behavior.
+- P97: archived at `openspec/changes/archive/2026-06-23-p97-default-local-config-file/`; made local default configuration loading explicit and documented.
+- P98: archived at `openspec/changes/archive/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup/`; added release runtime guardrails and shared frontend redaction.
+- P99: archived at `openspec/changes/archive/2026-06-23-p99-initial-release-version/`; recorded `v0.1.0` as the initial local release version marker without creating a Git tag, publishing a GitHub Release, refreshing a package, or expanding runtime investment capability.
 
 ## Recommended Reading Paths From The Former Docs README
 

@@ -77,6 +77,8 @@
 
 当前活跃变更：无。
 
+P99 已归档到 `openspec/changes/archive/2026-06-23-p99-initial-release-version/`。P99 已完成初始发布版本号固化：新增根级 `VERSION`=`v0.1.0`，同步 `web/package.json` 与 `web/package-lock.json` 为 `0.1.0`，并更新 release/governance/progress 材料。P99 不创建 Git tag、不发布 GitHub Release、不刷新最终分发包、不声称物理第二机器复验、不新增投资运行时能力，不声称券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。
+
 P98 已归档到 `openspec/changes/archive/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup/`。P98 已完成运行时边界与前端复用加固：新增 `runtime.mode`，发布模式会拒绝 `data_sources.use_stub=true`；Docker/`.env.example` 显式使用 release mode；前端新增共享 `redactSensitiveText`，并收敛 `ErrorState`、`LocalInstallPage`、`DataQualityPage` 的 key/SQL/prompt/raw/path/stack 脱敏逻辑；验收记录见 `docs/release/acceptance/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup.md`。P98 不新增投资运行时能力，不声称券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。
 
 P97 已归档到 `openspec/changes/archive/2026-06-23-p97-default-local-config-file/`。P97 已完成默认本地配置文件修正：`config.Load("")` 默认顺序为 `INVESTMENT_AGENT_CONFIG`、ignored `configs/config.yaml`、`configs/config.example.yaml` fallback；`cmd/agent` 帮助、配置文档、quickstart、本地诊断脚本和 `.gitignore` 已同步。P97 不新增投资运行时能力，不声称券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。
