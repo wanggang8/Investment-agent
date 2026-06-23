@@ -112,7 +112,7 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | --- | --- |
 | audit-tool | 44 |
 | config-gated-fallback | 28 |
-| contextual | 67 |
+| contextual | 69 |
 | dev-config | 2 |
 | release-config | 3 |
 | safety-gate | 12 |
