@@ -3,11 +3,13 @@ package sqlite
 import (
 	"context"
 	"database/sql"
+	"database/sql/driver"
 	"embed"
 	"fmt"
 	"sort"
+	"strings"
 
-	_ "modernc.org/sqlite"
+	moderncsqlite "modernc.org/sqlite"
 )
 
 // migrationFiles 内嵌 migration 目录下的 SQL 文件，保证二进制可独立执行迁移。
@@ -20,13 +22,49 @@ type Store struct {
 	DB *sql.DB
 }
 
+func init() {
+	moderncsqlite.RegisterConnectionHook(configureSQLiteConnection)
+}
+
 // Open 打开 SQLite 数据库文件；path 可使用 :memory: 进行测试。
 func Open(path string) (*Store, error) {
 	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		return nil, err
 	}
+	if err := verifyConnection(db); err != nil {
+		_ = db.Close()
+		return nil, err
+	}
 	return &Store{DB: db}, nil
+}
+
+func verifyConnection(db *sql.DB) error {
+	if err := db.Ping(); err != nil {
+		return fmt.Errorf("ping sqlite: %w", err)
+	}
+	return nil
+}
+
+func configureSQLiteConnection(conn moderncsqlite.ExecQuerierContext, dsn string) error {
+	pragmas := []string{
+		`PRAGMA foreign_keys = ON`,
+		`PRAGMA busy_timeout = 5000`,
+	}
+	if !isMemorySQLitePath(dsn) {
+		pragmas = append(pragmas, `PRAGMA journal_mode = WAL`)
+	}
+	for _, statement := range pragmas {
+		if _, err := conn.ExecContext(context.Background(), statement, []driver.NamedValue{}); err != nil {
+			return fmt.Errorf("configure sqlite %s: %w", statement, err)
+		}
+	}
+	return nil
+}
+
+func isMemorySQLitePath(path string) bool {
+	trimmed := strings.TrimSpace(strings.ToLower(path))
+	return trimmed == ":memory:" || strings.Contains(trimmed, "mode=memory")
 }
 
 // Close 关闭底层数据库连接。

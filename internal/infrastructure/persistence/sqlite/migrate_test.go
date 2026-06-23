@@ -3,6 +3,7 @@ package sqlite
 import (
 	"context"
 	"database/sql"
+	"strings"
 	"testing"
 
 	_ "modernc.org/sqlite"
@@ -39,6 +40,116 @@ func TestMigrateCreatesTablesAndSeeds(t *testing.T) {
 	}
 	if status != "active" {
 		t.Fatalf("rule v3.0 status=%s", status)
+	}
+}
+
+func TestOpenConfiguresFileBackedConnection(t *testing.T) {
+	store, err := Open(t.TempDir() + "/configured.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+
+	assertSQLitePragmas(t, store.DB, true)
+}
+
+func TestOpenConfiguresEveryPooledFileConnection(t *testing.T) {
+	store, err := Open(t.TempDir() + "/pooled.db")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	store.DB.SetMaxOpenConns(4)
+
+	ctx := context.Background()
+	conns := make([]*sql.Conn, 0, 4)
+	for i := 0; i < 4; i++ {
+		conn, err := store.DB.Conn(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+		conns = append(conns, conn)
+	}
+	t.Cleanup(func() {
+		for _, conn := range conns {
+			_ = conn.Close()
+		}
+	})
+
+	for _, conn := range conns {
+		assertSQLiteConnPragmas(t, conn, true)
+	}
+}
+
+func TestOpenKeepsMemoryDatabaseCompatible(t *testing.T) {
+	store, err := Open(":memory:")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+
+	assertSQLitePragmas(t, store.DB, false)
+}
+
+func assertSQLitePragmas(t *testing.T, db *sql.DB, wantWAL bool) {
+	t.Helper()
+	var foreignKeys int
+	if err := db.QueryRow(`PRAGMA foreign_keys`).Scan(&foreignKeys); err != nil {
+		t.Fatal(err)
+	}
+	if foreignKeys != 1 {
+		t.Fatalf("foreign_keys=%d, want 1", foreignKeys)
+	}
+
+	var busyTimeout int
+	if err := db.QueryRow(`PRAGMA busy_timeout`).Scan(&busyTimeout); err != nil {
+		t.Fatal(err)
+	}
+	if busyTimeout != 5000 {
+		t.Fatalf("busy_timeout=%d, want 5000", busyTimeout)
+	}
+
+	var journalMode string
+	if err := db.QueryRow(`PRAGMA journal_mode`).Scan(&journalMode); err != nil {
+		t.Fatal(err)
+	}
+	assertJournalMode(t, journalMode, wantWAL)
+}
+
+func assertSQLiteConnPragmas(t *testing.T, conn *sql.Conn, wantWAL bool) {
+	t.Helper()
+	ctx := context.Background()
+	var foreignKeys int
+	if err := conn.QueryRowContext(ctx, `PRAGMA foreign_keys`).Scan(&foreignKeys); err != nil {
+		t.Fatal(err)
+	}
+	if foreignKeys != 1 {
+		t.Fatalf("foreign_keys=%d, want 1", foreignKeys)
+	}
+
+	var busyTimeout int
+	if err := conn.QueryRowContext(ctx, `PRAGMA busy_timeout`).Scan(&busyTimeout); err != nil {
+		t.Fatal(err)
+	}
+	if busyTimeout != 5000 {
+		t.Fatalf("busy_timeout=%d, want 5000", busyTimeout)
+	}
+
+	var journalMode string
+	if err := conn.QueryRowContext(ctx, `PRAGMA journal_mode`).Scan(&journalMode); err != nil {
+		t.Fatal(err)
+	}
+	assertJournalMode(t, journalMode, wantWAL)
+}
+
+func assertJournalMode(t *testing.T, journalMode string, wantWAL bool) {
+	t.Helper()
+	normalized := strings.ToLower(journalMode)
+	if wantWAL && normalized != "wal" {
+		t.Fatalf("journal_mode=%s, want wal", journalMode)
+	}
+	if !wantWAL && normalized == "wal" {
+		t.Fatal("memory database should not be forced into WAL mode")
 	}
 }
 

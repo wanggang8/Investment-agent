@@ -3,7 +3,7 @@ set -eu
 
 mkdir -p /data/sqlite /data/veclite /logs
 
-if [ -z "${DEEPSEEK_API_KEY:-}" ]; then
+if [ -z "${DEEPSEEK_API_KEY:-}" ] && [ -z "${DEEPSEEK_API_KEY_FILE:-}" ]; then
   echo "warning: DEEPSEEK_API_KEY is empty; LLM-backed analysis will degrade safely where required" >&2
 fi
 

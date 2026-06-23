@@ -10,7 +10,7 @@ Investment Agent supports a local Docker Compose deployment path. The deployment
 tar -xzf investment-agent-<label>.tar.gz
 cd investment-agent-<label>
 cp .env.example .env
-# Edit .env and set DEEPSEEK_API_KEY.
+# Edit .env and set DEEPSEEK_API_KEY, or set DEEPSEEK_API_KEY_FILE.
 bash scripts/install.sh
 ```
 
@@ -29,12 +29,24 @@ Runtime secrets are local-only. Do not commit `.env`.
 Required or common settings:
 
 - `DEEPSEEK_API_KEY`: LLM provider key. If empty, LLM-backed analysis degrades safely where required.
+- `DEEPSEEK_API_KEY_FILE`: optional path to a local file containing only the LLM provider key. `DEEPSEEK_API_KEY` takes precedence when both are set. This supports Docker/Compose secret-style mounts without committing keys.
 - `DEEPSEEK_BASE_URL`: default `https://api.deepseek.com`.
 - `DEEPSEEK_MODEL`: default `deepseek-chat`.
 - `DEEPSEEK_TIMEOUT_SECONDS`: default `30`.
 - `INVESTMENT_AGENT_WEB_PORT`: default `4173`.
 - `INVESTMENT_AGENT_SERVER_PORT`: default `8080`.
 - `INVESTMENT_AGENT_DATA_DIR`: persistent local data directory.
+
+Example with a mounted secret file:
+
+```bash
+mkdir -p .investment-agent/data
+printf '%s' '<your-key>' > .investment-agent/data/deepseek_api_key
+chmod 600 .investment-agent/data/deepseek_api_key
+DEEPSEEK_API_KEY_FILE=/data/deepseek_api_key docker compose up -d --build
+```
+
+When using this pattern, mount the file into the container through a local Compose override or another trusted local secret mechanism. Do not commit secret files.
 
 ## Install Versus Upgrade
 
@@ -83,7 +95,7 @@ Backups are written under:
 
 The public repository is expected to use GitHub Actions as the release gate:
 
-- pull requests and pushes to `main` run OpenSpec validation, `go vet`, bounded `golangci-lint`, Go tests, frontend lint/test/build, deployment checks, P92/P93 audit checks, release package smoke, and whitespace checks;
+- pull requests and pushes to `main` run OpenSpec validation, backend Go package selection through `scripts/go-packages.sh`, `go vet`, bounded `golangci-lint`, Go tests, frontend lint/test/build, deployment checks, P92/P93 audit checks, API route contract checks, release package smoke, and whitespace checks;
 - tags matching `v*` run the release workflow and upload the local deployment package plus manifest as GitHub release artifacts;
 - the security scan runs on PR/main pushes and weekly schedule with `govulncheck`, frontend production dependency audit, and P93 code reality / secret checks.
 

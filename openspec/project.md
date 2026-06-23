@@ -125,8 +125,10 @@
 | P92 原始需求最终独立复核台账 | `p92-final-original-requirement-audit-ledger` | done |
 | P93 最终代码真实性与设计审查 | `p93-final-code-reality-design-audit` | done |
 | P94 GitHub CI/CD hardening | `p94-github-ci-release-hardening` | done |
+| P95 架构/API/工程加固 | `p95-architecture-api-engineering-hardening` | in_progress |
+| P96 Public docs/README 产品化 | `p96-public-docs-readme-productization` | done |
 
-当前机器可读进度以 `openspec/PROGRESS.md` 为准。P19–P24 为已交付能力的历史状态校准；仓库中未补建对应 `openspec/changes/archive/` 包，后续若要追补审计材料，应作为独立治理 change 处理。P33–P40 当前计划内功能队列已完成；P41 已完成 P40 后路线图治理；P42 已完成用户决策工作台；P43 已完成数据质量可观测；P44 已完成本地安装诊断与打包；P45 已完成 P44 后路线图治理；P46 已完成本地知识导入治理；P47 已完成决策闭环解释并归档；P48 已完成数据源质量回归包并归档；P49 已完成本地发布与升级体验并归档；P50 已完成 P49 后治理与验收路线图并归档；P51 已完成 P19-P24 审计证据包并归档；P52 已完成项目验收门禁矩阵并归档；P53 已完成验收执行与发布候选材料并归档；P54 已完成发布交付与可重复性加固并归档；P55 已完成前端全功能真实验收与设计审查并归档；P56 已完成 UI 验收阻断与产品化设计修复并归档；P57 已完成产品体验打磨总规划并归档；P58 已完成今日工作台重构并归档；P59 已完成决策解释体验重构并归档；P60 已完成组合、风险与数据质量体验重构；P61 已完成治理和运维页面产品化；P62 已完成设计系统与可访问性验收；P63-P94 均已完成并归档至对应 `openspec/changes/archive/`。P94 已归档：GitHub PR/main CI 已补齐 OpenSpec、`go vet`、bounded `golangci-lint`、Go tests、frontend lint/test/build、P91/P92/P93 checks、release package smoke 和 security scan；tag `v*` release workflow 会执行 preflight 后打包上传 package/manifest。P94 不创建 tag、不发布 GitHub Release、不声称物理第二机器复验或新增券商/交易/自动确认/Level2/付费登录源能力。当前活跃 change 为无；下一建议阶段为无。
+当前机器可读进度以 `openspec/PROGRESS.md` 为准。P19–P24 为已交付能力的历史状态校准；仓库中未补建对应 `openspec/changes/archive/` 包，后续若要追补审计材料，应作为独立治理 change 处理。P33–P40 当前计划内功能队列已完成；P41 已完成 P40 后路线图治理；P42 已完成用户决策工作台；P43 已完成数据质量可观测；P44 已完成本地安装诊断与打包；P45 已完成 P44 后路线图治理；P46 已完成本地知识导入治理；P47 已完成决策闭环解释并归档；P48 已完成数据源质量回归包并归档；P49 已完成本地发布与升级体验并归档；P50 已完成 P49 后治理与验收路线图并归档；P51 已完成 P19-P24 审计证据包并归档；P52 已完成项目验收门禁矩阵并归档；P53 已完成验收执行与发布候选材料并归档；P54 已完成发布交付与可重复性加固并归档；P55 已完成前端全功能真实验收与设计审查并归档；P56 已完成 UI 验收阻断与产品化设计修复并归档；P57 已完成产品体验打磨总规划并归档；P58 已完成今日工作台重构并归档；P59 已完成决策解释体验重构并归档；P60 已完成组合、风险与数据质量体验重构；P61 已完成治理和运维页面产品化；P62 已完成设计系统与可访问性验收；P63-P94 均已完成并归档至对应 `openspec/changes/archive/`。P95 当前仍为活跃 change：代码/文档实现与二轮复审已完成，但本沙箱无法执行需要本地监听的 full backend test，需 GitHub CI 或非沙箱 `go test $(bash scripts/go-packages.sh)` 证据后再归档。P96 已归档到 `openspec/changes/archive/2026-06-23-p96-public-docs-readme-productization/`，完成 public README/docs 产品化且不新增运行时能力。当前活跃 change 为 P95；下一建议阶段为无。
 
 ## 实现约束（摘要）
 

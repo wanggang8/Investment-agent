@@ -329,7 +329,7 @@ data = {
         "bash scripts/local-release-package.sh --verify <archive>",
         "openspec validate --all --strict",
         "git diff --check",
-        "go test ./...",
+        "go test $(bash scripts/go-packages.sh)",
         "npm --prefix web test",
         "npm --prefix web run build",
         "bash scripts/e2e-smoke.sh",

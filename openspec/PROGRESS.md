@@ -5,9 +5,9 @@
 
 | 字段 | 值 |
 | --- | --- |
-| **current_phase** | `none` |
-| **current_change** | `none` |
-| **status** | `idle` |
+| **current_phase** | `P95` |
+| **current_change** | `p95-architecture-api-engineering-hardening` |
+| **status** | `in_progress` |
 | **next_phase** | `none` |
 | **next_change_id** | `none` |
 
@@ -112,6 +112,8 @@
 | P92 | `p92-final-original-requirement-audit-ledger` | `done` |
 | P93 | `p93-final-code-reality-design-audit` | `done` |
 | P94 | `p94-github-ci-release-hardening` | `done` |
+| P95 | `p95-architecture-api-engineering-hardening` | `in_progress` |
+| P96 | `p96-public-docs-readme-productization` | `done` |
 
 状态枚举：`pending` | `in_progress` | `executed_scoped_gaps` | `ready_for_archive` | `done` | `idle`
 
@@ -193,6 +195,8 @@
 | 原始需求最终独立复核台账 | P92 `done` | 已归档到 `openspec/changes/archive/2026-06-22-p92-final-original-requirement-audit-ledger/`；从 P88 全量 341 行矩阵叠加 P89/P90 最终补丁证据，生成 P92 final ledger 与 summary，确认 330 个 full-release-required rows 全部 `real_pass`、11 个 reference-only rows 保持参考口径、full-release-required 非 `real_pass` 为 0；逐行覆盖功能入口/UI、行为数据影响、API/SQLite/readback/审计证据、验收命令/证据文件和安全边界；不新增运行时能力 |
 | 最终代码真实性与设计审查 | P93 `done` | 已归档到 `openspec/changes/archive/2026-06-22-p93-final-code-reality-design-audit/`；已生成 P93 code reality/design audit，P92 仍是 341 行 row-level artifact，P93 对 341 行做 cross-check 并解析到当前代码/证据 bundle，release-blocking findings 为 0；已移除未引用的 `PlaceholderPage`、8 个历史 workflow node wrappers 和旧 helper，清空本地 key 占位、关闭本地 stub 默认，并确认 release 默认非 stub、无嵌入 secret；不新增运行时能力或物理第二机器复验声明 |
 | GitHub CI/CD hardening | P94 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p94-github-ci-release-hardening/`；已补齐 PR/main CI 的 OpenSpec、`go vet`、bounded `golangci-lint`、Go tests、frontend lint/test/build、P91/P92/P93 checks、release package smoke 和 whitespace check；tag `v*` release workflow 会在 preflight 后打包上传 package/manifest；security scan 覆盖 `govulncheck`、frontend production audit 和 P93 code reality / secret scan；不创建 tag、不发布 GitHub Release、不新增运行时能力 |
+| 架构/API/工程加固 | P95 `in_progress` | P95 已完成代码/文档实现与子 agent 二轮复审，修复 Go package helper、P93 source inventory、API route contract check、SQLite per-connection PRAGMA hook、Docker secret-file 配置、架构文档和 package manifest；本沙箱因禁止 `httptest.NewServer` 本地监听，尚缺 CI 或非沙箱 `go test $(bash scripts/go-packages.sh)` full execution 证据，故暂不归档 |
+| Public docs/README 产品化 | P96 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p96-public-docs-readme-productization/`；已新增 GitHub-facing root README、产品概览、quickstart、简洁 docs map，并将长阶段历史拆到 `docs/release/history.md`；保持 release caveats、安全边界和需求真源链接，不新增运行时能力 |
 
 全量需求真源：`docs/requirements.md`。文档地图：`docs/README.md`。分阶段任务：`docs/development-plan.md` §1.1、§3。
 

@@ -156,6 +156,10 @@ func applyEnvOverrides(cfg *Config) {
 	}
 	if v := os.Getenv("DEEPSEEK_API_KEY"); v != "" {
 		cfg.DeepSeek.APIKey = v
+	} else if v := os.Getenv("DEEPSEEK_API_KEY_FILE"); v != "" {
+		if data, err := os.ReadFile(v); err == nil {
+			cfg.DeepSeek.APIKey = strings.TrimSpace(string(data))
+		}
 	}
 	if v := os.Getenv("DEEPSEEK_BASE_URL"); v != "" {
 		cfg.DeepSeek.BaseURL = v

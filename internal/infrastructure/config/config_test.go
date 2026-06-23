@@ -101,6 +101,47 @@ func TestLoadDeepSeekDeploymentEnvOverrides(t *testing.T) {
 	}
 }
 
+func TestLoadDeepSeekAPIKeyFromFileWhenEnvKeyMissing(t *testing.T) {
+	dir := t.TempDir()
+	keyPath := filepath.Join(dir, "deepseek_api_key")
+	if err := os.WriteFile(keyPath, []byte(" file-secret-key \n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("DEEPSEEK_API_KEY_FILE", keyPath)
+	root := findModuleRoot(t)
+	path := filepath.Join(root, "configs", "config.example.yaml")
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	if cfg.DeepSeek.APIKey != "file-secret-key" {
+		t.Fatalf("api key = %q, want file-secret-key", cfg.DeepSeek.APIKey)
+	}
+}
+
+func TestLoadDeepSeekAPIKeyEnvOverridesFile(t *testing.T) {
+	dir := t.TempDir()
+	keyPath := filepath.Join(dir, "deepseek_api_key")
+	if err := os.WriteFile(keyPath, []byte("file-secret-key"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("DEEPSEEK_API_KEY", "env-secret-key")
+	t.Setenv("DEEPSEEK_API_KEY_FILE", keyPath)
+	root := findModuleRoot(t)
+	path := filepath.Join(root, "configs", "config.example.yaml")
+
+	cfg, err := Load(path)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	if cfg.DeepSeek.APIKey != "env-secret-key" {
+		t.Fatalf("api key = %q, want env-secret-key", cfg.DeepSeek.APIKey)
+	}
+}
+
 func TestLoadDataSourceEnvOverrides(t *testing.T) {
 	t.Setenv("INVESTMENT_AGENT_DATA_SOURCES", "official,manual")
 	t.Setenv("INVESTMENT_AGENT_MARKET_DATA_ENDPOINT", "https://example.invalid/market")

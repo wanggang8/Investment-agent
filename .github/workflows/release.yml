@@ -35,20 +35,21 @@ jobs:
       - name: Validate before packaging
         run: |
           openspec validate --all --strict
-          go vet ./...
-          go test ./...
+          go vet $(bash scripts/go-packages.sh)
+          go test $(bash scripts/go-packages.sh)
           npm --prefix web run lint
           npm --prefix web test
           npm --prefix web run build
           python3 scripts/p91_deployment_check.py
           python3 scripts/p92_final_requirement_audit.py --check
           python3 scripts/p93_code_reality_audit.py --check
+          python3 scripts/api_route_contract_check.py
           git diff --check
       - name: Go lint
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.9.0
-          args: --timeout=5m --enable-only=govet,ineffassign,staticcheck,unused ./...
+          args: --timeout=5m --enable-only=govet,ineffassign,staticcheck,unused ./cmd/... ./internal/... ./pkg/...
       - name: Build release package
         id: package
         run: |

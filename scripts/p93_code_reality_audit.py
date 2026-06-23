@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -117,22 +118,35 @@ def redact(value: str) -> str:
 
 
 def production_files() -> list[Path]:
-    roots = ["internal", "cmd", "pkg", "web/src", "configs", "scripts", ".github", "docker", "."]
-    suffixes = {".go", ".ts", ".tsx", ".css", ".yaml", ".yml", ".sh", ".py", ".js", ".mjs", ".md", ".env", ".example", ".dockerignore", ""}
+    roots = ("internal/", "cmd/", "pkg/", "web/src/", "configs/", "scripts/", ".github/", "docker/")
+    explicit = {"Dockerfile", "docker-compose.yml", ".env.example", ".dockerignore"}
+    suffixes = {
+        ".go",
+        ".ts",
+        ".tsx",
+        ".css",
+        ".yaml",
+        ".yml",
+        ".sh",
+        ".py",
+        ".js",
+        ".mjs",
+        ".md",
+        ".env",
+        ".example",
+        ".dockerignore",
+        "",
+    }
+    result = subprocess.run(["git", "ls-files", "-z", "--cached", "--others", "--exclude-standard"], cwd=ROOT, check=True, stdout=subprocess.PIPE)
     files: list[Path] = []
-    explicit = [ROOT / "Dockerfile", ROOT / "docker-compose.yml", ROOT / ".env.example", ROOT / ".dockerignore"]
-    for item in explicit:
-        if item.exists():
-            files.append(item)
-    for root in roots[:-1]:
-        base = ROOT / root
-        if not base.exists():
+    for raw in result.stdout.decode("utf-8").split("\0"):
+        if not raw:
             continue
-        for path in base.rglob("*"):
-            if not path.is_file():
+        if raw in explicit or raw.startswith(roots):
+            path = ROOT / raw
+            if not path.is_file() or path.suffix not in suffixes:
                 continue
-            r = rel(path)
-            if any(part in r for part in ("/node_modules/", "/test-results/", "/playwright-report/")):
+            if any(part in raw for part in ("/node_modules/", "/test-results/", "/playwright-report/", "/dist/")):
                 continue
             files.append(path)
     return sorted(set(files))

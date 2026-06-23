@@ -75,7 +75,9 @@
 
 ## 7. 当前活跃变更
 
-当前活跃变更：无。
+当前活跃变更：`p95-architecture-api-engineering-hardening`。P95 已完成代码/文档实现、focused 验证和子 agent 二轮复审；本地沙箱禁止 `httptest.NewServer` 绑定监听端口，导致 `go test $(bash scripts/go-packages.sh)` full execution 无法在当前环境取得通过证据。P95 必须等待 GitHub CI 或非沙箱本地 full backend test 证据后再归档。
+
+P96 已归档到 `openspec/changes/archive/2026-06-23-p96-public-docs-readme-productization/`。P96 已完成 public README/docs 产品化：新增 root `README.md`、`docs/product-overview.md`、`docs/quickstart.md`，将 `docs/README.md` 收敛为文档地图，并把长阶段历史拆到 `docs/release/history.md`；验收记录见 `docs/release/acceptance/2026-06-23-p96-public-docs-readme-productization.md`。P96 不修改运行时代码，不新增券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。
 
 P94 已归档到 `openspec/changes/archive/2026-06-23-p94-github-ci-release-hardening/`。P94 已完成 GitHub CI/CD hardening：PR/main CI 覆盖 OpenSpec、`go vet`、bounded `golangci-lint`、Go tests、frontend lint/test/build、P91/P92/P93 checks、release package smoke 和 whitespace check；tag `v*` release workflow 在打包前运行 release preflight 并上传 package/manifest；新增独立 security scan workflow，覆盖 `govulncheck`、frontend production dependency audit 和 P93 code reality / secret scan。P94 同步清理 frontend lint warning、Go staticcheck/unused findings，并更新 `docs/deployment.md` 与 P94 acceptance record。P94 不创建 Git tag，不发布 GitHub Release，不声称物理第二机器复验，不新增券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。
 

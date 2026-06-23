@@ -31,14 +31,14 @@ jobs:
       - name: OpenSpec validation
         run: openspec validate --all --strict
       - name: Go vet
-        run: go vet ./...
+        run: go vet $(bash scripts/go-packages.sh)
       - name: Go lint
         uses: golangci/golangci-lint-action@v9
         with:
           version: v2.9.0
-          args: --timeout=5m --enable-only=govet,ineffassign,staticcheck,unused ./...
+          args: --timeout=5m --enable-only=govet,ineffassign,staticcheck,unused ./cmd/... ./internal/... ./pkg/...
       - name: Go tests
-        run: go test ./...
+        run: go test $(bash scripts/go-packages.sh)
       - name: Frontend lint
         run: npm --prefix web run lint
       - name: Frontend tests
@@ -51,6 +51,8 @@ jobs:
         run: python3 scripts/p92_final_requirement_audit.py --check
       - name: P93 code reality audit check
         run: python3 scripts/p93_code_reality_audit.py --check
+      - name: API route contract check
+        run: python3 scripts/api_route_contract_check.py
       - name: Release package smoke
         run: |
           bash scripts/local-release-package.sh --release-label ci-smoke --output-dir tmp/ci-release

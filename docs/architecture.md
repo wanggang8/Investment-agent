@@ -1,7 +1,7 @@
 # Investment Agent 项目架构与技术规范
 
 > 基线版本：v3.0  
-> 最后更新：2026-05-30  
+> 最后更新：2026-06-23
 > 定位：个人 AI 投资纪律 Agent，遵循投资大师智慧，严格执行预设规则，支持多 Agent 辩论、预期收益评估、信源分级防伪与安全自主学习。  
 > 配套文档：Eino 工作流见 `docs/workflow.md`，HTTP API 契约见 `docs/api.md`，前端数据契约见 `docs/frontend-contract.md`。
 
@@ -54,90 +54,31 @@
 ```text
 investment-agent/
 ├── cmd/
-│   ├── agent/
-│   │   └── main.go
-│   └── server/
-│       └── main.go
+│   ├── agent/        # 本地任务 CLI：数据刷新、smoke、质量门禁
+│   ├── server/       # 本地 HTTP API 服务
+│   └── smoke-seed/   # E2E/恢复演练 seed 工具
 ├── internal/
-│   ├── domain/
-│   │   ├── model/
-│   │   │   ├── portfolio.go
-│   │   │   ├── manual_operation.go
-│   │   │   ├── constitution.go
-│   │   │   ├── market_data.go
-│   │   │   ├── market_state.go
-│   │   │   └── take_profit.go
-│   │   ├── repository/
-│   │   │   ├── portfolio_repo.go
-│   │   │   ├── market_repo.go
-│   │   │   └── error_casebook_repo.go
-│   │   ├── rule/
-│   │   │   ├── rules_engine.go
-│   │   │   ├── expectation_engine.go
-│   │   │   ├── source_policy.go
-│   │   │   ├── capability_policy.go
-│   │   │   ├── risk_policy.go
-│   │   │   └── gatekeeper_logic.go
-│   │   └── services/
-│   │       ├── analyst.go
-│   │       ├── gatekeeper.go
-│   │       └── notification.go
 │   ├── application/
-│   │   ├── command/
-│   │   │   ├── make_decision_cmd.go
-│   │   │   └── record_error_cmd.go
-│   │   ├── query/
-│   │   │   └── get_portfolio_query.go
-│   │   ├── handler/
-│   │   │   ├── decision_handler.go
-│   │   │   ├── sop_handler.go
-│   │   │   ├── evolution_handler.go
-│   │   │   └── expectation_handler.go
-│   │   └── dto/
-│   │       └── decision_result.go
+│   │   ├── dto/      # HTTP/API 展示 DTO
+│   │   ├── handler/  # net/http handler 与统一响应信封
+│   │   ├── knowledge/# 内置大师经验与标的画像注册表
+│   │   ├── service/  # 应用服务：组合、确认、证据、设置、规则治理等
+│   │   └── workflow/ # Eino 图、节点步骤、数据源 collector、RAG/预期收益
+│   ├── domain/
+│   │   ├── analyst/  # 分析师端口定义
+│   │   ├── model/    # 核心实体和值对象
+│   │   ├── repository/# 仓储接口和事务协调接口
+│   │   └── rule/     # 纯规则、信源、风险、能力圈、守门人逻辑
 │   └── infrastructure/
-│       ├── config/
-│       │   ├── config.go
-│       │   └── config.yaml
-│       ├── persistence/
-│       │   └── sqlite/
-│       │       ├── migrate.go
-│       │       ├── migration/
-│       │       │   ├── 001_init.sql
-│       │       │   ├── 002_add_error_cases.sql
-│       │       │   ├── 003_add_portfolio_snapshots.sql
-│       │       │   ├── 004_add_decision_records.sql
-│       │       │   └── 005_add_intelligence_tables.sql
-│       │       ├── portfolio_repo_impl.go
-│       │       ├── market_repo_impl.go
-│       │       └── error_casebook_repo_impl.go
-│       ├── rag/
-│       │   ├── pipeline.go
-│       │   ├── embedder.go
-│       │   ├── vector_store.go
-│       │   ├── retriever.go
-│       │   └── source_tracker.go
-│       ├── llm/
-│       │   ├── deepseek_client.go
-│       │   └── prompt_builder.go
-│       ├── news/
-│       │   ├── crawler.go
-│       │   └── classifier.go
-│       ├── analyst/
-│       │   ├── value_analyst.go
-│       │   └── trend_officer.go
-│       └── notification/
-│           └── email_service.go
+│       ├── config/   # YAML + env + secret-file runtime config
+│       ├── llm/deepseek/
+│       ├── persistence/sqlite/
+│       │   └── migration/
+│       └── wiring/   # 生产依赖组装
+├── scripts/          # 本地安装、发布包、验收和工程门禁脚本
 ├── pkg/
-│   ├── logger/
-│   │   └── logger.go
-│   ├── errors/
-│   │   └── errors.go
 │   ├── httputil/
-│   │   ├── client.go
-│   │   └── response.go
-│   └── utils/
-│       └── financial.go
+│   └── logger/
 ├── web/
 │   ├── src/
 │   │   ├── app/
@@ -146,12 +87,12 @@ investment-agent/
 │   │   ├── features/
 │   │   ├── services/
 │   │   ├── styles/
-│   │   └── utils/
-│   ├── package.json
-│   ├── tsconfig.json
-│   └── vite.config.ts
-├── config/
+│   │   ├── shared/
+│   │   ├── styles/
+│   │   └── types/
+├── configs/
 ├── docs/
+├── openspec/
 ├── go.mod
 └── go.sum
 ```
@@ -160,19 +101,21 @@ investment-agent/
 
 | 层级 | 目录 | 职责 | 依赖方向 |
 | --- | --- | --- | --- |
-| 领域层 | `internal/domain/model/` | 定义核心实体、值对象、根本规则、市场状态、移动止盈对象。 | 不依赖其他业务模块。 |
+| 领域层 | `internal/domain/model/` | 定义核心实体、值对象、状态枚举和审计动作。 | 不依赖其他业务模块。 |
 | 领域层 | `internal/domain/repository/` | 定义仓储接口。 | 仅依赖 model。 |
 | 领域层 | `internal/domain/rule/` | 纯函数规则引擎，包括规则计算、辩论裁决、预期收益、守门人纯逻辑。 | 仅依赖 model。 |
-| 领域层 | `internal/domain/services/` | 定义需要外部数据支持的领域服务接口，包括分析师、守门人、通知端口。 | 可依赖 model 和 repository 接口。 |
-| 应用层 | `internal/application/handler/` | 编排领域对象、规则、服务接口与 SOP。 | 依赖 repository 接口、services 接口和 rule。 |
-| 基础设施 | `internal/infrastructure/persistence/` | 实现仓储接口。 | 依赖 repository 接口。 |
-| 基础设施 | `internal/infrastructure/analyst/` | 调用 LLM 生成价值分析师、趋势风控官的独立分析报告。 | 依赖 llm。 |
-| 基础设施 | `internal/infrastructure/rag/` | RAG 管道、VecLite 向量存储、检索、重排序、信源分级。 | 由 application 调用。 |
-| 基础设施 | `internal/infrastructure/llm/` | 大模型客户端和 Prompt 构建。 | 被 analyst、news 等模块调用。 |
-| 基础设施 | `internal/infrastructure/news/` | 新闻爬虫与内容打标。 | 作为 RAG 数据入口。 |
+| 领域层 | `internal/domain/analyst/` | 定义分析师输出端口和模型无关结构。 | 可依赖 model。 |
+| 应用层 | `internal/application/workflow/` | Eino 图、工作流上下文、数据源 collector、证据/RAG、预期收益和裁决编排。 | 依赖 repository 接口、domain model/rule 和注入端口。 |
+| 应用层 | `internal/application/service/` | 组合维护、确认、证据、设置、风险、规则治理、查询和知识准备度服务。 | 依赖 repository 接口和领域规则，不直接持有具体 SQLite 类型。 |
+| 应用层 | `internal/application/handler/` | 请求解析、DTO 映射、统一响应和路由注册。 | 调用应用服务或工作流入口，不拼接 SQL。 |
+| 基础设施 | `internal/infrastructure/persistence/sqlite/` | SQLite schema migration、仓储实现和事务协调。 | 实现 repository 接口；打开连接时设置本地运行 PRAGMA。 |
+| 基础设施 | `internal/infrastructure/llm/deepseek/` | DeepSeek 兼容 Chat Completions 客户端。 | 由 wiring 注入到工作流分析师端口。 |
+| 基础设施 | `internal/infrastructure/config/` | YAML、环境变量和 secret-file 配置加载与校验。 | 被 cmd 和 wiring 调用。 |
+| 基础设施 | `internal/infrastructure/wiring/` | 按配置组装数据源、LLM、VecLite 和工作流依赖。 | 位于 cmd 与应用层之间。 |
 | 公共基础能力 | `internal/pkg/` | 与业务规则解耦但需要被应用层和基础设施层共享的能力，包括统一应用错误、ID 生成和时间格式化。 | 可被 application、infrastructure、pkg/http 使用。 |
 | 公共库 | `pkg/` | 与业务无关的通用能力，例如 HTTP 信封、客户端和日志。 | 可被各层调用。 |
 | 前端 | `web/` | Agent 决策驾驶舱和支撑页面。 | 通过 HTTP API 调用后端，不访问本地数据库和文件。 |
+| 工程门禁 | `scripts/go-packages.sh`、`scripts/api_route_contract_check.py`、`scripts/p93_code_reality_audit.py` | 后端包选择、API 路由契约和代码真实性审计。 | 被 CI、release workflow 和本地验收调用。 |
 
 ## 5. 分层依赖规则
 
@@ -186,6 +129,20 @@ investment-agent/
 8. `cmd/main.go` 负责组装依赖并完成手动注入。
 9. `internal/application/workflow` 只依赖 `domain/repository` 中的仓储接口和事务协调接口，不导入 SQLite 具体实现。
 10. `internal/application/handler` 只负责请求解析、调用应用服务或工作流入口、写响应信封；不得直接持有数据库连接、拼接 SQL 或管理 SQL 事务。
+11. 后端 Go 验证必须通过 `scripts/go-packages.sh` 选择项目自有包，避免 `web/node_modules` 或其他前端依赖目录进入 Go package discovery。
+12. HTTP API 路由必须通过 `scripts/api_route_contract_check.py` 与 `docs/api.md` / `docs/frontend-contract.md` 保持同步。
+13. P93 代码真实性审计扫描 Git tracked 与 nonignored untracked 的 release-relevant source files，不以 ignored 本地运行产物作为审计输入。
+14. SQLite 本地文件库连接启用 foreign keys、busy timeout，并尝试 WAL；`:memory:` 测试库保持兼容。
+
+### 5.1 工程门禁与本地运行约束
+
+| 约束 | 说明 |
+| --- | --- |
+| 后端包选择 | CI、release 和本地后端测试使用 `go test $(bash scripts/go-packages.sh)`，不得裸用 `go test ./...` 作为公开仓库门禁。 |
+| API 契约同步 | 新增或删除 `/api/v1` 路由时，必须同步 API 文档并通过 `python3 scripts/api_route_contract_check.py`。 |
+| 代码真实性审计 | `python3 scripts/p93_code_reality_audit.py --check` 是 release 边界、secret 和 demo/stub 风险门禁；本地 ignored runtime artifacts 不应改变结果。 |
+| SQLite 并发 | 本地产品以单用户低并发为目标，但 UI、每日自动运行和刷新任务可能并发访问 SQLite，因此文件库使用 WAL/busy timeout 降低锁冲突。 |
+| Docker secrets | `.env` 是简易路径；`DEEPSEEK_API_KEY_FILE` 支持本地 secret-file/Compose override 方式。运行时密钥不得提交。 |
 
 ## 6. 关键设计决策
 
