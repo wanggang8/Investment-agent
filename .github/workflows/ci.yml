@@ -33,9 +33,9 @@ jobs:
       - name: Go vet
         run: go vet ./...
       - name: Go lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: latest
+          version: v2.9.0
           args: --timeout=5m --enable-only=govet,ineffassign,staticcheck,unused ./...
       - name: Go tests
         run: go test ./...
