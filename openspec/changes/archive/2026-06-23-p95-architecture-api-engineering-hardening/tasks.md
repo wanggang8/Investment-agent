@@ -34,4 +34,4 @@
 - [x] Update `docs/architecture.md` to reflect current directories and engineering constraints.
 - [x] Generate P95 acceptance evidence.
 - [x] Run OpenSpec, backend, frontend, P91/P92/P93, API route, package smoke, and security-equivalent checks.
-- [ ] Archive P95 only after validation passes.
+- [x] Archive P95 only after validation passes.

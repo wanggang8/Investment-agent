@@ -25,12 +25,13 @@ P95 hardened public engineering validation, API route governance, SQLite local r
 
 Passed in this environment:
 
-- `openspec validate --all --strict`: 36 passed, 0 failed.
+- `openspec validate --all --strict`: passed.
 - `bash scripts/go-packages.sh`: selected only `cmd`, `internal`, and `pkg` packages; no `web/node_modules` or `investment-agent/web` package selected.
 - `go vet $(bash scripts/go-packages.sh)`: passed.
 - `go test ./internal/infrastructure/config ./internal/infrastructure/persistence/sqlite ./internal/application/handler ./internal/domain/rule ./pkg/httputil`: passed.
 - `go test ./internal/infrastructure/persistence/sqlite`: passed with pooled multi-connection PRAGMA coverage.
 - `go test $(bash scripts/go-packages.sh) -run '^$'`: passed, full backend package test compile gate.
+- `go test $(bash scripts/go-packages.sh)`: passed after unrestricted local permissions were restored.
 - `npm --prefix web run lint`: passed.
 - `npm --prefix web test -- --run`: 48 files passed, 176 tests passed.
 - `npm --prefix web run build`: passed.
@@ -43,13 +44,22 @@ Passed in this environment:
 - `release-manifest.json` verification commands include the copyable command `go test $(bash scripts/go-packages.sh)` without an escaped dollar sign.
 - `git diff --check`: passed.
 
+Passed in GitHub Actions on commit `054d2708440da925e2e4cc4ae65065ac002b8905`:
+
+- CI run: `https://github.com/wanggang8/Investment-agent/actions/runs/28001447118`
+- CI conclusion: `success`, completed `2026-06-23T04:09:08Z`.
+- CI `Go tests` step: `success`, completed `2026-06-23T04:08:13Z`.
+- CI also passed OpenSpec validation, Go vet, Go lint, frontend lint/tests/build, P91/P92/P93 checks, API route contract check, release package smoke, and whitespace check.
+- Security Scan run: `https://github.com/wanggang8/Investment-agent/actions/runs/28001447137`
+- Security Scan conclusion: `success`, completed `2026-06-23T04:07:30Z`; included Go vulnerability scan, frontend production dependency audit, and P93 code reality / secret scan.
+
 ## Review Closure
 
 Subagent review identified four blockers before archive: SQLite PRAGMAs were pool-scoped instead of per-connection, the release manifest escaped the backend test command, `docs/architecture.md` described P93 as tracked-only while the script scans tracked plus nonignored untracked source files, and full backend execution evidence was unavailable in this sandbox. The first three blockers are closed by the P95 patch and the validation above.
 
 ## Environment-Limited Checks
 
-`go test $(bash scripts/go-packages.sh)` was attempted again after the review fixes, but the current sandbox blocks local listening sockets used by `httptest.NewServer`, causing tests in `cmd/agent` and `internal/application/workflow` to panic with `listen tcp6 [::1]:0: bind: operation not permitted`. This is an environment permission limit, not a test assertion failure. Focused non-listening Go package tests, full backend test compilation via `-run '^$'`, and `go vet` passed locally; the GitHub CI workflow remains configured to run the full backend package set in an environment that allows local test servers.
+Before GitHub CI evidence was available, `go test $(bash scripts/go-packages.sh)` was attempted in the earlier local sandbox and was blocked by local listening-socket restrictions used by `httptest.NewServer`, causing tests in `cmd/agent` and `internal/application/workflow` to panic with `listen tcp6 [::1]:0: bind: operation not permitted`. This was an environment permission limit, not a test assertion failure. The archive blocker is now closed by the successful GitHub CI full backend test evidence above.
 
 ## Boundary
 
