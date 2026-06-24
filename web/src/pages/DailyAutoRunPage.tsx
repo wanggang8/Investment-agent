@@ -48,14 +48,8 @@ export function DailyAutoRunPage() {
   const dailyModel = buildDailyOpsModel({ autoRun: status })
 
   return (
-    <section>
-      <header className="page-header">
-        <div>
-          <h1>每日自动运行</h1>
-          <p>展示本地每日刷新、纪律评估、通知与审计状态。</p>
-        </div>
-        <strong>{status ? statusLabels[status.status] : '加载中'}</strong>
-      </header>
+    <section className="reference-tight-page">
+      <h1 className="page-title">每日自动运行</h1>
       <section className={`daily-hero daily-tone-${dailyModel.overallTone}`} aria-label="每日自动运行总览">
         <div className="daily-hero-main">
           <div className="state-label">每日自动运行健康</div>
@@ -83,6 +77,7 @@ export function DailyAutoRunPage() {
           </ul>
         </aside>
       </section>
+      <p className="reference-page-note">展示本地每日刷新、纪律评估、通知与审计状态。当前状态：{status ? statusLabels[status.status] : '加载中'}。</p>
       {error ? <p role="alert">{error}</p> : null}
       {status ? (
         <div className="panel-list">

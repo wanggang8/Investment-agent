@@ -82,7 +82,7 @@ body {
   flex-direction: column;
   height: 100vh;
   overflow-y: auto;
-  padding: 1rem 0.7rem;
+  padding: 0.95rem 0.68rem;
   background:
     linear-gradient(180deg, rgba(20, 66, 82, 0.24) 0%, rgba(16, 34, 51, 0) 20rem),
     var(--color-nav);
@@ -94,8 +94,8 @@ body {
   grid-template-columns: auto 1fr;
   column-gap: 0.7rem;
   align-items: center;
-  padding: 0.35rem 0.55rem 0.85rem;
-  margin-bottom: 0.75rem;
+  padding: 0.32rem 0.52rem 0.72rem;
+  margin-bottom: 0.55rem;
 }
 
 .app-brand strong,
@@ -111,27 +111,27 @@ body {
 
 .nav-group {
   display: grid;
-  gap: 0.18rem;
-  margin: 0 0 0.75rem;
+  gap: 0.14rem;
+  margin: 0 0 0.64rem;
 }
 
 .nav-group-label {
-  padding: 0.18rem 0.6rem;
+  padding: 0.14rem 0.58rem;
   color: #93a9b9;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
 
 .app-nav a {
   display: flex;
-  min-height: 2.25rem;
+  min-height: 2.12rem;
   align-items: center;
-  padding: 0.48rem 0.62rem;
+  padding: 0.42rem 0.58rem;
   color: inherit;
   text-decoration: none;
   border-radius: 6px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   border: 1px solid transparent;
 }
 
@@ -184,9 +184,9 @@ body {
 
 .reference-sidebar-footer {
   display: grid;
-  gap: 0.3rem;
+  gap: 0.25rem;
   margin: auto 0.25rem 0;
-  padding: 1rem 0.55rem 0.2rem;
+  padding: 0.78rem 0.55rem 0.15rem;
   border-top: 1px solid rgba(178, 209, 217, 0.18);
   color: #b7c8d6;
 }
@@ -361,16 +361,16 @@ body {
 .reference-hero {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) minmax(10rem, 0.38fr) minmax(14rem, 0.5fr);
-  gap: 1.15rem;
+  gap: 1rem;
   align-items: center;
-  margin-bottom: 0.95rem;
-  padding: 1.08rem 1.28rem;
+  margin-bottom: 0.82rem;
+  padding: 0.92rem 1.08rem;
 }
 
 .reference-hero-icon {
   display: grid;
-  width: 3.35rem;
-  height: 3.35rem;
+  width: 3.05rem;
+  height: 3.05rem;
   place-items: center;
   border: 1px solid #efd9bd;
   border-radius: 999px;
@@ -386,17 +386,17 @@ body {
 }
 
 .reference-hero-main h2 {
-  margin: 0 0 0.38rem;
+  margin: 0 0 0.3rem;
   color: var(--color-strong);
-  font-size: clamp(1.28rem, 1.58vw, 1.5rem);
+  font-size: clamp(1.22rem, 1.42vw, 1.42rem);
   line-height: 1.18;
 }
 
 .reference-hero-main p {
   max-width: 46rem;
-  margin: 0.38rem 0 0;
+  margin: 0.28rem 0 0;
   color: var(--color-muted);
-  line-height: 1.55;
+  line-height: 1.42;
 }
 
 .reference-hero-status {
@@ -406,15 +406,15 @@ body {
 
 .reference-hero-state,
 .reference-hero-prohibited {
-  min-height: 5.75rem;
+  min-height: 5.1rem;
   border-left: 1px solid var(--color-border);
-  padding-left: 1.25rem;
+  padding-left: 1.05rem;
 }
 
 .reference-hero-state span,
 .reference-hero-prohibited span {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.36rem;
   color: var(--color-strong);
   font-size: 0.86rem;
   font-weight: 780;
@@ -423,21 +423,21 @@ body {
 .reference-hero-state strong {
   display: inline-flex;
   border-radius: 999px;
-  padding: 0.32rem 0.72rem;
+  padding: 0.25rem 0.62rem;
   background: #e9f1fb;
   color: #315b91;
-  font-size: 1.1rem;
+  font-size: 1.02rem;
 }
 
 .reference-hero-state p,
 .reference-hero-prohibited p,
 .reference-hero-prohibited li {
   color: var(--color-muted);
-  line-height: 1.45;
+  line-height: 1.36;
 }
 
 .reference-hero-prohibited ul {
-  margin: 0 0 0.8rem;
+  margin: 0 0 0.55rem;
   padding-left: 1.05rem;
 }
 
@@ -449,23 +449,23 @@ body {
 .reference-command-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.98fr);
-  gap: 1rem;
+  gap: 0.82rem;
   align-items: stretch;
-  margin-bottom: 1rem;
+  margin-bottom: 0.82rem;
 }
 
 .reference-side-stack {
   display: grid;
   min-width: 0;
-  gap: 1rem;
+  gap: 0.82rem;
 }
 
 .reference-lower-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.54fr);
-  gap: 1rem;
+  gap: 0.82rem;
   align-items: stretch;
-  margin-bottom: 1rem;
+  margin-bottom: 0.82rem;
 }
 
 .reference-panel-heading {
@@ -473,7 +473,7 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 0.9rem;
+  margin-bottom: 0.7rem;
 }
 
 .reference-panel-heading h2 {
@@ -495,7 +495,7 @@ body {
 .reference-progress-tracker,
 .reference-checklist,
 .reference-ledger-surface {
-  padding: 0.95rem 1.05rem;
+  padding: 0.82rem 0.92rem;
 }
 
 .reference-action-queue ol {
@@ -509,9 +509,9 @@ body {
 .reference-action-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
-  gap: 0.85rem;
+  gap: 0.72rem;
   align-items: center;
-  padding: 0.68rem 0;
+  padding: 0.56rem 0;
   border-top: 1px solid var(--color-border);
 }
 
@@ -553,9 +553,9 @@ body {
 }
 
 .reference-action-body p {
-  margin: 0.25rem 0 0;
+  margin: 0.18rem 0 0;
   color: var(--color-muted);
-  line-height: 1.45;
+  line-height: 1.34;
 }
 
 .reference-priority-chip {
@@ -583,14 +583,14 @@ body {
 .reference-metric-cards {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 0.58rem;
 }
 
 .reference-metric-card {
   min-width: 0;
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  padding: 0.78rem;
+  padding: 0.66rem;
   background: #fff;
 }
 
@@ -621,7 +621,7 @@ body {
   display: block;
   margin: 0.35rem 0 0;
   color: var(--color-strong);
-  font-size: 1.22rem;
+  font-size: 1.12rem;
   font-weight: 820;
 }
 
@@ -982,10 +982,10 @@ body {
 .daily-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.34fr);
-  gap: 1.2rem;
+  gap: 1rem;
   align-items: stretch;
-  margin-bottom: 1rem;
-  padding: 1.18rem 1.25rem;
+  margin-bottom: 0.82rem;
+  padding: 0.92rem 1rem;
   border: 1px solid var(--color-border);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.94);
@@ -993,15 +993,16 @@ body {
 }
 
 .daily-hero h2 {
-  margin: 0.15rem 0 0.6rem;
+  margin: 0.12rem 0 0.42rem;
   color: var(--color-strong);
-  font-size: clamp(1.32rem, 1.8vw, 1.72rem);
+  font-size: clamp(1.22rem, 1.42vw, 1.48rem);
   line-height: 1.18;
   letter-spacing: 0;
 }
 
 .daily-hero p {
-  margin: 0.4rem 0;
+  margin: 0.28rem 0;
+  line-height: 1.4;
 }
 
 .daily-hero-main,
@@ -1011,35 +1012,51 @@ body {
 
 .daily-hero-side {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.52rem;
   align-content: start;
-  padding: 0.25rem 0 0.25rem 1.15rem;
+  padding: 0.12rem 0 0.12rem 0.95rem;
   border-left: 1px solid var(--color-border);
   background: transparent;
 }
 
 .daily-hero-side strong {
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.22rem;
   color: var(--daily-accent, var(--color-primary));
 }
 
 .daily-hero-side ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(8rem, 100%), 1fr));
+  gap: 0.34rem 0.62rem;
   margin: 0;
-  padding-left: 1.1rem;
+  padding-left: 0;
+  list-style: none;
 }
 
 .daily-hero-side li span {
-  display: block;
-  margin-top: 0.2rem;
+  display: -webkit-box;
+  margin-top: 0.14rem;
+  overflow: hidden;
   color: var(--color-muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.daily-hero-side .muted-text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .daily-hero-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem 1rem;
-  margin: 0.85rem 0 0;
+  gap: 0.52rem 0.82rem;
+  margin: 0.62rem 0 0;
 }
 
 .daily-hero-meta div {
@@ -1138,8 +1155,8 @@ body {
 .daily-signal-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.72rem;
+  margin-bottom: 0.82rem;
 }
 
 .risk-queue-grid {
@@ -1151,7 +1168,48 @@ body {
 }
 
 .quality-signal-grid {
-  margin: 0.9rem 0 0;
+  margin: 0.62rem 0 0;
+}
+
+.daily-hero .quality-signal-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(6.6rem, 100%), 1fr));
+  gap: 0.42rem;
+}
+
+.daily-hero .ui-summary-card,
+.daily-hero .daily-signal {
+  padding: 0.46rem 0.5rem;
+}
+
+.daily-hero .ui-summary-card strong,
+.daily-hero .daily-signal strong {
+  font-size: 1rem;
+}
+
+.daily-hero .ui-summary-card p,
+.daily-hero .daily-signal p {
+  display: -webkit-box;
+  margin-top: 0.22rem;
+  overflow: hidden;
+  color: var(--color-muted);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.reference-page-note {
+  margin: -0.1rem 0 0.82rem;
+  padding: 0.68rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid #64748b;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--color-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.reference-tight-page .page-header {
+  margin-top: 0;
 }
 
 .decision-story {
@@ -1496,7 +1554,7 @@ button:disabled {
 .ui-empty-state,
 .ui-error-state {
   min-width: 0;
-  padding: 0.9rem;
+  padding: 0.78rem;
   border: 1px solid var(--color-border);
   border-left: 3px solid var(--daily-accent, var(--color-primary));
   border-radius: 8px;
@@ -1549,7 +1607,7 @@ button:disabled {
 .ui-summary-card strong {
   display: block;
   color: var(--color-strong);
-  font-size: 1.1rem;
+  font-size: 1.04rem;
 }
 
 .ui-summary-card p,
@@ -2000,8 +2058,7 @@ ol {
   }
 
   .app-topbar {
-    position: sticky;
-    top: 0;
+    position: static;
     z-index: 20;
     display: flex;
     align-items: center;
@@ -2101,6 +2158,72 @@ ol {
     font-size: 1.28rem;
   }
 
+  .daily-hero {
+    gap: 0.72rem;
+    padding: 0.78rem;
+  }
+
+  .daily-hero h2 {
+    margin-bottom: 0.26rem;
+    font-size: 1.14rem;
+  }
+
+  .daily-hero p {
+    line-height: 1.32;
+  }
+
+  .daily-hero-main > p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .daily-hero .quality-signal-grid {
+    display: flex;
+    gap: 0.42rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    padding-bottom: 0.12rem;
+    scroll-snap-type: x proximity;
+  }
+
+  .daily-hero .ui-summary-card,
+  .daily-hero .daily-signal {
+    flex: 0 0 7.15rem;
+    min-height: 4.45rem;
+    scroll-snap-align: start;
+  }
+
+  .daily-hero .ui-summary-card p,
+  .daily-hero .daily-signal p {
+    -webkit-line-clamp: 1;
+  }
+
+  .daily-hero-side {
+    gap: 0.38rem;
+    padding-top: 0.64rem;
+  }
+
+  .daily-hero-side ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.3rem 0.46rem;
+  }
+
+  .daily-hero-side li span,
+  .daily-hero-side .muted-text {
+    display: none;
+  }
+
+  .daily-hero-meta {
+    gap: 0.36rem 0.58rem;
+    margin-top: 0.48rem;
+  }
+
+  .daily-hero-meta div {
+    min-width: calc(50% - 0.4rem);
+  }
+
   .daily-action {
     grid-template-columns: 1fr;
   }
@@ -2111,12 +2234,77 @@ ol {
   }
 
   .reference-hero {
-    gap: 0.9rem;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.68rem;
+    padding: 0.78rem;
   }
 
   .reference-hero-icon {
-    width: 3.2rem;
-    height: 3.2rem;
+    width: 2.45rem;
+    height: 2.45rem;
+  }
+
+  .reference-hero-main h2 {
+    margin-bottom: 0.18rem;
+    font-size: 1.16rem;
+  }
+
+  .reference-hero-main p {
+    line-height: 1.32;
+  }
+
+  .reference-hero-main p:not(.reference-hero-status) {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .reference-hero-state,
+  .reference-hero-prohibited {
+    grid-column: auto;
+    min-height: auto;
+    padding: 0.62rem 0 0;
+  }
+
+  .reference-hero-state {
+    grid-column: 1 / 2;
+  }
+
+  .reference-hero-prohibited {
+    grid-column: 2 / 3;
+  }
+
+  .reference-hero-state span,
+  .reference-hero-prohibited span {
+    margin-bottom: 0.22rem;
+    font-size: 0.8rem;
+  }
+
+  .reference-hero-state strong {
+    padding: 0.2rem 0.52rem;
+    font-size: 0.92rem;
+  }
+
+  .reference-hero-state p,
+  .reference-hero-prohibited p,
+  .reference-hero-prohibited li {
+    line-height: 1.3;
+  }
+
+  .reference-hero-state p,
+  .reference-hero-prohibited p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .reference-hero-prohibited ul {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.12rem;
+    margin-bottom: 0.3rem;
   }
 
   .reference-action-row {

@@ -107,11 +107,8 @@ export function LocalKnowledgePage() {
   }
 
   return (
-    <div>
+    <div className="reference-tight-page">
       <h1 className="page-title">本地知识导入</h1>
-      <p className="page-placeholder">
-        将本地研究记录先校验为脱敏预览，再由人工写入本地背景事实。页面只展示预览、批次和索引计划，不触发交易、不改变规则、不发送到外部通道。
-      </p>
 
       <section className={`daily-hero daily-tone-${localModel.overallTone}`} aria-label="本地知识导入总览">
         <div className="daily-hero-main">
@@ -136,6 +133,9 @@ export function LocalKnowledgePage() {
           </ul>
         </aside>
       </section>
+      <p className="reference-page-note">
+        将本地研究记录先校验为脱敏预览，再由人工写入本地背景事实。页面只展示预览、批次和索引计划，不触发交易、不改变规则、不发送到外部通道。
+      </p>
 
       <section className="cockpit-grid" aria-label="本地知识导入区域">
         <article className="cockpit-card">

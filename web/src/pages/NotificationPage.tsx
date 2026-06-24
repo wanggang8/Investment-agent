@@ -52,14 +52,8 @@ export function NotificationPage({ pollIntervalMs = notificationPollIntervalMs }
   const inboxModel = buildNotificationInboxModel({ notifications: items, unreadCount })
 
   return (
-    <section>
-      <header className="page-header">
-        <div>
-          <h1>通知中心</h1>
-          <p>未读通知：{unreadCount}</p>
-        </div>
-        <Button onClick={markAllRead} disabled={unreadCount === 0}>全部标记已读</Button>
-      </header>
+    <section className="reference-tight-page">
+      <h1 className="page-title">通知中心</h1>
       <section className={`daily-hero daily-tone-${inboxModel.overallTone}`} aria-label="本地通知总览">
         <div className="daily-hero-main">
           <div className="state-label">本地通知收件箱</div>
@@ -81,8 +75,10 @@ export function NotificationPage({ pollIntervalMs = notificationPollIntervalMs }
               </li>
             ))}
           </ul>
+          <Button onClick={markAllRead} disabled={unreadCount === 0}>全部标记已读</Button>
         </aside>
       </section>
+      <p className="reference-page-note"><span>{`未读通知：${unreadCount}`}</span>。通知中心只处理本地应用内状态，不发送站外消息，也不代表任何交易许可。</p>
       {inboxModel.sourceGroups.length ? (
         <section className="cockpit-card" aria-label="通知来源分类">
           <div className="state-label">来源分类</div>

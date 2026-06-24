@@ -26,46 +26,31 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 
 const navGroups = [
   {
-    label: '今日',
+    label: '核心工作区',
     items: [
       { to: '/', label: '今日纪律', end: true, icon: Home },
       { to: '/workbench', label: '决策工作台', icon: BriefcaseBusiness },
-    ],
-  },
-  {
-    label: '决策',
-    items: [
       { to: '/consultation', label: '决策咨询', icon: MessageCircleQuestion },
       { to: '/decision-loop', label: '决策闭环', icon: GitBranch },
     ],
   },
   {
-    label: '组合',
+    label: '系统与证据',
     items: [
       { to: '/positions', label: '持仓', icon: WalletCards },
-      { to: '/risk-alerts', label: '风险预警', icon: Siren },
-    ],
-  },
-  {
-    label: '证据',
-    items: [
       { to: '/data-quality', label: '数据质量', icon: DatabaseZap },
+      { to: '/risk-alerts', label: '风险预警', icon: Siren },
       { to: '/evidence', label: '情报与证据', icon: FileSearch },
       { to: '/local-knowledge', label: '本地知识', icon: BookOpen },
     ],
   },
   {
-    label: '治理',
+    label: '治理与本地',
     items: [
       { to: '/rules', label: '规则与纪律', icon: Scale },
       { to: '/audit', label: '复盘与审计', icon: ClipboardList },
       { to: '/review', label: '复盘摘要', icon: ClipboardCheck },
       { to: '/notifications', label: '通知中心', icon: Bell },
-    ],
-  },
-  {
-    label: '系统',
-    items: [
       { to: '/settings', label: '设置', icon: Settings },
       { to: '/local-install', label: '本地安装', icon: PackageCheck },
       { to: '/daily-auto-run', label: '每日自动运行', icon: CalendarClock },

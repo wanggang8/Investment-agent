@@ -28,13 +28,8 @@ export function DailyDisciplineReportsPage() {
   const dailyModel = buildDailyOpsModel({ reports })
 
   return (
-    <section>
-      <header className="page-header">
-        <div>
-          <h1>每日纪律报告历史</h1>
-          <p>回看最近每日纪律报告，追踪数据缺口、证据覆盖和人工复核边界。</p>
-        </div>
-      </header>
+    <section className="reference-tight-page">
+      <h1 className="page-title">每日纪律报告历史</h1>
       <section className={`daily-hero daily-tone-${dailyModel.overallTone}`} aria-label="每日纪律复盘总览">
         <div className="daily-hero-main">
           <div className="state-label">每日纪律复盘状态</div>
@@ -62,6 +57,7 @@ export function DailyDisciplineReportsPage() {
           </ul>
         </aside>
       </section>
+      <p className="reference-page-note">回看最近每日纪律报告，追踪数据缺口、证据覆盖和人工复核边界。</p>
       {error ? <p role="alert">{error}</p> : null}
       {loaded && reports.length === 0 && !error ? <p>暂无每日纪律报告</p> : null}
       {reports.length > 0 ? (

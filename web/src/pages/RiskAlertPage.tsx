@@ -43,15 +43,8 @@ export function RiskAlertPage() {
   const disposition = buildRiskDispositionModel(alerts)
 
   return (
-    <section className="page-card risk-alert-page">
-      <header className="page-header">
-        <div>
-          <h1>风险预警中心</h1>
-          <p>集中查看风险类型、SOP 状态、触发依据和人工复核动作。</p>
-        </div>
-        <strong>{alerts.length} 条</strong>
-      </header>
-      <p className="state-card state-frozen-watch">风险预警只提供本地人工复核线索，不会自动交易，也不会调用券商接口。</p>
+    <section className="page-card risk-alert-page reference-tight-page">
+      <h1 className="page-title">风险预警中心</h1>
       <section className={`daily-hero daily-tone-${disposition.highestSeverity === 'critical' ? 'danger' : disposition.highestSeverity === 'warning' ? 'warning' : 'success'}`} aria-label="风险处置队列">
         <div className="daily-hero-main">
           <div className="state-label">风险处置队列</div>
@@ -65,6 +58,7 @@ export function RiskAlertPage() {
           <small>{disposition.safetyNotes[0]}</small>
         </aside>
       </section>
+      <p className="reference-page-note">风险预警中心集中查看风险类型、SOP 状态、触发依据和人工复核动作；只提供本地人工复核线索，不会自动交易，也不会调用券商接口。当前 {alerts.length} 条。</p>
       {error ? <p role="alert">{error}</p> : null}
       {loaded && alerts.length === 0 && !error ? (
         <EmptyState title="暂无需要处置的风险预警" description="当前没有需要处置的本地风险。" action={{ label: '返回工作台', href: '/workbench' }} />

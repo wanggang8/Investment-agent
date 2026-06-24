@@ -121,11 +121,8 @@ export function LocalInstallPage() {
   }
 
   return (
-    <div>
+    <div className="reference-tight-page">
       <h1 className="page-title">本地安装与诊断</h1>
-      <p className="page-placeholder">
-        该页用于本地安装引导、配置草稿与诊断打包的只读查看。这里只提供命令与验证路径，不提供交易触发、规则自动生效入口，也不外连交易通道。
-      </p>
 
       <section className={`daily-hero daily-tone-${localModel.overallTone}`} aria-label="本地配置与诊断总览">
         <div className="daily-hero-main">
@@ -150,6 +147,9 @@ export function LocalInstallPage() {
           </ul>
         </aside>
       </section>
+      <p className="reference-page-note">
+        该页用于本地安装引导、配置草稿与诊断打包的只读查看。这里只提供命令与验证路径，不提供交易触发、规则自动生效入口，也不外连交易通道。
+      </p>
 
       <section className="cockpit-card">
         <div className="state-label">配置向导</div>

@@ -133,6 +133,22 @@ P111 前端视觉重构不新增 DTO 字段，但要求所有页面把现有 DTO
 
 P111 完成门禁：每个覆盖路由需要桌面和移动截图、console/reflow JSON、mismatch ledger；未解决 P0/P1/P2 visual mismatch 时页面不得标记完成。
 
+### 4.5 P112 Reference Fidelity Addendum
+
+P112 不新增 DTO 字段，也不要求后端为 UI 重构提供新接口。前端必须继续只消费现有 service/API DTO，并把缺失、降级、空态和只读状态映射为安全中文说明。
+
+P112 对 P111 visual contract 增加以下验收约束：
+
+| 约束 | 要求 |
+| --- | --- |
+| secondary page first surface | `/risk-alerts`、`/notifications`、`/daily-discipline/reports`、`/daily-auto-run`、`/local-install`、`/local-knowledge` 等页面不得在 reference hero 前再显示旧式 page header。 |
+| navigation grouping | 桌面侧栏按核心工作区、系统与证据、治理与本地组织，不得新增交易、下单、券商或外部推送入口。 |
+| mobile topbar | 移动端 topbar 必须可读且不产生全页截图拼接重复；当前契约为普通文档流 topbar，不依赖 sticky 行为。 |
+| mobile density | 移动端允许将指标摘要渲染为横向 rail，但不得造成页面级横向滚动或隐藏必要状态文字。 |
+| screenshot evidence | 视觉验收截图需要覆盖桌面和 390px 移动端；若浏览器截图工具存在 sticky 拼接伪影，必须改用可验证的 Playwright 原生截图。 |
+
+P112 复审结论：18 个覆盖路由在桌面和移动端均无页面级横向溢出；子 agent 未发现需要后端调整的视觉阻断项。
+
 ## 5. 每日纪律报告页契约
 
 页面：`web/src/pages/DailyDisciplineReportsPage.tsx`、`web/src/pages/DailyDisciplineReportDetailPage.tsx`
