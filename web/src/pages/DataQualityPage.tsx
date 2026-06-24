@@ -585,7 +585,7 @@ function safePolicyReason(value: string) {
   return redactSensitiveText(value, {
     key: '[REDACTED_KEY]',
     sql: 'SELECT [REDACTED]',
-    prompt: 'prompt [REDACTED]',
+    prompt: '[PROMPT]',
     raw: 'raw [REDACTED]',
     stack: '[REDACTED_STACK]',
     path: '[REDACTED_PATH]',

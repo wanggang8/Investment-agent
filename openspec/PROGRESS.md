@@ -123,6 +123,7 @@
 | P103 | `p103-product-acceptance-ux-linkage-fixes` | `done` |
 | P104 | `p104-full-product-operation-linkage-acceptance` | `done` |
 | P105 | `p105-release-v0-1-1` | `done` |
+| P106 | `p106-release-v0-1-2-package-scan-fix` | `done` |
 
 状态枚举：`pending` | `in_progress` | `executed_scoped_gaps` | `ready_for_archive` | `done` | `idle`
 
@@ -214,6 +215,7 @@
 | 产品级验收分析 | P102 `done` | 已完成真实模型恢复后的本地源码产品验收；结论为 `product_acceptance_pass_with_non_blocking_ux_findings`，核心本地产品链路从组合事实、真实模型咨询、人工计划确认、决策闭环、审计、复盘、工作台到通知均可用并有截图/API/SQLite/DOM readback 证据；遗留非阻断 UX findings 为首次空组合显示通用读取失败、决策详情长文本密度较高、决策闭环 query 深链接未聚焦为单条详情；不处理 Docker/安装/升级/卸载/GitHub Release/分发包/物理第二机器。 |
 | 产品操作联动验收门禁 | P104 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p104-full-product-operation-linkage-acceptance/`；已建立可重复的本地源码产品操作联动验收矩阵与 runner，fresh runner 覆盖组合校准与一致性拒绝、持仓维护、线下流水、批量导入、修正审计、再平衡、人工计划确认、决策闭环、通知、风险、数据质量处置、dashboard/review/audit 下游读回；SQLite 读回和安全负证据通过，不处理 Docker/安装/升级/卸载/GitHub Release/分发包/物理第二机器，不新增运行时投资能力。 |
 | v0.1.1 源码发布 | P105 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p105-release-v0-1-1/`；当前源码版本已推进到 `v0.1.1`，root/frontend 版本元数据与 release-facing 材料已同步，P105 验收记录已生成；OpenSpec、Go、前端 test/build、P104 runner、P92/P93 和 whitespace gates 均通过；不新增运行时投资能力，不处理 Docker/安装/分发包/物理第二机器验收。 |
+| v0.1.2 发布包扫描修复 | P106 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p106-release-v0-1-2-package-scan-fix/`；已修复 `v0.1.1` 远端 Release/CI 暴露的 release package prompt-payload 扫描误报，当前源码版本推进到 `v0.1.2`，本地 release package smoke/verify 通过；不移动已推送的 `v0.1.1` tag，不新增运行时投资能力。 |
 
 全量需求真源：`docs/requirements.md`。文档地图：`docs/README.md`。分阶段任务：`docs/development-plan.md` §1.1、§3。
 

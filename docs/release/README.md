@@ -4,9 +4,9 @@
 
 This directory contains release-facing materials derived from actual acceptance runs. It does not contain temporary SQLite databases, raw logs, full prompts, raw HTTP responses, private paths, or complete API keys.
 
-Current source release version: `v0.1.1`.
+Current source release version: `v0.1.2`.
 
-`v0.1.0` remains the initial local release version marker recorded by P99. `v0.1.1` is the current source release version prepared by P105 after P100-P104 local-source acceptance, config compatibility, product acceptance, UX linkage fixes, and operation-linkage acceptance. P105 does not by itself claim Docker validation, installer validation, fresh distribution package refresh, physical second-machine validation, or successful remote GitHub Release workflow completion unless separately verified.
+`v0.1.0` remains the initial local release version marker recorded by P99. `v0.1.1` was pushed by P105 but its remote CI/Release workflows failed at the release package smoke scan. `v0.1.2` is the current patch release prepared by P106 to fix that package-scan false positive while preserving P100-P104 local-source acceptance, config compatibility, product acceptance, UX linkage fixes, and operation-linkage acceptance. P106 does not by itself claim Docker validation, installer validation, physical second-machine validation, or successful remote GitHub Release workflow completion unless separately verified after push.
 
 ## 2026-06-18 Release Candidate And Package
 
@@ -61,6 +61,7 @@ Current source release version: `v0.1.1`.
 | `docs/release/acceptance/2026-06-24-p103-product-acceptance-ux-linkage-fixes.md` | P103 product acceptance UX linkage fixes. |
 | `docs/release/acceptance/2026-06-24-p104-full-product-operation-linkage-acceptance.md` | P104 repeatable product operation/linkage acceptance evidence. |
 | `docs/release/acceptance/2026-06-24-p105-v0.1.1-release.md` | P105 current source release version `v0.1.1` evidence and tag boundary. |
+| `docs/release/acceptance/2026-06-24-p106-v0.1.2-package-scan-fix.md` | P106 `v0.1.2` package-scan fix, local release package smoke/verify, and tag boundary. |
 | `docs/release/acceptance-repeatability.md` | Rules for repeating acceptance consistently. |
 
 Current release status: `release_ready_scoped_with_p86_final_integrated_progress`.
