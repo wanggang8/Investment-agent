@@ -130,8 +130,16 @@
 | P97 默认本地配置文件修正 | `p97-default-local-config-file` | done |
 | P98 运行时边界与前端复用加固 | `p98-runtime-hardening-and-code-reuse-cleanup` | done |
 | P99 初始发布版本号 | `p99-initial-release-version` | done |
+| P100 本地源码最终验收 | `p100-local-source-final-acceptance` | done |
+| P101 本地配置路径统一 | `p101-unify-local-config-path` | done |
+| P102 产品验收审计 | `p102-product-acceptance-audit` | done |
+| P103 产品验收 UX 联动修复 | `p103-product-acceptance-ux-linkage-fixes` | done |
+| P104 产品操作联动验收 | `p104-full-product-operation-linkage-acceptance` | done |
+| P105 v0.1.1 发布版本 | `p105-release-v0-1-1` | done |
+| P106 v0.1.2 package scan 修复 | `p106-release-v0-1-2-package-scan-fix` | done |
+| P107 README 双语与中文功能介绍 | `p107-readme-bilingual-product-intro` | done |
 
-当前机器可读进度以 `openspec/PROGRESS.md` 为准。P19–P24 为已交付能力的历史状态校准；仓库中未补建对应 `openspec/changes/archive/` 包，后续若要追补审计材料，应作为独立治理 change 处理。P33–P40 当前计划内功能队列已完成；P41 已完成 P40 后路线图治理；P42 已完成用户决策工作台；P43 已完成数据质量可观测；P44 已完成本地安装诊断与打包；P45 已完成 P44 后路线图治理；P46 已完成本地知识导入治理；P47 已完成决策闭环解释并归档；P48 已完成数据源质量回归包并归档；P49 已完成本地发布与升级体验并归档；P50 已完成 P49 后治理与验收路线图并归档；P51 已完成 P19-P24 审计证据包并归档；P52 已完成项目验收门禁矩阵并归档；P53 已完成验收执行与发布候选材料并归档；P54 已完成发布交付与可重复性加固并归档；P55 已完成前端全功能真实验收与设计审查并归档；P56 已完成 UI 验收阻断与产品化设计修复并归档；P57 已完成产品体验打磨总规划并归档；P58 已完成今日工作台重构并归档；P59 已完成决策解释体验重构并归档；P60 已完成组合、风险与数据质量体验重构；P61 已完成治理和运维页面产品化；P62 已完成设计系统与可访问性验收；P63-P106 均已完成并归档至对应 `openspec/changes/archive/`。P106 已将当前源码版本推进到 `v0.1.2` 并修复 release package scan 误报；不发布 GitHub Release 成功声明、不新增运行时投资能力。当前活跃 change 为无；下一建议阶段为无。
+当前机器可读进度以 `openspec/PROGRESS.md` 为准。P19–P24 为已交付能力的历史状态校准；仓库中未补建对应 `openspec/changes/archive/` 包，后续若要追补审计材料，应作为独立治理 change 处理。P33–P40 当前计划内功能队列已完成；P41 已完成 P40 后路线图治理；P42 已完成用户决策工作台；P43 已完成数据质量可观测；P44 已完成本地安装诊断与打包；P45 已完成 P44 后路线图治理；P46 已完成本地知识导入治理；P47 已完成决策闭环解释并归档；P48 已完成数据源质量回归包并归档；P49 已完成本地发布与升级体验并归档；P50 已完成 P49 后治理与验收路线图并归档；P51 已完成 P19-P24 审计证据包并归档；P52 已完成项目验收门禁矩阵并归档；P53 已完成验收执行与发布候选材料并归档；P54 已完成发布交付与可重复性加固并归档；P55 已完成前端全功能真实验收与设计审查并归档；P56 已完成 UI 验收阻断与产品化设计修复并归档；P57 已完成产品体验打磨总规划并归档；P58 已完成今日工作台重构并归档；P59 已完成决策解释体验重构并归档；P60 已完成组合、风险与数据质量体验重构；P61 已完成治理和运维页面产品化；P62 已完成设计系统与可访问性验收；P63-P107 均已完成并归档至对应 `openspec/changes/archive/`。P107 已补齐 README 双语入口与中文项目功能介绍；不新增运行时投资能力、发布包或 GitHub Release 声明。当前活跃 change 为无；下一建议阶段为无。
 
 ## 实现约束（摘要）
 

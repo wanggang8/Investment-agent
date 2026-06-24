@@ -1,5 +1,7 @@
 # Investment Agent
 
+[English](README.md) | [简体中文](README.zh-CN.md)
+
 Investment Agent is a local-first investment discipline cockpit for personal research, portfolio maintenance, evidence review, and manual decision governance. It combines public evidence collection, SQLite-backed local state, VecLite retrieval, deterministic rules, and LLM-assisted analysis into a workflow that keeps the final action with the user.
 
 ![Investment Agent cockpit](docs/diagrams/ui-cockpit-ia.png)

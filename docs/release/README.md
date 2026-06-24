@@ -62,6 +62,7 @@ Current source release version: `v0.1.2`.
 | `docs/release/acceptance/2026-06-24-p104-full-product-operation-linkage-acceptance.md` | P104 repeatable product operation/linkage acceptance evidence. |
 | `docs/release/acceptance/2026-06-24-p105-v0.1.1-release.md` | P105 current source release version `v0.1.1` evidence and tag boundary. |
 | `docs/release/acceptance/2026-06-24-p106-v0.1.2-package-scan-fix.md` | P106 `v0.1.2` package-scan fix, local release package smoke/verify, and tag boundary. |
+| `docs/release/acceptance/2026-06-24-p107-readme-bilingual-product-intro.md` | P107 public README language switch and Simplified Chinese product introduction evidence. |
 | `docs/release/acceptance-repeatability.md` | Rules for repeating acceptance consistently. |
 
 Current release status: `release_ready_scoped_with_p86_final_integrated_progress`.
