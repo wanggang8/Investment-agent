@@ -32,7 +32,7 @@ Review and governance pages support monthly or quarterly review, error-case mark
 
 ## Local Data Model In Plain Terms
 
-Local state is persisted in SQLite and local VecLite directories. The app stores decisions, portfolio facts, evidence metadata, source-health state, audit events, notifications, rule records, review records, and retrieval material needed for the local workflow. The L1 data contract remains [data-model.md](data-model.md).
+Local state is persisted in SQLite and local VecLite/sqlite-vec index files. The app stores decisions, portfolio facts, evidence metadata, source-health state, audit events, notifications, rule records, review records, and retrieval material needed for the local workflow. SQLite remains the authoritative fact store; the vector index can be rebuilt from SQLite `rag_chunks`. The L1 data contract remains [data-model.md](data-model.md).
 
 ## Safety Boundary
 

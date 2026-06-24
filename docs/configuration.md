@@ -28,7 +28,8 @@ export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
 | `server.host` / `server.port` | HTTP 监听地址 | `127.0.0.1:8080` |
 | `sqlite.path` | SQLite 数据文件路径 | `./data/investment-agent.db` |
 | `veclite.path` | VecLite 索引文件或目录路径 | `./data/veclite` |
-| `deepseek.api_key` / `deepseek.base_url` / `deepseek.model` / `deepseek.timeout_seconds` | DeepSeek 或 OpenAI-compatible API Key、API 地址、模型名与超时秒数；常规运行可缺 key，真实 smoke 必须配置 key | 空字符串 / `https://api.deepseek.com` / `deepseek-chat` / `60` |
+| `deepseek.api_key` / `deepseek.base_url` / `deepseek.model` / `deepseek.timeout_seconds` | DeepSeek 或 OpenAI-compatible chat API Key、API 地址、分析模型名与超时秒数；常规运行可缺 key，真实 smoke 必须配置 key | 空字符串 / `https://api.deepseek.com` / `deepseek-chat` / `60` |
+| `embedding.enabled` / `provider` / `api_key` / `base_url` / `model` / `dimensions` / `timeout_seconds` | P108 真实 sqlite-vec 语义检索的 embedding 配置；独立于 chat/analysis 模型，必须使用 OpenAI-compatible `/embeddings` endpoint；关闭时保留旧本地索引/SQLite 降级路径 | `false` / `openai_compatible` / 空字符串 / 空字符串 / 空字符串 / `1536` / `60` |
 | `data_sources.enabled` | 启用的数据源名称列表 | `stub` |
 | `data_sources.use_stub` | 是否启用本地 stub 数据源 | `true` |
 | `data_sources.market_endpoint` | 最小只读行情 HTTP/JSON endpoint，系统会附加 `symbol` 查询参数 | 空字符串 |
@@ -53,6 +54,13 @@ export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
 | `INVESTMENT_AGENT_SQLITE_PATH` | `sqlite.path` | SQLite 数据文件路径 |
 | `INVESTMENT_AGENT_VECLITE_PATH` | `veclite.path` | VecLite 索引文件或目录路径 |
 | `DEEPSEEK_API_KEY` | `deepseek.api_key` | DeepSeek API Key，只在本地环境变量中设置 |
+| `INVESTMENT_AGENT_EMBEDDING_ENABLED` | `embedding.enabled` | 是否启用真实 sqlite-vec semantic retrieval；默认 `false` |
+| `INVESTMENT_AGENT_EMBEDDING_PROVIDER` | `embedding.provider` | 当前仅支持 `openai_compatible` |
+| `INVESTMENT_AGENT_EMBEDDING_API_KEY` | `embedding.api_key` | Embedding provider API Key；可与 chat key 相同，也可独立 |
+| `INVESTMENT_AGENT_EMBEDDING_BASE_URL` | `embedding.base_url` | OpenAI-compatible embeddings API base URL，例如 `https://api.openai.com/v1` |
+| `INVESTMENT_AGENT_EMBEDDING_MODEL` | `embedding.model` | Embedding 模型名，例如 `text-embedding-3-small` 或兼容服务提供的 embedding model |
+| `INVESTMENT_AGENT_EMBEDDING_DIMENSIONS` | `embedding.dimensions` | Embedding 向量维度，必须与模型返回长度一致 |
+| `INVESTMENT_AGENT_EMBEDDING_TIMEOUT_SECONDS` | `embedding.timeout_seconds` | Embedding 请求超时秒数 |
 | `INVESTMENT_AGENT_DATA_SOURCES` | `data_sources.enabled` | 逗号分隔的数据源名称，例如 `stub,official` |
 | `INVESTMENT_AGENT_MARKET_DATA_ENDPOINT` | `data_sources.market_endpoint` | 最小只读行情 HTTP/JSON endpoint |
 | `INVESTMENT_AGENT_INTELLIGENCE_ENDPOINT` | `data_sources.intelligence_endpoint` | 最小只读情报 HTTP/JSON endpoint |
@@ -266,6 +274,7 @@ go run ./cmd/agent --task market-refresh
 go run ./cmd/agent --task evidence-index
 go run ./cmd/agent --task public-evidence-refresh --symbol 510300 --start-date YYYY-MM-DD --end-date YYYY-MM-DD
 go run ./cmd/agent --task llm-smoke --symbol 510300
+go run ./cmd/agent --task embedding-smoke --symbol 510300
 go run ./cmd/agent --task review --period monthly
 go run ./cmd/agent --task review --period quarterly
 go run ./cmd/agent --backup ./data/backups
@@ -275,6 +284,8 @@ go run ./cmd/agent --release-upgrade-check --target-version vNEXT --diagnostics 
 ```
 
 `llm-smoke` 只读取本地配置中的 `deepseek.api_key`、`deepseek.base_url`、`deepseek.model` 和 `deepseek.timeout_seconds`，执行一次真实分析材料调用，并写入脱敏审计摘要。缺少 `deepseek.api_key` 时该任务会明确拒绝；常规本地任务仍允许在无 key 时按分析材料降级运行。
+
+`embedding-smoke` 只读取本地配置中的 `embedding.enabled`、`embedding.api_key`、`embedding.base_url`、`embedding.model`、`embedding.dimensions` 和 `embedding.timeout_seconds`，执行一次 OpenAI-compatible `/embeddings` 调用，并写入脱敏审计摘要。它不会把向量内容、API key 或 provider 原始响应写入 stdout/audit；缺少 embedding 配置时会明确拒绝。Chat/analysis 模型不能替代该 smoke。
 
 安全边界：`cmd/agent` 只触发本地分析、刷新、索引、复盘、配置诊断和本地文件备份恢复；不提供买入、卖出、撤单、改单或任何自动交易能力。任务执行会写入 `audit_events`，用于追踪输入摘要、执行状态和错误码。复盘可以生成规则提案，但不能让规则自动生效；规则变更仍需守门人审计和用户最终确认。
 
@@ -317,16 +328,24 @@ curl -X POST http://127.0.0.1:8080/api/v1/evidence/rebuild-index
 
 索引是可重建辅助数据；事实数据以 SQLite 中的 `intelligence_summary`、`rag_chunks` 和相关审计记录为准。
 
-P13 后，本地索引继续使用 JSON 文件适配器。文件包含版本化 envelope，用于区分 `healthy`、`missing`、`corrupted`、`incompatible`、`degraded` 等状态。索引缺失、损坏或版本不兼容时，可通过上面的命令由 SQLite `rag_chunks` 重新生成。重建响应会返回 `indexed_count`、`skipped_count`、`last_rebuild_at` 和 `index_health`，便于前端展示索引状态与降级原因。
+P108 后，`embedding.enabled=true` 时本地索引使用独立 sqlite-vec 文件执行真实 embedding topK 检索；`embedding.enabled=false` 时保留旧本地索引和 SQLite 摘要降级路径。索引缺失、损坏、embedding provider 不可用或维度不匹配时，可通过上面的命令由 SQLite `rag_chunks` 重新生成或降级到 SQLite summary。重建响应会返回 `indexed_count`、`skipped_count`、`last_rebuild_at` 和 `index_health`，便于前端展示索引状态与降级原因。
 
-真实 VecLite API 仍是后续可替换实现，本阶段不强制接入外部 VecLite 服务。
+Embedding 配置与 `deepseek`/chat 分析配置分离。`deepseek.model` 或其他 chat model 不能替代 embedding model；真实语义检索必须调用 provider 的 `/embeddings` 接口。
+
+真实 embedding 配置 smoke：
+
+```bash
+go run ./cmd/agent --task embedding-smoke --symbol 510300
+```
+
+该命令只验证 embedding endpoint 请求格式、鉴权、模型名、返回维度和审计记录；它不重建索引。索引重建仍使用 `evidence-index` 或 `/api/v1/evidence/rebuild-index`。
 
 ## 常见故障处理
 
 | 故障 | 处理方式 |
 | --- | --- |
 | 数据源不可用 | 确认 `data_sources.enabled` 与 `INVESTMENT_AGENT_USE_STUB_DATA`；必要时启用 stub，并检查 `audit_events.error_code`。 |
-| VecLite 索引损坏 | 备份 SQLite 后执行 `go run ./cmd/agent --task evidence-index` 或调用重建 API。 |
+| VecLite/sqlite-vec 索引损坏 | 备份 SQLite 后执行 `go run ./cmd/agent --task evidence-index` 或调用重建 API。若启用 `embedding.enabled=true`，同时确认 embedding endpoint、model 和 dimensions 与服务返回一致。 |
 | DeepSeek 缺配置 | 常规工作流可设置 `DEEPSEEK_API_KEY` 或私有配置 `deepseek.api_key`；未配置时系统只降级分析材料，最终裁决仍由规则生成。`llm-smoke` 需要私有配置中的 key。 |
 | SQLite 写入失败 | 检查 `sqlite.path`、目录权限、磁盘空间；修复后重新执行任务，已提交事实不应被覆盖。 |
 | 本地调度失败 | 查看 launchd/cron 日志和 `audit_events.error_code`；按 `docs/ops-local-scheduler.md` 停用、修复后再启用。 |

@@ -28,7 +28,7 @@
 
 ![Investment Agent 数据与存储关系图](./diagrams/data-storage-relationship.svg)
 
-说明：上图用于表达外部数据如何写入本地事实库，以及 Eino 工作流如何读取 SQLite 与 VecLite 并生成前端 DTO。SQLite 是账户、持仓、情报摘要、决策记录和审计事件的事实基准；VecLite 是由 SQLite 情报摘要重建的辅助检索索引，不作为唯一事实来源。前端只能通过 HTTP API 使用 DTO，不直接访问 SQLite、VecLite 或本地文件。
+说明：上图用于表达外部数据如何写入本地事实库，以及 Eino 工作流如何读取 SQLite 与 VecLite/sqlite-vec 并生成前端 DTO。SQLite 是账户、持仓、情报摘要、决策记录和审计事件的事实基准；VecLite/sqlite-vec 是由 SQLite 情报摘要和 `rag_chunks` 重建的辅助检索索引，不作为唯一事实来源。前端只能通过 HTTP API 使用 DTO，不直接访问 SQLite、VecLite 或本地文件。
 
 ### 2.3 技术选型
 
@@ -36,9 +36,9 @@
 | --- | --- | --- |
 | 语言 | Go 1.22+ | 高性能、强类型、并发支持好。 |
 | Agent 编排 | Eino | 从第一版起使用完整组件化与 Graph 编排，避免后续架构迁移。 |
-| 大模型 | DeepSeek | 项目固定主模型，降低模型适配复杂度。 |
-| 嵌入模型 | text-embedding-3-small / bge-large-zh | 文本向量化，兼顾中文语义效果。 |
-| 向量数据库 | VecLite | 纯 Go 嵌入式向量库，提供 HNSW、BM25、混合检索、metadata 过滤和单文件存储。 |
+| 大模型 | DeepSeek / OpenAI-compatible chat completions | 生成分析材料，最终裁决仍由本地规则负责。 |
+| 嵌入模型 | OpenAI-compatible embeddings | 文本向量化；配置与 chat/analysis 模型分离，必须走 `/embeddings`。 |
+| 向量数据库 | sqlite-vec 辅助索引 | P108 起使用独立 sqlite-vec 本地索引文件执行 embedding topK 检索；SQLite `rag_chunks` 仍是可重建真源。 |
 | 关系数据库 | SQLite 本地版 | 统一存储账户、行情、错误案例、情报摘要和操作日志。 |
 | 数据库迁移 | GORM AutoMigrate + 手写 SQL | 开发期快速迭代，稳定后精确管理。 |
 | 配置 | YAML + 环境变量 | 轻量，减少额外框架依赖。 |
@@ -176,15 +176,14 @@ investment-agent/
 - 每次决策均读取用户确认后的 SQLite 快照。
 - 操作确认记录需保留成交数量、成交价格、确认时间、关联建议编号。
 
-### 6.5 向量存储固定使用 VecLite
+### 6.5 向量索引使用 sqlite-vec，保留 VecLite 兼容降级
 
-- 向量存储采用 VecLite，作为项目确定性基础设施。
-- VecLite 以 Go 嵌入式方式集成，不依赖独立向量数据库服务。
-- 文本摘要向量、BM25 索引、metadata 过滤条件均由 `infrastructure/rag/vector_store.go` 统一封装。
-- 向量文件默认存储在 `./data/investment.vec`，与 SQLite 数据文件一起纳入本地备份策略。
-- SQLite 中的情报摘要是事实基准，VecLite 索引可由 SQLite 摘要表重建。
-- 若 VecLite 文件损坏或索引版本不兼容，系统应清理向量文件并从 SQLite 重新构建索引。
-- 备份与迁移必须同时包含 SQLite 数据文件和 VecLite 向量文件。
+- P108 起，`embedding.enabled=true` 时检索索引使用独立 sqlite-vec 本地文件和 OpenAI-compatible `/embeddings` provider 执行真实语义 topK。
+- 旧 VecLite/FileVectorIndex 路径保留为 `embedding.enabled=false` 时的本地兼容和测试 fallback；它不再代表真实 embedding 检索。
+- sqlite-vec 文件与主业务 SQLite 分离，避免把主库从 `modernc.org/sqlite` 切换到 CGO driver；主 SQLite 仍是事实真源。
+- SQLite 中的 `intelligence_summary` 与 `rag_chunks` 是事实基准，sqlite-vec/VecLite 索引均可由 SQLite `rag_chunks` 重建。
+- 若向量文件损坏、索引版本不兼容、embedding provider 不可用或向量维度不匹配，系统应从 SQLite 重建索引；必要时降级到 SQLite summary。
+- 备份与迁移必须同时包含 SQLite 数据文件和本地向量索引文件。
 
 ## 7. RAG 模块架构
 
@@ -192,9 +191,9 @@ investment-agent/
 
 1. 定时爬取：`news/crawler.go` 从 S/A/B 级信源获取资讯。
 2. 大模型打标：`news/classifier.go` 提取实体、事件、影响方向、可信度等级、发布时间。
-3. 向量化：`rag/embedder.go` 将文本摘要转为向量。
-4. 双库存储：结构化小结写入 SQLite，文本摘要向量写入 VecLite。
-5. 决策检索：`rag/retriever.go` 优先查询结构化小结，需要详细分析时回溯原文。
+3. 向量化：embedding provider 将文本摘要转为向量，真实路径必须走 OpenAI-compatible `/embeddings`。
+4. 双库存储：结构化小结写入 SQLite，文本摘要向量写入独立 sqlite-vec 索引；关闭 embedding 时使用旧本地索引兼容路径。
+5. 决策检索：语义检索优先使用 sqlite-vec topK，索引不可用时降级到 SQLite summary。
 6. 重排序：结合语义匹配、信源等级和时效权重，返回 Top-K 证据。
 
 ### 7.2 信源分级标准
@@ -277,8 +276,8 @@ strategy:
 | `llm.provider` | 大模型提供商，固定为 deepseek。 | `deepseek` |
 | `llm.api_key` | API 密钥，支持环境变量。 | `${LLM_API_KEY}` |
 | `llm.base_url` | API 地址。 | DeepSeek API 地址 |
-| `rag.vector_store` | 向量库类型，固定使用 VecLite。 | `veclite` |
-| `rag.veclite_path` | VecLite 单文件存储路径。 | `./data/investment.vec` |
+| `rag.vector_store` | 向量索引类型；P108 后真实语义检索使用 sqlite-vec，旧 VecLite/FileVectorIndex 为兼容 fallback。 | `sqlite_vec` / `veclite_fallback` |
+| `rag.veclite_path` | 本地向量索引文件路径；启用 embedding 时该路径指向 sqlite-vec 辅助索引文件。 | `./data/veclite` |
 | `rag.rerank_min_score` | 重排序过滤阈值。 | `0.5` |
 | `rag.top_k` | 检索返回数量。 | `8` |
 | `news.sources` | 新闻信源列表。 | 空列表 |
@@ -578,7 +577,7 @@ docs: 更新架构文档
 | 单元测试 | `domain/model/` 实体方法 | 验证实体行为与状态转换。 |
 | 集成测试 | `application/handler/` | 注入 mock repository、mock services 和 mock analyst，验证编排逻辑。 |
 | 集成测试 | `infrastructure/persistence/` | 使用 SQLite 内存模式验证 CRUD。 |
-| 集成测试 | `infrastructure/rag/` | 使用 VecLite 测试库验证向量检索、混合检索和重排序。 |
+| 集成测试 | `application/service/` | 使用确定性 embedding provider 和 sqlite-vec 本地文件验证向量写入、topK 检索、fallback 和重建。 |
 | 前端测试 | `web/` | 验证裁决报告、证据链、操作确认区和格式化函数。 |
 
 ## 16. 实施路线图
@@ -614,7 +613,7 @@ docs: 更新架构文档
 ### 16.4 模块四：RAG 与预期收益（2-3 周）
 
 - 实现 `internal/infrastructure/news`。
-- 实现 `internal/infrastructure/rag`，固定使用 VecLite 作为向量存储。
+- 实现本地 RAG 索引；P108 后真实语义检索使用 sqlite-vec，旧 VecLite/FileVectorIndex 仅作兼容 fallback。
 - 实现信源分级与追踪。
 - 实现结构化小结和向量摘要双库存储。
 - 集成时效权重与重排序。

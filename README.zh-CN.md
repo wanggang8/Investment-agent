@@ -38,7 +38,7 @@ Investment Agent 是研究和决策支持系统，不是交易系统。它不连
 
 ![System architecture](docs/diagrams/system-architecture.png)
 
-应用由本地 Go + SQLite + VecLite 后端和 React/Vite 前端组成。Docker Compose 是在个人电脑、NAS 或 VPS 上运行的推荐方式，数据目录和密钥由用户自己控制。更多实现细节见 [docs/architecture.md](docs/architecture.md)；README 只保留高层产品说明。
+应用由本地 Go + SQLite + sqlite-vec/VecLite 检索后端和 React/Vite 前端组成。Docker Compose 是在个人电脑、NAS 或 VPS 上运行的推荐方式，数据目录和密钥由用户自己控制。更多实现细节见 [docs/architecture.md](docs/architecture.md)；README 只保留高层产品说明。
 
 ## 快速开始
 

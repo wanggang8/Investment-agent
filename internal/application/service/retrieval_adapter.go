@@ -30,7 +30,7 @@ func (r *RetrievalAdapter) RetrieveEvidence(ctx context.Context, req workflow.Re
 	indexHealth := r.indexHealth(ctx)
 	summaries, summaryErr := r.listSummaries(ctx, req.Symbol)
 	if r.index != nil {
-		chunks, err := r.index.Search(ctx, req.Symbol)
+		chunks, err := r.searchIndex(ctx, req)
 		if err == nil && len(chunks) > 0 {
 			matched, inconsistent := summariesForConsistentChunks(chunks, summaries)
 			if inconsistent {
@@ -38,7 +38,7 @@ func (r *RetrievalAdapter) RetrieveEvidence(ctx context.Context, req workflow.Re
 			} else if len(matched) == 0 {
 				degradedReason = "veclite metadata missing"
 			} else {
-				return workflow.RetrievalResult{EvidenceSet: evidenceSetFromSummaries(matched), OutputRef: chunks[0].ChunkID, QualitySummary: retrievalQualitySummary(req.Symbol, len(matched), indexHealth, "veclite", "", chunks...)}, nil
+				return workflow.RetrievalResult{EvidenceSet: evidenceSetFromSummaries(matched), OutputRef: chunks[0].ChunkID, QualitySummary: retrievalQualitySummary(querySummary(req), len(matched), indexHealth, r.indexFallbackSource(), "", chunks...)}, nil
 			}
 		} else if err != nil {
 			degradedReason = "veclite search failed"
@@ -60,6 +60,27 @@ func (r *RetrievalAdapter) RetrieveEvidence(ctx context.Context, req workflow.Re
 		consistency = "mismatch"
 	}
 	return workflow.RetrievalResult{EvidenceSet: evidenceSetFromSummaries(summaries), OutputRef: summaries[0].SummaryID, DegradedReason: degradedReason, QualitySummary: retrievalQualitySummaryWithConsistency(req.Symbol, len(summaries), indexHealth, "sqlite_summary", degradedReason, consistency)}, nil
+}
+
+func (r *RetrievalAdapter) searchIndex(ctx context.Context, req workflow.RetrievalRequest) ([]repository.RAGChunk, error) {
+	if semantic, ok := r.index.(SemanticVectorIndex); ok {
+		return semantic.SearchSimilar(ctx, VectorSearchQuery{Text: querySummary(req), Symbol: req.Symbol, TopK: req.TopK})
+	}
+	return r.index.Search(ctx, req.Symbol)
+}
+
+func (r *RetrievalAdapter) indexFallbackSource() string {
+	if _, ok := r.index.(SemanticVectorIndex); ok {
+		return "sqlite_vec"
+	}
+	return "veclite"
+}
+
+func querySummary(req workflow.RetrievalRequest) string {
+	if strings.TrimSpace(req.Query) != "" {
+		return req.Query
+	}
+	return req.Symbol
 }
 
 func (r *RetrievalAdapter) indexHealth(ctx context.Context) string {

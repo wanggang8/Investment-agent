@@ -83,7 +83,7 @@ func capabilityCheckStep(_ context.Context, wf *WorkflowContext, _ WorkflowDepen
 func evidenceRetrievalStep(ctx context.Context, wf *WorkflowContext, deps WorkflowDependencies) NodeResult {
 	wf.RetrievalInput = wf.Symbol
 	if svc := deps.retrievalService(); svc != nil {
-		result, err := svc.RetrieveEvidence(ctx, RetrievalRequest{Symbol: wf.Symbol})
+		result, err := svc.RetrieveEvidence(ctx, RetrievalRequest{Symbol: wf.Symbol, Query: wf.UserQuestion})
 		if err != nil {
 			wf.RetrievalDegradedReason = err.Error()
 			return nodeResult("EvidenceRetrievalNode", "retrieve_evidence", StatusFailed, ErrCodeEvidenceNotFound, "symbol", wf.Symbol, "retrieval", wf.RetrievalDegradedReason)

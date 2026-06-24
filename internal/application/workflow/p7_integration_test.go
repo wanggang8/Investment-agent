@@ -62,6 +62,30 @@ func (s testRetrievalService) RetrieveEvidence(context.Context, RetrievalRequest
 	return s.result, s.err
 }
 
+type recordingRetrievalService struct {
+	req RetrievalRequest
+}
+
+func (s *recordingRetrievalService) RetrieveEvidence(_ context.Context, req RetrievalRequest) (RetrievalResult, error) {
+	s.req = req
+	return RetrievalResult{EvidenceSet: model.EvidenceSet{Items: []model.Evidence{{EvidenceID: "sum1", SourceLevel: model.SourceLevelA, Role: model.EvidenceFormal, EventType: model.EventNormal}}, VerificationStatus: model.VerificationSatisfied}, OutputRef: "sum1", QualitySummary: RetrievalQualitySummary{TopK: 1, FallbackSource: "sqlite_vec"}}, nil
+}
+
+func TestEvidenceRetrievalPassesUserQuestionToSemanticRetrieval(t *testing.T) {
+	retrieval := &recordingRetrievalService{}
+	wf := &WorkflowContext{RequestID: "req_retrieve_question", Symbol: "510300", UserQuestion: "监管处罚会不会影响持仓"}
+	deps := WorkflowDependencies{RetrievalService: retrieval}
+
+	result := RunEvidenceRetrievalNode(context.Background(), wf, deps)
+
+	if result.Status != StatusSuccess {
+		t.Fatalf("expected retrieval success, got %+v", result)
+	}
+	if retrieval.req.Query != "监管处罚会不会影响持仓" || retrieval.req.Symbol != "510300" {
+		t.Fatalf("expected user question and symbol passed to retrieval, got %+v", retrieval.req)
+	}
+}
+
 func TestEvidenceRetrievalFallsBackToSQLiteSummary(t *testing.T) {
 	wf := &WorkflowContext{RequestID: "req_retrieve", Symbol: "510300"}
 	deps := WorkflowDependencies{RetrievalService: testRetrievalService{result: RetrievalResult{EvidenceSet: model.EvidenceSet{Items: []model.Evidence{{EvidenceID: "sum1", SourceLevel: model.SourceLevelA, Role: model.EvidenceFormal, EventType: model.EventNormal}}, VerificationStatus: model.VerificationSatisfied}, OutputRef: "sum1", DegradedReason: "veclite unavailable", QualitySummary: RetrievalQualitySummary{TopK: 1, IndexHealth: "missing", FallbackSource: "sqlite_summary", SourceConsistencyStatus: "checked", DegradedReason: "veclite unavailable"}}}}

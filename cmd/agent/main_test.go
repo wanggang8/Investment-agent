@@ -29,7 +29,7 @@ func TestRunHelpShowsLocalTasksAndNoTrading(t *testing.T) {
 		t.Fatalf("expected help exit code 0, got %d", code)
 	}
 	out := stdout.String()
-	for _, want := range []string{"daily", "market-refresh", "evidence-index", "review", "public-evidence-refresh", "p34-expanded-refresh", "retrieval-quality-smoke", "data-source-quality-regression", "data-source-quality-resolution-check", "--source", "--start-date", "--end-date", "不会执行交易", "本地调度", "audit_events", "不会自动应用规则"} {
+	for _, want := range []string{"daily", "market-refresh", "evidence-index", "review", "public-evidence-refresh", "p34-expanded-refresh", "llm-smoke", "embedding-smoke", "retrieval-quality-smoke", "data-source-quality-regression", "data-source-quality-resolution-check", "--source", "--start-date", "--end-date", "不会执行交易", "本地调度", "audit_events", "不会自动应用规则"} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("expected help to contain %q, got %s", want, out)
 		}
@@ -457,6 +457,63 @@ func TestRunLLMSmokeRequiresRealLLMConfig(t *testing.T) {
 
 	if code == 0 || !strings.Contains(stderr.String(), "deepseek.api_key") {
 		t.Fatalf("expected missing deepseek.api_key error, code=%d stderr=%s", code, stderr.String())
+	}
+}
+
+func TestRunEmbeddingSmokeUsesEmbeddingEndpoint(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "agent.db")
+	var gotPath string
+	var gotAuth string
+	var gotModel string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotPath = r.URL.Path
+		gotAuth = r.Header.Get("Authorization")
+		var body struct {
+			Model string `json:"model"`
+			Input string `json:"input"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			t.Fatalf("decode embedding request: %v", err)
+		}
+		gotModel = body.Model
+		if body.Input == "" || strings.Contains(body.Input, "embed-key") {
+			t.Fatalf("unexpected embedding input: %q", body.Input)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = fmt.Fprint(w, `{"data":[{"embedding":[0.1,0.2,0.3]}]}`)
+	}))
+	defer server.Close()
+	configPath := writeEmbeddingSmokeTestConfig(t, dbPath, server.URL, "embed-key", "text-embedding-3-small", 3)
+
+	var stdout, stderr bytes.Buffer
+	code := run(context.Background(), []string{"--config", configPath, "--task", "embedding-smoke", "--symbol", "510300"}, &stdout, &stderr)
+
+	if code != 0 {
+		t.Fatalf("expected embedding-smoke exit code 0, got %d, stderr=%s", code, stderr.String())
+	}
+	if gotPath != "/v1/embeddings" || gotAuth != "Bearer embed-key" || gotModel != "text-embedding-3-small" {
+		t.Fatalf("unexpected embedding request path=%s auth=%q model=%q", gotPath, gotAuth, gotModel)
+	}
+	if !strings.Contains(stdout.String(), "不会执行交易") {
+		t.Fatalf("expected safety output, got %s", stdout.String())
+	}
+	store, err := appsqlite.Open(dbPath)
+	if err != nil {
+		t.Fatalf("open sqlite: %v", err)
+	}
+	defer store.Close()
+	assertAuditEvent(t, store.DB, "run_local_task", "embedding-smoke:symbol=510300:model=text-embedding-3-small", "embedding_smoke:dimensions=3:no_auto_trading")
+}
+
+func TestRunEmbeddingSmokeRequiresEmbeddingConfig(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "agent.db")
+	configPath := writeTestConfig(t, dbPath)
+
+	var stdout, stderr bytes.Buffer
+	code := run(context.Background(), []string{"--config", configPath, "--task", "embedding-smoke", "--symbol", "510300"}, &stdout, &stderr)
+
+	if code == 0 || !strings.Contains(stderr.String(), "embedding.enabled") {
+		t.Fatalf("expected missing embedding.enabled error, code=%d stderr=%s", code, stderr.String())
 	}
 }
 
@@ -984,6 +1041,35 @@ func TestRunPreflightReportsChecksAndWritesSafeDiagnostics(t *testing.T) {
 	}
 }
 
+func TestRunPreflightReportsEmbeddingWithoutLeakingKey(t *testing.T) {
+	dir := t.TempDir()
+	dbPath := filepath.Join(dir, "agent.db")
+	configPath := writeEmbeddingSmokeTestConfig(t, dbPath, "https://embedding.example.test", "embed-secret", "text-embedding-3-small", 3)
+	diagnosticsPath := filepath.Join(dir, "diagnostics", "preflight.json")
+
+	var stdout, stderr bytes.Buffer
+	code := run(context.Background(), []string{"--config", configPath, "--preflight", "--diagnostics", diagnosticsPath}, &stdout, &stderr)
+
+	if code != 0 {
+		t.Fatalf("expected preflight exit code 0, got %d stderr=%s", code, stderr.String())
+	}
+	out := stdout.String()
+	for _, want := range []string{"embedding:pass", "model=text-embedding-3-small", "dimensions=3", "不会执行交易"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("expected preflight output to contain %q, got %s", want, out)
+		}
+	}
+	data, err := os.ReadFile(diagnosticsPath)
+	if err != nil {
+		t.Fatalf("read diagnostics: %v", err)
+	}
+	for _, leaked := range []string{"embed-secret", "Authorization", "Bearer"} {
+		if strings.Contains(out, leaked) || strings.Contains(string(data), leaked) {
+			t.Fatalf("preflight leaked %q stdout=%s diagnostics=%s", leaked, out, string(data))
+		}
+	}
+}
+
 func TestRunReleaseUpgradeCheckWritesSanitizedReadOnlyDiagnostics(t *testing.T) {
 	dir := t.TempDir()
 	missingDataDir := filepath.Join(dir, "missing-data")
@@ -1355,6 +1441,16 @@ func writeLLMSmokeTestConfig(t *testing.T, dbPath, baseURL, apiKey, llmModel str
 	t.Helper()
 	configPath := filepath.Join(t.TempDir(), "config.yaml")
 	content := "server:\n  host: 127.0.0.1\n  port: 0\nsqlite:\n  path: " + dbPath + "\nveclite:\n  path: " + filepath.Join(filepath.Dir(dbPath), "veclite.json") + "\ndeepseek:\n  api_key: \"" + apiKey + "\"\n  base_url: " + baseURL + "\n  model: " + llmModel + "\ndata_sources:\n  enabled:\n    - stub\n  use_stub: true\nlog:\n  level: error\n"
+	if err := os.WriteFile(configPath, []byte(content), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+	return configPath
+}
+
+func writeEmbeddingSmokeTestConfig(t *testing.T, dbPath, baseURL, apiKey, model string, dimensions int) string {
+	t.Helper()
+	configPath := filepath.Join(t.TempDir(), "config.yaml")
+	content := fmt.Sprintf("server:\n  host: 127.0.0.1\n  port: 0\nsqlite:\n  path: %s\nveclite:\n  path: %s\nembedding:\n  enabled: true\n  provider: openai_compatible\n  api_key: %q\n  base_url: %s/v1\n  model: %s\n  dimensions: %d\ndata_sources:\n  enabled:\n    - stub\n  use_stub: true\nlog:\n  level: error\n", dbPath, filepath.Join(filepath.Dir(dbPath), "vectors.db"), apiKey, baseURL, model, dimensions)
 	if err := os.WriteFile(configPath, []byte(content), 0o600); err != nil {
 		t.Fatalf("write config: %v", err)
 	}

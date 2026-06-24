@@ -37,7 +37,7 @@ Investment Agent is a research and decision-support system. It does not connect 
 
 ![System architecture](docs/diagrams/system-architecture.png)
 
-The application is a local Go + SQLite + VecLite backend with a React/Vite frontend. Docker Compose is the easiest way to run it on a personal machine, NAS, or VPS with user-controlled storage. More implementation detail lives in [docs/architecture.md](docs/architecture.md); P95 owns detailed architecture corrections, so this README intentionally stays high level.
+The application is a local Go + SQLite + sqlite-vec/VecLite retrieval backend with a React/Vite frontend. Docker Compose is the easiest way to run it on a personal machine, NAS, or VPS with user-controlled storage. More implementation detail lives in [docs/architecture.md](docs/architecture.md); this README intentionally stays high level.
 
 ## Quick Start
 

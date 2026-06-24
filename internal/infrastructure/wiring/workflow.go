@@ -9,6 +9,7 @@ import (
 	"investment-agent/internal/application/workflow"
 	"investment-agent/internal/domain/repository"
 	"investment-agent/internal/infrastructure/config"
+	embeddingopenai "investment-agent/internal/infrastructure/embedding/openai"
 	"investment-agent/internal/infrastructure/llm/deepseek"
 )
 
@@ -53,7 +54,20 @@ func NewWorkflowDependencies(cfg *config.Config, repos repository.Repositories, 
 		}
 		deps.AnalystService = deepseek.NewClient(deepseek.Config{APIKey: cfg.DeepSeek.APIKey, BaseURL: cfg.DeepSeek.BaseURL, Model: cfg.DeepSeek.Model, TimeoutSeconds: cfg.DeepSeek.TimeoutSeconds}, &http.Client{Timeout: timeout})
 	}
-	index := service.NewFileVectorIndex(cfg.VecLite.Path)
+	index := service.VectorIndex(service.NewFileVectorIndex(cfg.VecLite.Path))
+	if cfg.Embedding.Enabled {
+		timeout := 60 * time.Second
+		if cfg.Embedding.TimeoutSeconds > 0 {
+			timeout = time.Duration(cfg.Embedding.TimeoutSeconds) * time.Second
+		}
+		embedder := embeddingopenai.NewClient(embeddingopenai.Config{APIKey: cfg.Embedding.APIKey, BaseURL: cfg.Embedding.BaseURL, Model: cfg.Embedding.Model}, &http.Client{Timeout: timeout})
+		index = service.NewSQLiteVecVectorIndex(service.SQLiteVecVectorIndexConfig{
+			Path:       cfg.VecLite.Path,
+			Dimensions: cfg.Embedding.Dimensions,
+			TopK:       8,
+			Embedder:   embedder,
+		})
+	}
 	deps.RetrievalService = service.NewRetrievalAdapter(tx, index)
 	deps.VectorIndexWriter = index
 	return deps

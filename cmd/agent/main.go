@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -22,6 +23,7 @@ import (
 	"investment-agent/internal/domain/model"
 	"investment-agent/internal/domain/repository"
 	"investment-agent/internal/infrastructure/config"
+	embeddingopenai "investment-agent/internal/infrastructure/embedding/openai"
 	"investment-agent/internal/infrastructure/llm/deepseek"
 	appsqlite "investment-agent/internal/infrastructure/persistence/sqlite"
 	"investment-agent/internal/infrastructure/wiring"
@@ -38,6 +40,7 @@ var supportedTasks = map[string]model.AuditAction{
 	"public-evidence-refresh":              model.AuditActionRunLocalTask,
 	"p34-expanded-refresh":                 model.AuditActionRunLocalTask,
 	"llm-smoke":                            model.AuditActionRunLocalTask,
+	"embedding-smoke":                      model.AuditActionRunLocalTask,
 	"retrieval-quality-smoke":              model.AuditActionRunLocalTask,
 	"data-source-quality-regression":       model.AuditActionRunLocalTask,
 	"data-source-quality-resolution-check": model.AuditActionRunLocalTask,
@@ -52,7 +55,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	fs := flag.NewFlagSet("agent", flag.ContinueOnError)
 	fs.SetOutput(stderr)
 	configPath := fs.String("config", "", "配置文件路径，默认读取 INVESTMENT_AGENT_CONFIG、configs/config.yaml 或 configs/config.example.yaml")
-	task := fs.String("task", "", "手动任务：daily、market-refresh、evidence-index、public-evidence-refresh、p34-expanded-refresh、llm-smoke、retrieval-quality-smoke、data-source-quality-regression、data-source-quality-resolution-check、review")
+	task := fs.String("task", "", "手动任务：daily、market-refresh、evidence-index、public-evidence-refresh、p34-expanded-refresh、llm-smoke、embedding-smoke、retrieval-quality-smoke、data-source-quality-regression、data-source-quality-resolution-check、review")
 	period := fs.String("period", "monthly", "复盘周期：monthly 或 quarterly")
 	source := fs.String("source", "", "P34 扩展数据源或 P48 回归模式：sentiment_proxy_fixture、configured、fixture、current")
 	symbol := fs.String("symbol", "510300", "本地任务标的代码，用于 market-refresh、public-evidence-refresh 与 p34-expanded-refresh")
@@ -151,11 +154,11 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 		return 0
 	}
 	if strings.TrimSpace(*task) == "" {
-		fmt.Fprintln(stderr, "missing --task；可选 daily、market-refresh、evidence-index、public-evidence-refresh、p34-expanded-refresh、llm-smoke、retrieval-quality-smoke、data-source-quality-regression、data-source-quality-resolution-check、review")
+		fmt.Fprintln(stderr, "missing --task；可选 daily、market-refresh、evidence-index、public-evidence-refresh、p34-expanded-refresh、llm-smoke、embedding-smoke、retrieval-quality-smoke、data-source-quality-regression、data-source-quality-resolution-check、review")
 		return 2
 	}
 	if _, ok := supportedTasks[*task]; !ok {
-		fmt.Fprintf(stderr, "unsupported task %q；可选 daily、market-refresh、evidence-index、public-evidence-refresh、p34-expanded-refresh、llm-smoke、retrieval-quality-smoke、data-source-quality-regression、data-source-quality-resolution-check、review\n", *task)
+		fmt.Fprintf(stderr, "unsupported task %q；可选 daily、market-refresh、evidence-index、public-evidence-refresh、p34-expanded-refresh、llm-smoke、embedding-smoke、retrieval-quality-smoke、data-source-quality-regression、data-source-quality-resolution-check、review\n", *task)
 		return 2
 	}
 	if *task == "review" && *period != "monthly" && *period != "quarterly" {
@@ -238,6 +241,7 @@ func printHelp(w io.Writer) {
 	fmt.Fprintln(w, "  go run ./cmd/agent --task public-evidence-refresh --symbol 510300 --start-date YYYY-MM-DD --end-date YYYY-MM-DD")
 	fmt.Fprintln(w, "  go run ./cmd/agent --task p34-expanded-refresh --source sentiment_proxy_fixture --symbol 000300 --start-date YYYY-MM-DD --end-date YYYY-MM-DD")
 	fmt.Fprintln(w, "  go run ./cmd/agent --task llm-smoke --symbol 510300")
+	fmt.Fprintln(w, "  go run ./cmd/agent --task embedding-smoke --symbol 510300")
 	fmt.Fprintln(w, "  go run ./cmd/agent --task retrieval-quality-smoke --symbol 510300")
 	fmt.Fprintln(w, "  go run ./cmd/agent --task data-source-quality-regression --source fixture|current --symbol 000300")
 	fmt.Fprintln(w, "  go run ./cmd/agent --task data-source-quality-regression --source current --symbol 000300 --strict-quality-gate")
@@ -285,6 +289,7 @@ func buildPreflightReport(configPath string, cfg *config.Config) preflightReport
 		readOnlyPathCheck("veclite_path", cfg.VecLite.Path, true),
 		dataSourceCheck(cfg),
 		deepSeekCheck(cfg),
+		embeddingCheck(cfg),
 	)
 	return report
 }
@@ -504,6 +509,16 @@ func deepSeekCheck(cfg *config.Config) preflightCheck {
 		return preflightCheck{Name: "deepseek", Status: "warning", Detail: "api key missing", Remediation: "需要真实 LLM smoke 时在本地配置中填写 key；预检不会输出密钥原文。"}
 	}
 	return preflightCheck{Name: "deepseek", Status: "pass", Detail: "api key configured; model=" + strings.TrimSpace(cfg.DeepSeek.Model)}
+}
+
+func embeddingCheck(cfg *config.Config) preflightCheck {
+	if !cfg.Embedding.Enabled {
+		return preflightCheck{Name: "embedding", Status: "skipped", Detail: "embedding disabled; sqlite-vec semantic retrieval inactive"}
+	}
+	if strings.TrimSpace(cfg.Embedding.APIKey) == "" {
+		return preflightCheck{Name: "embedding", Status: "warning", Detail: "embedding enabled; api key missing", Remediation: "需要真实 sqlite-vec semantic retrieval 或 embedding-smoke 时填写 embedding.api_key；预检不会输出密钥原文。"}
+	}
+	return preflightCheck{Name: "embedding", Status: "pass", Detail: fmt.Sprintf("api key configured; model=%s dimensions=%d", strings.TrimSpace(cfg.Embedding.Model), cfg.Embedding.Dimensions)}
 }
 
 func writePreflightDiagnostics(path string, report preflightReport) error {
@@ -742,12 +757,18 @@ func runTask(ctx context.Context, cfg *config.Config, task string, period string
 	switch task {
 	case "retrieval-quality-smoke":
 		outputRef, err = runRetrievalQualitySmoke(ctx, rt, symbol)
+	case "embedding-smoke":
+		outputRef, err = runEmbeddingSmoke(ctx, cfg, symbol)
 	case "data-source-quality-regression":
 		outputRef, err = runDataSourceQualityRegression(ctx, rt, source, symbol, strictQualityGate)
 	case "data-source-quality-resolution-check":
 		outputRef, err = runDataSourceQualityResolutionCheck(ctx, rt, symbol)
 	default:
 		err = executeTask(ctx, cfg, rt, task, period, source, symbol, startDate, endDate)
+	}
+	auditModel := cfg.DeepSeek.Model
+	if task == "embedding-smoke" {
+		auditModel = cfg.Embedding.Model
 	}
 	if err != nil {
 		auditOutputRef := "task_failed"
@@ -757,12 +778,12 @@ func runTask(ctx context.Context, cfg *config.Config, task string, period string
 		if task == "data-source-quality-resolution-check" && strings.HasPrefix(strings.TrimSpace(outputRef), "data_quality_gate_resolution:") {
 			auditOutputRef = outputRef
 		}
-		if auditErr := appendTaskAudit(ctx, rt.repos.AuditRepo, task, period, source, symbol, cfg.DeepSeek.Model, startDate, endDate, string(model.AuditStatusFailed), errorCode(err), auditOutputRef); auditErr != nil {
+		if auditErr := appendTaskAudit(ctx, rt.repos.AuditRepo, task, period, source, symbol, auditModel, startDate, endDate, string(model.AuditStatusFailed), errorCode(err), auditOutputRef); auditErr != nil {
 			return "", fmt.Errorf("%w; write failed audit: %v", err, auditErr)
 		}
 		return "", err
 	}
-	return outputRef, appendTaskAudit(ctx, rt.repos.AuditRepo, task, period, source, symbol, cfg.DeepSeek.Model, startDate, endDate, string(model.AuditStatusSuccess), "", outputRef)
+	return outputRef, appendTaskAudit(ctx, rt.repos.AuditRepo, task, period, source, symbol, auditModel, startDate, endDate, string(model.AuditStatusSuccess), "", outputRef)
 }
 
 func openRuntime(ctx context.Context, cfg *config.Config) (agentRuntime, error) {
@@ -980,7 +1001,11 @@ func executeTask(ctx context.Context, cfg *config.Config, rt agentRuntime, task 
 				return err
 			}
 		}
-		if _, err := evidenceSvc.RebuildVectorIndexWithStats(ctx, service.NewFileVectorIndex(cfg.VecLite.Path)); err != nil {
+		index, ok := rt.deps.VectorIndexWriter.(service.VectorIndex)
+		if !ok {
+			index = service.NewFileVectorIndex(cfg.VecLite.Path)
+		}
+		if _, err := evidenceSvc.RebuildVectorIndexWithStats(ctx, index); err != nil {
 			return err
 		}
 		_, err = evidenceSvc.AppendRebuildAudit(ctx, requestID)
@@ -997,6 +1022,31 @@ func executeTask(ctx context.Context, cfg *config.Config, rt agentRuntime, task 
 	default:
 		return apperr.New(apperr.CodeBadRequest, apperr.CategoryBadRequest, "未知本地任务")
 	}
+}
+
+func runEmbeddingSmoke(ctx context.Context, cfg *config.Config, symbol string) (string, error) {
+	if !cfg.Embedding.Enabled {
+		return "", apperr.New(apperr.CodeBadRequest, apperr.CategoryBadRequest, "embedding-smoke requires embedding.enabled=true")
+	}
+	if strings.TrimSpace(cfg.Embedding.BaseURL) == "" || strings.TrimSpace(cfg.Embedding.Model) == "" {
+		return "", apperr.New(apperr.CodeBadRequest, apperr.CategoryBadRequest, "embedding-smoke requires embedding.base_url and embedding.model")
+	}
+	if strings.TrimSpace(symbol) == "" {
+		return "", apperr.New(apperr.CodeBadRequest, apperr.CategoryBadRequest, "embedding-smoke requires --symbol")
+	}
+	timeout := 60 * time.Second
+	if cfg.Embedding.TimeoutSeconds > 0 {
+		timeout = time.Duration(cfg.Embedding.TimeoutSeconds) * time.Second
+	}
+	client := embeddingopenai.NewClient(embeddingopenai.Config{APIKey: cfg.Embedding.APIKey, BaseURL: cfg.Embedding.BaseURL, Model: cfg.Embedding.Model}, &http.Client{Timeout: timeout})
+	vec, err := client.Embed(ctx, "Investment Agent embedding smoke for symbol "+symbol)
+	if err != nil {
+		return "", err
+	}
+	if cfg.Embedding.Dimensions > 0 && len(vec) != cfg.Embedding.Dimensions {
+		return "", apperr.New(apperr.CodeVectorIndexUnavailable, apperr.CategoryInternal, fmt.Sprintf("embedding dimensions mismatch: got %d want %d", len(vec), cfg.Embedding.Dimensions))
+	}
+	return fmt.Sprintf("embedding_smoke:dimensions=%d:no_auto_trading", len(vec)), nil
 }
 
 func runPublicEvidenceRefresh(ctx context.Context, cfg *config.Config, rt agentRuntime, requestID string, symbol string, start, end time.Time) error {
@@ -1338,6 +1388,9 @@ func appendTaskAudit(ctx context.Context, repo repository.AuditRepository, task 
 		if status == string(model.AuditStatusSuccess) && outputRef == "no_auto_trading" {
 			outputRef = "llm_smoke:quality=passed:parse=parsed:no_auto_trading"
 		}
+	}
+	if task == "embedding-smoke" {
+		inputRef = llmSmokeAuditInputRef(task, symbol, llmModel)
 	}
 	if task == "retrieval-quality-smoke" {
 		inputRef = retrievalQualitySmokeAuditInputRef(task, symbol)

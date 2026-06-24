@@ -14,11 +14,12 @@ import (
 // Config 是后端运行配置的总入口，对应本地 configs/config.yaml。
 // 当前只保存本地服务、SQLite、VecLite、DeepSeek 与日志配置。
 type Config struct {
-	Runtime     RuntimeConfig     `yaml:"runtime"`
+	Runtime      RuntimeConfig      `yaml:"runtime"`
 	Server       ServerConfig       `yaml:"server"`
 	SQLite       SQLiteConfig       `yaml:"sqlite"`
 	VecLite      VecLiteConfig      `yaml:"veclite"`
 	DeepSeek     DeepSeekConfig     `yaml:"deepseek"`
+	Embedding    EmbeddingConfig    `yaml:"embedding"`
 	DataSources  DataSourceConfig   `yaml:"data_sources"`
 	DailyAutoRun DailyAutoRunConfig `yaml:"daily_auto_run"`
 	Log          LogConfig          `yaml:"log"`
@@ -51,6 +52,17 @@ type DeepSeekConfig struct {
 	APIKey         string `yaml:"api_key"`
 	BaseURL        string `yaml:"base_url"`
 	Model          string `yaml:"model"`
+	TimeoutSeconds int    `yaml:"timeout_seconds"`
+}
+
+// EmbeddingConfig 保存 OpenAI-compatible embeddings 调用配置。
+type EmbeddingConfig struct {
+	Enabled        bool   `yaml:"enabled"`
+	Provider       string `yaml:"provider"`
+	APIKey         string `yaml:"api_key"`
+	BaseURL        string `yaml:"base_url"`
+	Model          string `yaml:"model"`
+	Dimensions     int    `yaml:"dimensions"`
 	TimeoutSeconds int    `yaml:"timeout_seconds"`
 }
 
@@ -157,6 +169,14 @@ func applyDefaults(cfg *Config) {
 	if cfg.DeepSeek.TimeoutSeconds <= 0 {
 		cfg.DeepSeek.TimeoutSeconds = 60
 	}
+	if cfg.Embedding.Enabled {
+		if strings.TrimSpace(cfg.Embedding.Provider) == "" {
+			cfg.Embedding.Provider = "openai_compatible"
+		}
+		if cfg.Embedding.TimeoutSeconds <= 0 {
+			cfg.Embedding.TimeoutSeconds = 60
+		}
+	}
 }
 
 // applyEnvOverrides 支持本地部署时用环境变量覆盖敏感或环境相关配置。
@@ -188,6 +208,31 @@ func applyEnvOverrides(cfg *Config) {
 	if v := os.Getenv("DEEPSEEK_TIMEOUT_SECONDS"); v != "" {
 		if seconds, err := strconv.Atoi(v); err == nil {
 			cfg.DeepSeek.TimeoutSeconds = seconds
+		}
+	}
+	if v := os.Getenv("INVESTMENT_AGENT_EMBEDDING_ENABLED"); v != "" {
+		cfg.Embedding.Enabled = v == "true" || v == "1"
+	}
+	if v := os.Getenv("INVESTMENT_AGENT_EMBEDDING_PROVIDER"); v != "" {
+		cfg.Embedding.Provider = v
+	}
+	if v := os.Getenv("INVESTMENT_AGENT_EMBEDDING_API_KEY"); v != "" {
+		cfg.Embedding.APIKey = v
+	}
+	if v := os.Getenv("INVESTMENT_AGENT_EMBEDDING_BASE_URL"); v != "" {
+		cfg.Embedding.BaseURL = v
+	}
+	if v := os.Getenv("INVESTMENT_AGENT_EMBEDDING_MODEL"); v != "" {
+		cfg.Embedding.Model = v
+	}
+	if v := os.Getenv("INVESTMENT_AGENT_EMBEDDING_DIMENSIONS"); v != "" {
+		if dimensions, err := strconv.Atoi(v); err == nil {
+			cfg.Embedding.Dimensions = dimensions
+		}
+	}
+	if v := os.Getenv("INVESTMENT_AGENT_EMBEDDING_TIMEOUT_SECONDS"); v != "" {
+		if seconds, err := strconv.Atoi(v); err == nil {
+			cfg.Embedding.TimeoutSeconds = seconds
 		}
 	}
 	if v := os.Getenv("INVESTMENT_AGENT_DATA_SOURCES"); v != "" {
@@ -230,6 +275,25 @@ func (c Config) Validate() error {
 	}
 	if strings.TrimSpace(c.VecLite.Path) == "" {
 		problems = append(problems, "veclite.path is required")
+	}
+	if c.Embedding.Enabled {
+		if strings.TrimSpace(c.Embedding.Provider) != "openai_compatible" {
+			problems = append(problems, "embedding.provider must be openai_compatible")
+		}
+		if strings.TrimSpace(c.Embedding.BaseURL) == "" {
+			problems = append(problems, "embedding.base_url is required when embedding.enabled is true")
+		} else if !validHTTPURL(c.Embedding.BaseURL) {
+			problems = append(problems, "embedding.base_url must be http or https URL")
+		}
+		if strings.TrimSpace(c.Embedding.Model) == "" {
+			problems = append(problems, "embedding.model is required when embedding.enabled is true")
+		}
+		if c.Embedding.Dimensions <= 0 {
+			problems = append(problems, "embedding.dimensions must be positive when embedding.enabled is true")
+		}
+		if c.Embedding.TimeoutSeconds < 0 {
+			problems = append(problems, "embedding.timeout_seconds must be non-negative")
+		}
 	}
 	if !c.DataSources.UseStub {
 		if strings.TrimSpace(c.DataSources.MarketEndpoint) == "" {

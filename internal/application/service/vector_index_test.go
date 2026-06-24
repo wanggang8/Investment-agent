@@ -69,6 +69,80 @@ func (r *recordingIntelligenceRepoForVectorTest) UpdateRAGChunksIndexStatus(_ co
 	return nil
 }
 
+type deterministicEmbeddingProvider struct{}
+
+func (deterministicEmbeddingProvider) Embed(_ context.Context, text string) ([]float32, error) {
+	switch text {
+	case "query risk":
+		return []float32{1, 0}, nil
+	case "risk disclosure":
+		return []float32{0.95, 0.05}, nil
+	case "valuation update":
+		return []float32{0.05, 0.95}, nil
+	default:
+		return []float32{0.5, 0.5}, nil
+	}
+}
+
+func TestSQLiteVecVectorIndexSearchesByEmbeddingDistance(t *testing.T) {
+	index := NewSQLiteVecVectorIndex(SQLiteVecVectorIndexConfig{
+		Path:       filepath.Join(t.TempDir(), "vectors.db"),
+		Dimensions: 2,
+		TopK:       2,
+		Embedder:   deterministicEmbeddingProvider{},
+	})
+	ctx := context.Background()
+	if err := index.Upsert(ctx, repository.RAGChunk{ChunkID: "chunk_risk", SummaryID: "sum_risk", Symbol: "510300", ChunkText: "risk disclosure", IndexStatus: "pending"}); err != nil {
+		t.Fatalf("Upsert risk: %v", err)
+	}
+	if err := index.Upsert(ctx, repository.RAGChunk{ChunkID: "chunk_value", SummaryID: "sum_value", Symbol: "510300", ChunkText: "valuation update", IndexStatus: "pending"}); err != nil {
+		t.Fatalf("Upsert value: %v", err)
+	}
+
+	got, err := index.SearchSimilar(ctx, VectorSearchQuery{Text: "query risk", Symbol: "510300", TopK: 2})
+	if err != nil {
+		t.Fatalf("SearchSimilar: %v", err)
+	}
+	if len(got) != 2 || got[0].ChunkID != "chunk_risk" || got[1].ChunkID != "chunk_value" {
+		t.Fatalf("expected semantic distance order risk before value, got %+v", got)
+	}
+	health := index.Health(ctx)
+	if health.Status != VectorIndexHealthHealthy || health.ChunkCount != 2 || !health.Rebuildable {
+		t.Fatalf("expected healthy sqlite-vec index, got %+v", health)
+	}
+}
+
+func TestRetrievalAdapterUsesSemanticVectorSearchWhenAvailable(t *testing.T) {
+	repo := intelligenceRepoForVectorTest{summaries: []repository.IntelligenceSummary{
+		{SummaryID: "sum_value", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "normal", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_value"]`, VerificationEvidenceRole: "formal", VerificationEventType: "normal", VerificationHighestSourceLevel: "A", Summary: "valuation update"},
+		{SummaryID: "sum_risk", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "normal", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_risk"]`, VerificationEvidenceRole: "formal", VerificationEventType: "normal", VerificationHighestSourceLevel: "A", Summary: "risk disclosure"},
+	}}
+	index := NewSQLiteVecVectorIndex(SQLiteVecVectorIndexConfig{
+		Path:       filepath.Join(t.TempDir(), "vectors.db"),
+		Dimensions: 2,
+		TopK:       2,
+		Embedder:   deterministicEmbeddingProvider{},
+	})
+	ctx := context.Background()
+	for _, chunk := range []repository.RAGChunk{
+		{ChunkID: "chunk_value", SummaryID: "sum_value", Symbol: "510300", ChunkText: "valuation update", IndexStatus: "pending"},
+		{ChunkID: "chunk_risk", SummaryID: "sum_risk", Symbol: "510300", ChunkText: "risk disclosure", IndexStatus: "pending"},
+	} {
+		if err := index.Upsert(ctx, chunk); err != nil {
+			t.Fatalf("Upsert %s: %v", chunk.ChunkID, err)
+		}
+	}
+	adapter := NewRetrievalAdapter(transactorStub{repos: repository.Repositories{IntelligenceRepo: repo}}, index)
+
+	out, err := adapter.RetrieveEvidence(ctx, workflow.RetrievalRequest{Symbol: "510300", Query: "query risk", TopK: 2})
+	if err != nil {
+		t.Fatalf("RetrieveEvidence: %v", err)
+	}
+	if out.QualitySummary.FallbackSource != "sqlite_vec" || out.EvidenceSet.Items[0].EvidenceID != "sum_risk" {
+		t.Fatalf("expected sqlite_vec semantic retrieval to return risk first, got quality=%+v evidence=%+v", out.QualitySummary, out.EvidenceSet.Items)
+	}
+}
+
 func TestFileVectorIndexPersistsChunksAcrossInstances(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "investment.vec.json")
 	index := NewFileVectorIndex(path)

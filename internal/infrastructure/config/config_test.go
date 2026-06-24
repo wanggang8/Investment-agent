@@ -301,6 +301,50 @@ func TestValidateAcceptsStubLocalRuntimeConfig(t *testing.T) {
 	}
 }
 
+func TestValidateRequiresEmbeddingFieldsWhenEnabled(t *testing.T) {
+	cfg := Config{
+		Server:      ServerConfig{Host: "127.0.0.1", Port: 8080},
+		SQLite:      SQLiteConfig{Path: "./data/agent.db"},
+		VecLite:     VecLiteConfig{Path: "./data/veclite"},
+		Embedding:   EmbeddingConfig{Enabled: true, Provider: "openai_compatible"},
+		DataSources: DataSourceConfig{Enabled: []string{"stub"}, UseStub: true},
+		Log:         LogConfig{Level: "info"},
+	}
+
+	err := cfg.Validate()
+
+	if err == nil {
+		t.Fatal("expected enabled embedding config without base_url/model/dimensions to fail validation")
+	}
+	for _, want := range []string{"embedding.base_url", "embedding.model", "embedding.dimensions"} {
+		if !strings.Contains(err.Error(), want) {
+			t.Fatalf("expected validation error to contain %q, got %v", want, err)
+		}
+	}
+}
+
+func TestValidateAcceptsOpenAICompatibleEmbeddingConfig(t *testing.T) {
+	cfg := Config{
+		Server:  ServerConfig{Host: "127.0.0.1", Port: 8080},
+		SQLite:  SQLiteConfig{Path: "./data/agent.db"},
+		VecLite: VecLiteConfig{Path: "./data/veclite"},
+		Embedding: EmbeddingConfig{
+			Enabled:        true,
+			Provider:       "openai_compatible",
+			BaseURL:        "https://api.example.invalid/v1",
+			Model:          "text-embedding-3-small",
+			Dimensions:     1536,
+			TimeoutSeconds: 60,
+		},
+		DataSources: DataSourceConfig{Enabled: []string{"stub"}, UseStub: true},
+		Log:         LogConfig{Level: "info"},
+	}
+
+	if err := cfg.Validate(); err != nil {
+		t.Fatalf("Validate: %v", err)
+	}
+}
+
 func TestValidateRejectsReleaseRuntimeWithStubData(t *testing.T) {
 	cfg := Config{Runtime: RuntimeConfig{Mode: "release"}, Server: ServerConfig{Host: "127.0.0.1", Port: 8080}, SQLite: SQLiteConfig{Path: "./data/agent.db"}, VecLite: VecLiteConfig{Path: "./data/veclite"}, DataSources: DataSourceConfig{Enabled: []string{"stub"}, UseStub: true}, Log: LogConfig{Level: "info"}}
 

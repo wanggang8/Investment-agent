@@ -9,6 +9,8 @@ import (
 // RetrievalRequest 是证据检索输入，当前按标的检索。
 type RetrievalRequest struct {
 	Symbol string
+	Query  string
+	TopK   int
 }
 
 // RetrievalResult 保留命中证据和可审计的降级原因。
