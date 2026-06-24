@@ -94,6 +94,40 @@ describe('DecisionDetailPage', () => {
     expect(screen.getAllByRole('link', { name: '查看决策闭环' })[0]).toHaveAttribute('href', '/decision-loop')
   })
 
+  it('keeps real-model analyst material collapsed until the user expands it', async () => {
+    vi.mocked(getDecision).mockResolvedValueOnce({
+      request_id: 'req_analyst',
+      data: {
+        ...firstDecision,
+        analyst_reports: [{
+          agent_name: 'expected_return',
+          conclusion: '这是一段很长的真实模型分析材料，应默认收起，避免压过最终裁决和人工边界。',
+          key_reasons: ['样本充足'],
+          risk_warnings: ['数据降级'],
+          confidence: 'qualitative',
+          evidence_ids: [],
+          model: 'gpt-5.4-mini',
+          parse_status: 'parsed',
+          quality_status: 'passed',
+        }],
+      },
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/decisions/decision_1']}>
+        <Routes>
+          <Route path="/decisions/:decisionId" element={<DecisionDetailPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => expect(screen.getByText('继续持有')).toBeInTheDocument())
+    expect(screen.getByText(/以下 1 份内容仅作为分析材料/)).toBeInTheDocument()
+    expect(screen.queryByText(/这是一段很长的真实模型分析材料/)).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '展开 1 份分析材料' }))
+    expect(screen.getByText(/这是一段很长的真实模型分析材料/)).toBeInTheDocument()
+  })
+
   it('keeps previous decision state when confirmation fails', async () => {
     vi.mocked(getDecision).mockResolvedValueOnce({ request_id: 'req_1', data: firstDecision })
     vi.mocked(createConfirmation).mockRejectedValue(new APIClientError({ requestId: 'req_fail', code: 'INVALID_STATE', message: '当前状态不允许执行该操作。', displayState: 'frozen_watch' }))

@@ -5,14 +5,14 @@
 ## Requirements
 ### Requirement: Initial release version marker
 
-The repository SHALL declare a single initial release version marker for release-facing handoff materials.
+The project SHALL preserve `v0.1.0` as the historical initial local release version marker recorded by P99, while allowing the current repository release marker to advance in later release changes.
 
-#### Scenario: Initial version is recorded
+#### Scenario: Initial version history is preserved
 
-- **GIVEN** the project is prepared for a local release handoff
-- **WHEN** a user or packaging operator inspects the repository version marker
-- **THEN** the root `VERSION` file SHALL contain `v0.1.0`
-- **AND** release materials SHALL describe `v0.1.0` as an initial local release version, not as proof of a Git tag, remote release publication, physical second-machine validation, final distribution package refresh, or expanded runtime investment capability.
+- **GIVEN** release history or P99 acceptance materials are inspected
+- **WHEN** the initial local release marker is described
+- **THEN** the materials SHALL identify `v0.1.0` as the initial local release version recorded by P99
+- **AND** the materials SHALL NOT treat that historical marker as proof that the current root `VERSION` file must remain `v0.1.0`.
 
 ### Requirement: Post-P67 release readiness decision
 
@@ -1020,3 +1020,139 @@ P98 SHALL add release-mode guardrails and shared frontend redaction without chan
 - **WHEN** the text contains key-shaped tokens, SQL fragments, prompt fragments, raw diagnostic payloads, stack traces, or local paths
 - **THEN** the text SHALL be redacted through a shared utility
 - **AND** current page/component tests SHALL continue to prove sensitive details are not displayed.
+
+### Requirement: P101 unified local config path
+
+The project SHALL use `configs/config.yaml` as the default ignored local config path for current local runtime and current local-source acceptance scripts.
+
+#### Scenario: Historical acceptance scripts use the runtime default
+
+- **GIVEN** a user configures LLM and local runtime settings in `configs/config.yaml`
+- **WHEN** current local-source acceptance scripts are run without explicit override variables
+- **THEN** they SHALL read `configs/config.yaml` by default
+- **AND** they SHALL NOT require a separate `configs/config.local.yaml` file.
+
+#### Scenario: Explicit overrides remain available
+
+- **GIVEN** an operator needs a one-off private config file
+- **WHEN** a script-specific variable such as `P71_LOCAL_CONFIG`, `P72_LOCAL_CONFIG`, `P75_LOCAL_CONFIG`, or `P63_LOCAL_CONFIG` is provided
+- **THEN** that script SHALL use the explicit path
+- **AND** this override SHALL NOT change the default documented local config path.
+
+### Requirement: P101 OpenAI-compatible local LLM request compatibility
+
+The local analyst LLM client SHALL remain compatible with OpenAI Chat Completions gateways that expect JSON accept headers, stable user-agent identification, and longer bounded response times.
+
+#### Scenario: Compatible headers are sent
+
+- **GIVEN** a configured OpenAI-compatible LLM gateway
+- **WHEN** the analyst client sends a chat completion request
+- **THEN** it SHALL send `Accept: application/json`
+- **AND** it SHALL send a stable `User-Agent`
+- **AND** it SHALL continue using the configured `<base_url>/chat/completions` path.
+
+#### Scenario: Transport timeout is retried once
+
+- **GIVEN** the first LLM request times out before receiving response headers
+- **WHEN** the retry succeeds
+- **THEN** the analyst client SHALL return parsed analysis material
+- **AND** it SHALL mark metadata with a bounded timeout retry
+- **AND** it SHALL NOT loosen the local parser or quality gate.
+
+#### Scenario: Default timeout allows slower compatible gateways
+
+- **GIVEN** a local config omits `deepseek.timeout_seconds`
+- **WHEN** defaults are applied
+- **THEN** the configured timeout SHALL be 60 seconds.
+
+#### Scenario: Release claims stay bounded
+
+- **GIVEN** P101 changes script defaults and LLM request compatibility
+- **WHEN** release readiness is described
+- **THEN** the project MAY claim local config path consistency for source-runtime validation
+- **AND** it MAY claim OpenAI-compatible LLM request compatibility for Chat Completions style gateways
+- **AND** it SHALL NOT claim Docker installation, package distribution, GitHub Release, physical second-machine validation, broker connectivity, trading, one-click trading, order placement, external push, automatic confirmation, automatic rule application, paid/login/auth-only sources, Level2 data, high-frequency data, future provider availability, or investment returns.
+
+### Requirement: P102 product acceptance audit
+
+The project SHALL support a product-level acceptance audit after real LLM access is configured.
+
+#### Scenario: Product audit evidence is captured
+
+- **GIVEN** local backend, frontend, SQLite, VecLite, and real LLM config are available
+- **WHEN** P102 product acceptance is executed
+- **THEN** the audit SHALL capture current-run screenshots for key product workflows
+- **AND** it SHALL assess UX, design reasonableness, accessibility risks, data/readback trust, and safety boundaries.
+
+#### Scenario: Release claims remain bounded
+
+- **GIVEN** P102 writes product acceptance findings
+- **WHEN** release readiness is described
+- **THEN** the project MAY claim product-level local-source acceptance only for the checked local runtime scope
+- **AND** it SHALL NOT claim Docker installation, package distribution, GitHub Release, physical second-machine validation, broker connectivity, trading, one-click trading, order placement, external push, automatic confirmation, automatic rule application, paid/login/auth-only sources, Level2 data, high-frequency data, future provider availability, or investment returns.
+
+### Requirement: P103 product acceptance UX linkage fixes
+
+The product SHALL address P102 non-blocking UX findings without expanding investment runtime capabilities.
+
+#### Scenario: Portfolio empty state is onboarding-safe
+
+- **GIVEN** no local portfolio snapshot exists
+- **WHEN** the user opens the portfolio page
+- **THEN** the page SHALL present first-use onboarding and local account calibration guidance instead of a generic system failure.
+
+#### Scenario: Decision analysis remains auditable without overwhelming the page
+
+- **GIVEN** a decision contains real LLM analyst reports
+- **WHEN** the user opens the decision detail page
+- **THEN** the page SHALL show the final verdict and safety boundary first
+- **AND** the full analysis material SHALL remain available through explicit expansion.
+
+#### Scenario: Decision loop deep link focuses the target
+
+- **GIVEN** a decision-loop URL includes `decision_id`
+- **WHEN** the linked decision is present in the loop response
+- **THEN** the page SHALL focus that decision's loop record and keep trace links read-only.
+
+#### Scenario: Release claims remain bounded
+
+- **GIVEN** P103 fixes P102 UX findings
+- **WHEN** release readiness is described
+- **THEN** the project MAY claim the checked local product UX issues were fixed
+- **AND** it SHALL NOT claim Docker installation, package distribution, GitHub Release, physical second-machine validation, broker connectivity, trading, one-click trading, order placement, external push, automatic confirmation, automatic rule application, paid/login/auth-only sources, Level2 data, high-frequency data, future provider availability, or investment returns.
+
+### Requirement: P104 Product Operation Linkage Acceptance
+The project SHALL maintain a repeatable local-source acceptance gate that verifies representative product operations through HTTP APIs, SQLite side effects, downstream readback, audit traceability, and forbidden automation absence.
+
+#### Scenario: Local runner validates linked product behavior
+- **GIVEN** the repository source tree is available locally
+- **WHEN** the P104 acceptance runner is executed
+- **THEN** it SHALL create an isolated temporary SQLite database and config
+- **AND** it SHALL start the local backend on localhost
+- **AND** it SHALL exercise representative portfolio, decision confirmation, review, audit, notification, risk, and data-quality operations through HTTP APIs
+- **AND** it SHALL verify durable SQLite side effects and downstream readback
+- **AND** it SHALL fail if forbidden broker/order/push/automatic-confirmation evidence is present.
+
+#### Scenario: Acceptance record stays honest about scope
+- **GIVEN** P104 validation has completed
+- **WHEN** the release acceptance record is updated
+- **THEN** it SHALL distinguish fresh P104 local-source linkage evidence from Docker, installer, package, remote deployment, physical second-machine, broker, automatic trading, automatic confirmation, automatic rule application, and return-guarantee claims.
+
+### Requirement: P105 current release version v0.1.1
+
+The repository SHALL declare `v0.1.1` as the current local source release version after P100-P104 validation has passed and P105 release gates have completed.
+
+#### Scenario: Current version metadata is synchronized
+
+- **GIVEN** P105 release validation has passed
+- **WHEN** a user or release operator inspects version metadata
+- **THEN** the root `VERSION` file SHALL contain `v0.1.1`
+- **AND** `web/package.json` SHALL declare version `0.1.1`
+- **AND** the root package entry in `web/package-lock.json` SHALL declare version `0.1.1`.
+
+#### Scenario: P105 release claims stay bounded
+
+- **GIVEN** `v0.1.1` is described in release materials
+- **WHEN** release readiness is communicated
+- **THEN** the project MAY claim local source product acceptance through P104 and current source version metadata synchronization
+- **AND** it SHALL NOT claim Docker installation validation, package refresh, GitHub Release workflow success, physical second-machine validation, broker connectivity, trading, one-click trading, order placement, external push, automatic confirmation, automatic rule application, paid/login/auth-only sources, Level2 data, high-frequency data, future provider availability, or investment returns unless separately validated.

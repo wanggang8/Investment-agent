@@ -112,19 +112,19 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | --- | --- |
 | audit-tool | 44 |
 | config-gated-fallback | 29 |
-| contextual | 69 |
+| contextual | 71 |
 | dev-config | 2 |
 | release-config | 3 |
 | safety-gate | 12 |
 | sql-bind-markers | 9 |
-| test-only | 583 |
+| test-only | 586 |
 | ui-empty-state | 11 |
 
 ## Suspicious Token Samples
 
 | classification | location | text | rationale |
 | --- | --- | --- | --- |
-| config-gated-fallback | cmd/agent/main.go:461 | if cfg.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
+| config-gated-fallback | cmd/agent/main.go:493 | if cfg.DataSources.UseStub { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/service/data_source_quality.go:364 | if freshness == "fresh" \|\| freshness == "stubbed" { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/service/data_source_quality.go:707 | if freshness != "fresh" && freshness != "stubbed" { | Stub path is gated by config or freshness classification and is not the Docker release default. |
 | config-gated-fallback | internal/application/service/data_source_quality.go:742 | case "fresh", "stubbed", "no_data", "source_unavailable", "parse_error", "stale", "missing", "unknown": | Stub path is gated by config or freshness classification and is not the Docker release default. |
@@ -180,7 +180,7 @@ P92 is the 341-row row-level artifact. P93 verifies every row has required audit
 | ui-empty-state | web/src/pages/DecisionDetailPage.tsx:82 | <label>上一轮基准情景中枢（%）<input inputMode="decimal" value={previousBaseMidpointPercent} onChange={(event) => setPreviousBaseMidpointPercent(event.target.value)} placeholder="可选" /></label> | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
 | ui-empty-state | web/src/pages/DecisionDetailPage.tsx:83 | <label>目标收益率（%）<input inputMode="decimal" value={targetReturnPercent} onChange={(event) => setTargetReturnPercent(event.target.value)} placeholder="可选" /></label> | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
 | ui-empty-state | web/src/pages/DecisionDetailPage.tsx:91 | {message && <div className="page-placeholder">{message}</div>} | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
-| ui-empty-state | web/src/pages/DecisionLoopPage.tsx:40 | <p className="page-placeholder">{safetyNote}</p> | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
+| ui-empty-state | web/src/pages/DecisionLoopPage.tsx:52 | <p className="page-placeholder">{safetyNote}</p> | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
 | ui-empty-state | web/src/pages/LocalInstallPage.tsx:126 | <p className="page-placeholder"> | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
 | ui-empty-state | web/src/pages/LocalKnowledgePage.tsx:112 | <p className="page-placeholder"> | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |
 | ui-empty-state | web/src/pages/RulesPage.tsx:70 | {message && <div className="page-placeholder">{message}</div>} | UI placeholder text/class represents empty-state copy or HTML input hint, not demo-only product code. |

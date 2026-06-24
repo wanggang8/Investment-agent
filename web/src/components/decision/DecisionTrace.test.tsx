@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { DecisionDetailResponse } from '../../types/decision'
 import { DecisionTrace } from './DecisionTrace'
@@ -87,6 +87,7 @@ describe('DecisionTrace', () => {
 
   it('maps decision enum fields to safe text without exposing unknown raw values', () => {
     render(<DecisionTrace decision={decision} />)
+    fireEvent.click(screen.getByRole('button', { name: '展开 1 份分析材料' }))
 
     expect(screen.getAllByText(/未知状态/).length).toBeGreaterThanOrEqual(3)
     expect(screen.getByText(/未知情景/)).toBeInTheDocument()
@@ -95,6 +96,7 @@ describe('DecisionTrace', () => {
 
   it('shows mapped confidence scenario and disclaimer for normal values', () => {
     render(<DecisionTrace decision={positiveDecision} />)
+    fireEvent.click(screen.getByRole('button', { name: '展开 1 份分析材料' }))
 
     expect(screen.getByText(/能力圈检查：能力圈内/)).toBeInTheDocument()
     expect(screen.getByText(/纪律通过：预警/)).toBeInTheDocument()
@@ -162,6 +164,7 @@ describe('DecisionTrace', () => {
         quality_status: 'passed',
       }],
     }} />)
+    fireEvent.click(screen.getByRole('button', { name: '展开 1 份分析材料' }))
 
     expect(screen.getByText('LLM 已参考知识与数据准备度摘要')).toBeInTheDocument()
     expect(screen.getByText(/prompt p37-analyst-v1/)).toBeInTheDocument()
@@ -285,6 +288,7 @@ describe('DecisionTrace', () => {
     }
 
     render(<DecisionTrace decision={realLikeDecision} />)
+    fireEvent.click(screen.getByRole('button', { name: '展开 1 份分析材料' }))
 
     expect(screen.getByRole('heading', { name: '继续持有，等待人工复核' })).toBeInTheDocument()
     expect(screen.getByText(/建议编号：decision_real_llm_nullable/)).toBeInTheDocument()

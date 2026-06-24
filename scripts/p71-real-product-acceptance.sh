@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TMP_DIR="$ROOT_DIR/tmp/p71-real-product-acceptance"
 CONFIG_PATH="$TMP_DIR/config.p71.yaml"
-LOCAL_CONFIG="${P71_LOCAL_CONFIG:-$ROOT_DIR/configs/config.local.yaml}"
+LOCAL_CONFIG="${P71_LOCAL_CONFIG:-$ROOT_DIR/configs/config.yaml}"
 SQLITE_PATH="$TMP_DIR/investment-agent-p71.db"
 VECLITE_PATH="$TMP_DIR/veclite.json"
 SERVER_LOG="$TMP_DIR/server.log"

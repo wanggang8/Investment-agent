@@ -1,19 +1,31 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { StatusNotice } from '../components/status/StatusNotice'
-import { listDecisionLoops } from '../services/decisionLoop'
+import { getDecisionLoop, listDecisionLoops } from '../services/decisionLoop'
 import type { PageErrorState } from '../shared/utils'
 import { toPageErrorState } from '../shared/utils'
 import type { DecisionLoopItem, DecisionLoopLink } from '../types/decisionLoop'
 
 export function DecisionLoopPage() {
+  const [searchParams] = useSearchParams()
+  const focusedDecisionId = searchParams.get('decision_id')?.trim() ?? ''
   const [items, setItems] = useState<DecisionLoopItem[]>([])
   const [safetyNote, setSafetyNote] = useState('只读解释链，仅展示本地事实和导航，不改变事实状态。')
   const [errorState, setErrorState] = useState<PageErrorState>()
 
   useEffect(() => {
     let mounted = true
-    listDecisionLoops({ limit: 20 })
+    const request = focusedDecisionId
+      ? getDecisionLoop(focusedDecisionId).then((res) => ({
+        request_id: res.request_id,
+        data: {
+          items: res.data ? [res.data] : [],
+          total: res.data ? 1 : 0,
+          safety_note: res.data?.safety_note || '只读解释链，仅展示本地事实和导航，不改变事实状态。',
+        },
+      }))
+      : listDecisionLoops({ limit: 20 })
+    request
       .then((res) => {
         if (!mounted) return
         setItems(res.data?.items ?? [])
@@ -28,7 +40,7 @@ export function DecisionLoopPage() {
     return () => {
       mounted = false
     }
-  }, [])
+  }, [focusedDecisionId])
 
   const safeItems = items.map(normalizeLoopItem)
   const incompleteCount = safeItems.filter((item) => item.loop_status === 'incomplete').length
@@ -53,7 +65,7 @@ export function DecisionLoopPage() {
           <h2>本地事实链</h2>
           <p>闭环条数：{safeItems.length}</p>
           <p>未闭合：{incompleteCount}</p>
-          <p>最近决策：{latest ? `${latest.decision_id}${latest.symbol ? ` · ${latest.symbol}` : ''}` : '暂无'}</p>
+          <p>{focusedDecisionId ? '当前聚焦' : '最近决策'}：{latest ? `${latest.decision_id}${latest.symbol ? ` · ${latest.symbol}` : ''}` : (focusedDecisionId || '暂无')}</p>
         </article>
 
         <article className="cockpit-card">
@@ -71,8 +83,8 @@ export function DecisionLoopPage() {
       {safeItems.length === 0 && !errorState ? (
         <article className="cockpit-card">
           <div className="state-label">空态</div>
-          <h2>暂无决策闭环记录</h2>
-          <p>完成本地决策记录后，这里会展示建议、用户记录、线下事实与追踪线索。</p>
+          <h2>{focusedDecisionId ? '未找到目标决策闭环' : '暂无决策闭环记录'}</h2>
+          <p>{focusedDecisionId ? '请回到决策详情或闭环列表确认该决策是否已经生成本地记录。' : '完成本地决策记录后，这里会展示建议、用户记录、线下事实与追踪线索。'}</p>
         </article>
       ) : null}
 

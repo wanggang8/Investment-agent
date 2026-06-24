@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -34,6 +36,12 @@ func TestClientParsesAnalysisMaterial(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Authorization") != "Bearer test-key" {
 			t.Fatalf("missing authorization header")
+		}
+		if r.Header.Get("Accept") != "application/json" {
+			t.Fatalf("accept header = %q, want application/json", r.Header.Get("Accept"))
+		}
+		if ua := r.Header.Get("User-Agent"); !strings.Contains(ua, "investment-agent") {
+			t.Fatalf("user-agent header = %q, want investment-agent marker", ua)
 		}
 		var body struct {
 			Model    string `json:"model"`
@@ -99,6 +107,31 @@ func TestClientRetriesQualityFailureWithStricterBoundary(t *testing.T) {
 	}
 	if resp.Reports["value"] == "" || resp.Metadata["retry"] != "quality_failed_safety_reprompt" {
 		t.Fatalf("expected successful retry metadata, resp=%+v", resp)
+	}
+}
+
+func TestClientRetriesTransportTimeoutOnce(t *testing.T) {
+	var calls int32
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if atomic.AddInt32(&calls, 1) == 1 {
+			time.Sleep(25 * time.Millisecond)
+			return
+		}
+		_, _ = w.Write([]byte(`{"choices":[{"message":{"content":"估值分析材料：仅描述风险和证据缺口。"}}]}`))
+	}))
+	defer server.Close()
+
+	httpClient := server.Client()
+	httpClient.Timeout = 5 * time.Millisecond
+	resp, err := NewClient(Config{APIKey: "test-key", BaseURL: server.URL, Model: "gpt-5.4-mini"}, httpClient).Analyze(context.Background(), analyst.Request{AgentName: "value", Symbol: "510300"})
+	if err != nil {
+		t.Fatalf("Analyze after timeout retry: %v", err)
+	}
+	if got := atomic.LoadInt32(&calls); got != 2 {
+		t.Fatalf("calls=%d, want 2", got)
+	}
+	if resp.Metadata["retry"] != "timeout_retry" || resp.Reports["value"] == "" {
+		t.Fatalf("missing timeout retry metadata or report: %+v", resp)
 	}
 }
 
@@ -190,4 +223,26 @@ func TestEvaluateQualityAllowsNormalAnalysisAndRejectsUnsafeClaims(t *testing.T)
 			t.Fatalf("unsafe output %q not rejected: %+v", text, result)
 		}
 	}
+}
+
+func TestLiveAnalyzeFromEnv(t *testing.T) {
+	if os.Getenv("INVESTMENT_AGENT_LIVE_LLM_DIAG") != "1" {
+		t.Skip("set INVESTMENT_AGENT_LIVE_LLM_DIAG=1 for a bounded live provider diagnostic")
+	}
+	resp, err := NewClient(Config{
+		APIKey:         os.Getenv("DEEPSEEK_API_KEY"),
+		BaseURL:        os.Getenv("DEEPSEEK_BASE_URL"),
+		Model:          os.Getenv("DEEPSEEK_MODEL"),
+		TimeoutSeconds: 60,
+	}, nil).Analyze(context.Background(), analyst.Request{
+		AgentName:       "value",
+		Symbol:          "510300",
+		EvidenceSummary: "P37 real LLM smoke: 本地最小样本，仅验证模型调用、解析、质量门禁和审计记录。",
+		PositionContext: "本 smoke 不读取、不写入账户或持仓，不创建确认单或交易流水。",
+		RuleBoundary:    "LLM 只生成分析材料，最终裁决由规则引擎负责；不得输出交易指令、收益承诺或最终裁决。",
+	})
+	if err != nil {
+		t.Fatalf("category=%s metadata=%v err=%v", ErrorCategory(err), ErrorMetadata(err), err)
+	}
+	t.Logf("metadata=%v report_len=%d", resp.Metadata, len(resp.Reports["value"]))
 }

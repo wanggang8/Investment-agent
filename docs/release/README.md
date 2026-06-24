@@ -1,12 +1,12 @@
 # Release Materials
 
-> Updated: 2026-06-23
+> Updated: 2026-06-24
 
 This directory contains release-facing materials derived from actual acceptance runs. It does not contain temporary SQLite databases, raw logs, full prompts, raw HTTP responses, private paths, or complete API keys.
 
-Initial release version: `v0.1.0`.
+Current source release version: `v0.1.1`.
 
-`v0.1.0` is the initial local release version marker recorded by P99. It is not a Git tag, not a GitHub Release publication, not a fresh package refresh, and not physical second-machine validation.
+`v0.1.0` remains the initial local release version marker recorded by P99. `v0.1.1` is the current source release version prepared by P105 after P100-P104 local-source acceptance, config compatibility, product acceptance, UX linkage fixes, and operation-linkage acceptance. P105 does not by itself claim Docker validation, installer validation, fresh distribution package refresh, physical second-machine validation, or successful remote GitHub Release workflow completion unless separately verified.
 
 ## 2026-06-18 Release Candidate And Package
 
@@ -55,6 +55,12 @@ Initial release version: `v0.1.0`.
 | `docs/release/acceptance/2026-06-23-p94-github-ci-release-hardening.md` | P94 GitHub CI/CD hardening evidence: PR/main quality gates, tag release workflow, security scan workflow, frontend lint closure, Go lint closure, and local CI-equivalent validation. |
 | `docs/release/acceptance/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup.md` | P98 runtime hardening and redaction reuse evidence: release mode rejects stub data, Docker uses release mode, and frontend diagnostic redaction is shared. |
 | `docs/release/acceptance/2026-06-23-p99-initial-release-version.md` | P99 initial release version evidence: root `VERSION` is `v0.1.0`, frontend package metadata is `0.1.0`, and release-claim boundaries remain unchanged. |
+| `docs/release/acceptance/2026-06-23-p100-local-source-final-acceptance.md` | P100 local source final acceptance evidence. |
+| `docs/release/acceptance/2026-06-24-p101-unify-local-config-path.md` | P101 local config path unification and OpenAI-compatible LLM request evidence. |
+| `docs/release/acceptance/2026-06-24-p102-product-acceptance-audit.md` | P102 real-model product acceptance audit and non-blocking UX findings. |
+| `docs/release/acceptance/2026-06-24-p103-product-acceptance-ux-linkage-fixes.md` | P103 product acceptance UX linkage fixes. |
+| `docs/release/acceptance/2026-06-24-p104-full-product-operation-linkage-acceptance.md` | P104 repeatable product operation/linkage acceptance evidence. |
+| `docs/release/acceptance/2026-06-24-p105-v0.1.1-release.md` | P105 current source release version `v0.1.1` evidence and tag boundary. |
 | `docs/release/acceptance-repeatability.md` | Rules for repeating acceptance consistently. |
 
 Current release status: `release_ready_scoped_with_p86_final_integrated_progress`.

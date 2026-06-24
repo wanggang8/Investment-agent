@@ -155,7 +155,7 @@ func applyDefaults(cfg *Config) {
 		cfg.DeepSeek.Model = "deepseek-chat"
 	}
 	if cfg.DeepSeek.TimeoutSeconds <= 0 {
-		cfg.DeepSeek.TimeoutSeconds = 15
+		cfg.DeepSeek.TimeoutSeconds = 60
 	}
 }
 

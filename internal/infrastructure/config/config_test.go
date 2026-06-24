@@ -31,8 +31,8 @@ func TestLoadExampleConfig(t *testing.T) {
 	if cfg.DeepSeek.Model == "" {
 		t.Fatal("deepseek model must have a default/example value")
 	}
-	if cfg.DeepSeek.TimeoutSeconds != 15 {
-		t.Fatalf("deepseek timeout_seconds = %d, want 15", cfg.DeepSeek.TimeoutSeconds)
+	if cfg.DeepSeek.TimeoutSeconds != 60 {
+		t.Fatalf("deepseek timeout_seconds = %d, want 60", cfg.DeepSeek.TimeoutSeconds)
 	}
 }
 

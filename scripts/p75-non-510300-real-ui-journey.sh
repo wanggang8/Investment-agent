@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TMP_DIR="$ROOT_DIR/tmp/p75-non-510300-real-ui-journey"
 CONFIG_PATH="$TMP_DIR/config.p75.yaml"
-LOCAL_CONFIG="${P75_LOCAL_CONFIG:-$ROOT_DIR/configs/config.local.yaml}"
+LOCAL_CONFIG="${P75_LOCAL_CONFIG:-$ROOT_DIR/configs/config.yaml}"
 SQLITE_PATH="$TMP_DIR/investment-agent-p75.db"
 VECLITE_PATH="$TMP_DIR/veclite.json"
 SERVER_LOG="$TMP_DIR/server.log"

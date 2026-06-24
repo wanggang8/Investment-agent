@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TMP_DIR="$ROOT_DIR/tmp/p63-full-ui-regression"
 CONFIG_PATH="$TMP_DIR/config.p63.yaml"
-LOCAL_CONFIG="${P63_LOCAL_CONFIG:-$ROOT_DIR/configs/config.local.yaml}"
+LOCAL_CONFIG="${P63_LOCAL_CONFIG:-$ROOT_DIR/configs/config.yaml}"
 SQLITE_PATH="$TMP_DIR/investment-agent-p63.db"
 VECLITE_PATH="$TMP_DIR/veclite"
 SERVER_LOG="$TMP_DIR/server.log"

@@ -54,7 +54,7 @@ function safePromptVersion(value?: string | null) {
 
 export function DecisionTrace({ decision, onConfirm }: Props) {
   const [showEvidence, setShowEvidence] = useState(true)
-  const [showAnalysis, setShowAnalysis] = useState(true)
+  const [showAnalysis, setShowAnalysis] = useState(false)
 
   if (!decision) {
     return <div className="page-placeholder">选择一条建议后展示完整裁决链路。</div>
@@ -213,8 +213,10 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
 
       <article className="cockpit-card">
         <div className="state-label">Agent 分析材料</div>
-        <p>以下内容仅作为分析材料，最终裁决仍以规则链为准。</p>
-        <button className="link-button" type="button" onClick={() => setShowAnalysis(!showAnalysis)}>{showAnalysis ? '收起' : '展开'}分析材料</button>
+        <p>以下 {analystReports.length} 份内容仅作为分析材料，最终裁决仍以规则链为准；默认收起以便优先复核裁决、安全边界和人工动作。</p>
+        {analystReports.length ? (
+          <button className="link-button" type="button" onClick={() => setShowAnalysis(!showAnalysis)}>{showAnalysis ? '收起' : `展开 ${analystReports.length} 份`}分析材料</button>
+        ) : <p>暂无分析材料。</p>}
         {showAnalysis && (
           analystReports.length ? analystReports.map((report) => (
             <section key={report.agent_name} className="proposal-item">

@@ -117,6 +117,12 @@
 | P97 | `p97-default-local-config-file` | `done` |
 | P98 | `p98-runtime-hardening-and-code-reuse-cleanup` | `done` |
 | P99 | `p99-initial-release-version` | `done` |
+| P100 | `p100-local-source-final-acceptance` | `done` |
+| P101 | `p101-unify-local-config-path` | `done` |
+| P102 | `p102-product-acceptance-audit` | `done` |
+| P103 | `p103-product-acceptance-ux-linkage-fixes` | `done` |
+| P104 | `p104-full-product-operation-linkage-acceptance` | `done` |
+| P105 | `p105-release-v0-1-1` | `done` |
 
 状态枚举：`pending` | `in_progress` | `executed_scoped_gaps` | `ready_for_archive` | `done` | `idle`
 
@@ -203,6 +209,11 @@
 | 默认本地配置文件修正 | P97 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p97-default-local-config-file/`；本机运行默认优先读取 ignored `configs/config.yaml`，缺失时回退 `configs/config.example.yaml`；文档和本地诊断脚本已同步，不新增运行时投资能力 |
 | 运行时边界与前端复用加固 | P98 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup/`；已新增 `runtime.mode` release guardrail，发布模式拒绝 stub 数据；Docker/`.env.example` 显式 release mode；前端 key/SQL/prompt/raw/path/stack redaction 已收敛到共享 `redactSensitiveText`；验收记录见 `docs/release/acceptance/2026-06-23-p98-runtime-hardening-and-code-reuse-cleanup.md`；不新增运行时投资能力 |
 | 初始发布版本号 | P99 `done` | 已归档到 `openspec/changes/archive/2026-06-23-p99-initial-release-version/`；已新增根级 `VERSION`=`v0.1.0`，同步前端 package metadata 为 `0.1.0`，并更新 release/governance/progress 材料；P99 不创建 Git tag、不发布 GitHub Release、不刷新最终分发包、不新增运行时投资能力 |
+| 本地源码最终验收 | P100 `done` | 已完成本地源码最终验收并生成 `docs/release/acceptance/2026-06-23-p100-local-source-final-acceptance.md`；结论为 `local_source_release_acceptance_passed_with_documented_degradation`。P100 以 Go 后端、Vite 前端、本地 SQLite/VecLite、真实浏览器 UI、API/readback 和审计证据为准，复验 P92/P93 通过，9 个主路由 × 3 视口设计 QA 通过，P90 capital-flow provider closure 通过；因本环境无真实 LLM key，P71/P72/P86 nested real-LLM-dependent rerun 仅记录 `authentication_or_key` 降级，不声称 fresh real LLM output；P89 legacy script 存在 P90 后 UI/provider 断言漂移，不作为 fresh pass 声明。P100 不处理 Docker、安装/升级/卸载、GitHub Release、Git tag、分发包刷新或物理第二机器复验，不新增运行时投资能力。 |
+| 本地配置统一与 LLM 兼容 | P101 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p101-unify-local-config-path/`；已完成当前本地程序与 P63/P71/P72/P75 本地源码验收脚本默认读取 ignored `configs/config.yaml`；LLM client 继续使用 OpenAI-compatible `/chat/completions` + `model/messages`，补充 JSON accept/user-agent headers、一次 timeout retry，并将默认/example timeout 调整为 60 秒；真实 `llm-smoke`、P71、P72、P86、OpenSpec、Go、前端、P92/P93 和 whitespace gates 已通过；验收记录见 `docs/release/acceptance/2026-06-24-p101-unify-local-config-path.md`。P101 不提交或打印真实 key，不新增运行时投资能力，不处理 Docker/安装/升级/卸载/GitHub Release/分发包/物理第二机器。 |
+| 产品级验收分析 | P102 `done` | 已完成真实模型恢复后的本地源码产品验收；结论为 `product_acceptance_pass_with_non_blocking_ux_findings`，核心本地产品链路从组合事实、真实模型咨询、人工计划确认、决策闭环、审计、复盘、工作台到通知均可用并有截图/API/SQLite/DOM readback 证据；遗留非阻断 UX findings 为首次空组合显示通用读取失败、决策详情长文本密度较高、决策闭环 query 深链接未聚焦为单条详情；不处理 Docker/安装/升级/卸载/GitHub Release/分发包/物理第二机器。 |
+| 产品操作联动验收门禁 | P104 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p104-full-product-operation-linkage-acceptance/`；已建立可重复的本地源码产品操作联动验收矩阵与 runner，fresh runner 覆盖组合校准与一致性拒绝、持仓维护、线下流水、批量导入、修正审计、再平衡、人工计划确认、决策闭环、通知、风险、数据质量处置、dashboard/review/audit 下游读回；SQLite 读回和安全负证据通过，不处理 Docker/安装/升级/卸载/GitHub Release/分发包/物理第二机器，不新增运行时投资能力。 |
+| v0.1.1 源码发布 | P105 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p105-release-v0-1-1/`；当前源码版本已推进到 `v0.1.1`，root/frontend 版本元数据与 release-facing 材料已同步，P105 验收记录已生成；OpenSpec、Go、前端 test/build、P104 runner、P92/P93 和 whitespace gates 均通过；不新增运行时投资能力，不处理 Docker/安装/分发包/物理第二机器验收。 |
 
 全量需求真源：`docs/requirements.md`。文档地图：`docs/README.md`。分阶段任务：`docs/development-plan.md` §1.1、§3。
 

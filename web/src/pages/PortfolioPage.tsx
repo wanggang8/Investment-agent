@@ -4,6 +4,7 @@ import { PortfolioTable } from '../components/portfolio/PortfolioTable'
 import { StatusNotice } from '../components/status/StatusNotice'
 import { Button, Field } from '../components/ui'
 import { buildPortfolioExperienceModel } from '../features/portfolio/portfolioExperienceModel'
+import { APIClientError } from '../services/client'
 import {
   adjustPortfolio,
   confirmPortfolioImport,
@@ -63,6 +64,10 @@ export function PortfolioPage() {
       })
       .catch((error: unknown) => {
         setPortfolio(undefined)
+        if (error instanceof APIClientError && error.code === 'NOT_FOUND') {
+          setErrorState(undefined)
+          return
+        }
         setErrorState(toPageErrorState(error))
       })
   }

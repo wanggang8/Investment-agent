@@ -137,4 +137,25 @@ describe('buildDecisionExplanationModel', () => {
     expect(model.missingDataWarnings).toContain('缺少可展示的正式证据，最终结论需要人工复核。')
     expect(model.safetyNotes).toContain('缺失、降级或 nullable 字段不会被解释为允许交易、自动确认或自动应用规则。')
   })
+
+  it('keeps fallback analyst conclusions compact in the story summary', () => {
+    const longConclusion = '第一段很长的分析材料。'.repeat(20)
+    const model = buildDecisionExplanationModel({
+      ...baseDecision,
+      analyst_reports: [{
+        agent_name: '趋势风控官',
+        conclusion: longConclusion,
+        key_reasons: [],
+        risk_warnings: [],
+        confidence: 'qualitative',
+        evidence_ids: [],
+        quality_status: 'passed',
+        parse_status: 'parsed',
+      }],
+    })
+
+    expect(model.keyReasons[0]).toMatch(/^趋势风控官：/)
+    expect(model.keyReasons[0].length).toBeLessThanOrEqual(125)
+    expect(model.keyReasons[0]).toContain('...')
+  })
 })

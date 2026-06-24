@@ -31,6 +31,7 @@ type Config struct {
 }
 
 const promptVersion = "p37-analyst-v1"
+const userAgent = "investment-agent/llm-openai-compatible"
 
 type classifiedError struct {
 	category string
@@ -111,6 +112,17 @@ func (c *Client) Analyze(ctx context.Context, req analyst.Request) (analyst.Resp
 	if err == nil {
 		return resp, nil
 	}
+	if ErrorCategory(err) == "timeout" {
+		retryResp, retryErr := c.analyzeOnce(ctx, req, false)
+		if retryErr != nil {
+			return analyst.Response{}, retryErr
+		}
+		if retryResp.Metadata == nil {
+			retryResp.Metadata = map[string]string{}
+		}
+		retryResp.Metadata["retry"] = "timeout_retry"
+		return retryResp, nil
+	}
 	if ErrorCategory(err) != "quality_failed" {
 		return analyst.Response{}, err
 	}
@@ -134,6 +146,8 @@ func (c *Client) analyzeOnce(ctx context.Context, req analyst.Request, safetyRet
 	}
 	httpReq.Header.Set("Authorization", "Bearer "+c.apiKey)
 	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Accept", "application/json")
+	httpReq.Header.Set("User-Agent", userAgent)
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
 		category := "unavailable"

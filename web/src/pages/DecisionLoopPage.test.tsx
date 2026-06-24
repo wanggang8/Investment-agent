@@ -5,10 +5,11 @@ import { APIClientError } from '../services/client'
 import { DecisionLoopPage } from './DecisionLoopPage'
 
 vi.mock('../services/decisionLoop', () => ({
+  getDecisionLoop: vi.fn(),
   listDecisionLoops: vi.fn(),
 }))
 
-import { listDecisionLoops } from '../services/decisionLoop'
+import { getDecisionLoop, listDecisionLoops } from '../services/decisionLoop'
 
 describe('DecisionLoopPage', () => {
   afterEach(() => {
@@ -122,5 +123,35 @@ describe('DecisionLoopPage', () => {
     render(<MemoryRouter><DecisionLoopPage /></MemoryRouter>)
 
     await waitFor(() => expect(screen.getByText('系统暂时无法处理请求，请稍后重试。')).toBeInTheDocument())
+  })
+
+  it('focuses a decision loop from decision_id query without rendering the full list', async () => {
+    vi.mocked(getDecisionLoop).mockResolvedValue({
+      request_id: 'rid_focus',
+      data: {
+        decision_id: 'decision_focus',
+        symbol: '510300',
+        generated_at: '2026-06-24T02:29:48Z',
+        final_verdict_status: 'hold',
+        final_verdict_text: '按纪律观察',
+        confirmation_status: 'planned',
+        loop_status: 'reviewed',
+        safety_note: '只读解释链，仅展示本地事实和导航，不改变事实状态。',
+        stages: [{ stage: 'recommendation', status: 'complete', label: '建议生成', summary: '按纪律观察', ref_type: 'decision', ref_id: 'decision_focus' }],
+        manual_actions: [],
+        risk_links: [],
+        review_links: [],
+        audit_links: [{ type: 'audit_event', id: 'audit_focus', label: '审计事件', href: '/audit#audit_focus', status: 'success' }],
+        missing_links: [],
+      },
+    })
+
+    render(<MemoryRouter initialEntries={['/decision-loop?decision_id=decision_focus']}><DecisionLoopPage /></MemoryRouter>)
+
+    await waitFor(() => expect(getDecisionLoop).toHaveBeenCalledWith('decision_focus'))
+    expect(listDecisionLoops).not.toHaveBeenCalled()
+    expect(screen.getByText('当前聚焦：decision_focus · 510300')).toBeInTheDocument()
+    expect(screen.getByText('decision_focus · 510300')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '审计事件' })).toHaveAttribute('href', '/audit#audit_focus')
   })
 })

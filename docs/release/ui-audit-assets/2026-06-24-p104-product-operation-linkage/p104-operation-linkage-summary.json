@@ -1,0 +1,80 @@
+{
+  "status": "passed",
+  "change": "p104-full-product-operation-linkage-acceptance",
+  "generated_at": "2026-06-24T03:23:58Z",
+  "base_url": "http://127.0.0.1:18104",
+  "sqlite_path": "/Users/vick/Desktop/project/Investment-agent/tmp/p104-product-operation-linkage/investment-agent-p104.db",
+  "operation_steps": [
+    {
+      "step": "portfolio_invalid_total_rejected",
+      "status": "passed"
+    },
+    {
+      "step": "portfolio_adjustment_readback",
+      "snapshot_id": "snap_d75cd5fa3e8eacca",
+      "status": "passed"
+    },
+    {
+      "step": "holding_edit_remove",
+      "status": "passed"
+    },
+    {
+      "step": "offline_transaction",
+      "status": "passed"
+    },
+    {
+      "step": "batch_import_validate_confirm",
+      "status": "passed"
+    },
+    {
+      "step": "correction_and_rebalance",
+      "status": "passed"
+    },
+    {
+      "step": "decision_confirmation_loop",
+      "status": "passed"
+    },
+    {
+      "step": "notifications_mark_read",
+      "status": "passed"
+    },
+    {
+      "step": "risk_lifecycle",
+      "status": "passed"
+    },
+    {
+      "step": "data_quality_resolution_create_retire",
+      "status": "passed"
+    },
+    {
+      "step": "downstream_dashboard_review_audit",
+      "status": "passed"
+    }
+  ],
+  "sqlite_readback": {
+    "portfolio_snapshots": 6,
+    "positions": 3,
+    "position_transactions": 3,
+    "operation_confirmations": 3,
+    "p104_executed_confirmations": 1,
+    "import_batches_committed": 1,
+    "corrections": 1,
+    "risk_resolved": 1,
+    "p104_notification_read": 1,
+    "notifications_unread_total": 1,
+    "dq_resolutions_retired": 1,
+    "audit_events": 15,
+    "auto_confirmation_rows": 0,
+    "forbidden_broker_order_push_tables": 0,
+    "auto_rule_apply_audit_events": 0,
+    "latest_total_assets": 1790.0,
+    "latest_position_market_value": 803.75,
+    "latest_cash": 986.25
+  },
+  "safety": {
+    "forbidden_broker_order_push_tables": 0,
+    "auto_confirmation_rows": 0,
+    "auto_rule_apply_audit_events": 0,
+    "claim_boundary": "P104 validates local-source product operation linkage only. It does not claim Docker/install/package/physical second-machine validation, broker integration, automatic trading, automatic confirmation, automatic rule application, or return guarantees."
+  }
+}

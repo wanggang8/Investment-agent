@@ -22,6 +22,7 @@ import (
 	"investment-agent/internal/domain/model"
 	"investment-agent/internal/domain/repository"
 	"investment-agent/internal/infrastructure/config"
+	"investment-agent/internal/infrastructure/llm/deepseek"
 	appsqlite "investment-agent/internal/infrastructure/persistence/sqlite"
 	"investment-agent/internal/infrastructure/wiring"
 	"investment-agent/internal/pkg/apperr"
@@ -181,7 +182,7 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 
 	outputRef, err := runTask(ctx, cfg, *task, *period, *source, *symbol, *strictQualityGate, startDate, endDate)
 	if err != nil {
-		fmt.Fprintf(stderr, "run task %s: %v\n", *task, err)
+		fmt.Fprintf(stderr, "run task %s: %v%s\n", *task, err, taskErrorDetail(*task, err))
 		return 1
 	}
 	if *task == "data-source-quality-regression" {
@@ -194,6 +195,37 @@ func run(ctx context.Context, args []string, stdout, stderr io.Writer) int {
 	}
 	fmt.Fprintf(stdout, "task %s completed；已写入 audit_events；不会执行交易。\n", *task)
 	return 0
+}
+
+func taskErrorDetail(task string, err error) string {
+	if task != "llm-smoke" || err == nil {
+		return ""
+	}
+	metadata := deepseek.ErrorMetadata(err)
+	parts := []string{"llm_category=" + deepseek.ErrorCategory(err)}
+	for _, key := range []string{"parse_status", "quality_status", "model", "prompt_version"} {
+		if value := strings.TrimSpace(metadata[key]); value != "" {
+			parts = append(parts, key+"="+value)
+		}
+	}
+	if appErr, ok := apperr.AsAppError(err); ok && appErr.Cause != nil {
+		parts = append(parts, "cause="+sanitizeTaskErrorDetail(appErr.Cause.Error()))
+	}
+	return " (" + strings.Join(parts, " ") + ")"
+}
+
+func sanitizeTaskErrorDetail(value string) string {
+	value = strings.ReplaceAll(value, "\n", " ")
+	value = strings.ReplaceAll(value, "\r", " ")
+	for _, marker := range []string{"Authorization", "Bearer", "api_key", "sk-"} {
+		if strings.Contains(strings.ToLower(value), strings.ToLower(marker)) {
+			return "redacted"
+		}
+	}
+	if len([]rune(value)) > 180 {
+		return string([]rune(value)[:180])
+	}
+	return value
 }
 
 func printHelp(w io.Writer) {

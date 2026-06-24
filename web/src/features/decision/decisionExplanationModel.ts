@@ -27,7 +27,7 @@ export function buildDecisionExplanationModel(decision: DecisionDetailResponse):
   const keyReasons = [
     ...analystReports.flatMap((report) => {
       const reasons = safeArray<string>(report.key_reasons)
-      return reasons.length ? reasons : report.conclusion ? [`${report.agent_name}：${report.conclusion}`] : []
+      return reasons.length ? reasons.map(compactReason) : report.conclusion ? [`${report.agent_name}：${compactReason(report.conclusion)}`] : []
     }),
     ...triggeredRules.map((rule) => `${rule.rule_name}：${rule.description}`).filter(Boolean),
     ...formalEvidence.map((item) => `${item.source_name}：${item.summary}`).filter(Boolean),
@@ -92,4 +92,12 @@ function highestSourceLevel(items: EvidenceItem[]) {
 
 function isAnalystReportUsable(report: DecisionDetailResponse['analyst_reports'][number]) {
   return report.quality_status === 'passed' || report.parse_status === 'parsed'
+}
+
+function compactReason(value: string) {
+  const normalized = value.replace(/\s+/g, ' ').trim()
+  if (normalized.length <= 100) {
+    return normalized
+  }
+  return `${normalized.slice(0, 97)}...`
 }

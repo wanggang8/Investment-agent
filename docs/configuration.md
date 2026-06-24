@@ -28,7 +28,7 @@ export INVESTMENT_AGENT_CONFIG=/path/to/config.yaml
 | `server.host` / `server.port` | HTTP 监听地址 | `127.0.0.1:8080` |
 | `sqlite.path` | SQLite 数据文件路径 | `./data/investment-agent.db` |
 | `veclite.path` | VecLite 索引文件或目录路径 | `./data/veclite` |
-| `deepseek.api_key` / `deepseek.base_url` / `deepseek.model` / `deepseek.timeout_seconds` | DeepSeek 或 OpenAI-compatible API Key、API 地址、模型名与超时秒数；常规运行可缺 key，真实 smoke 必须配置 key | 空字符串 / `https://api.deepseek.com` / `deepseek-chat` / `15` |
+| `deepseek.api_key` / `deepseek.base_url` / `deepseek.model` / `deepseek.timeout_seconds` | DeepSeek 或 OpenAI-compatible API Key、API 地址、模型名与超时秒数；常规运行可缺 key，真实 smoke 必须配置 key | 空字符串 / `https://api.deepseek.com` / `deepseek-chat` / `60` |
 | `data_sources.enabled` | 启用的数据源名称列表 | `stub` |
 | `data_sources.use_stub` | 是否启用本地 stub 数据源 | `true` |
 | `data_sources.market_endpoint` | 最小只读行情 HTTP/JSON endpoint，系统会附加 `symbol` 查询参数 | 空字符串 |

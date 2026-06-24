@@ -32,6 +32,18 @@ describe('PortfolioPage', () => {
     await waitFor(() => expect(screen.getByText('本地数据已过期，请刷新后再查看。')).toBeInTheDocument())
   })
 
+  it('maps missing portfolio snapshot to first-use onboarding instead of generic failure', async () => {
+    vi.mocked(getPortfolioCurrent).mockRejectedValue(new APIClientError({ requestId: 'rid_missing', code: 'NOT_FOUND', message: '系统暂时无法处理请求，请稍后重试。', displayState: 'generic_failure' }))
+
+    render(<PortfolioPage />)
+
+    await waitFor(() => expect(screen.getByText('需要初始化本地账户')).toBeInTheDocument())
+    expect(screen.getByText('首次初始化')).toBeInTheDocument()
+    expect(screen.getByText('录入本地账户与持仓')).toBeInTheDocument()
+    expect(screen.queryByText('读取失败')).not.toBeInTheDocument()
+    expect(screen.queryByText('系统暂时无法处理请求，请稍后重试。')).not.toBeInTheDocument()
+  })
+
   it('shows empty success state for portfolio page', async () => {
     vi.mocked(getPortfolioCurrent).mockResolvedValue({ request_id: 'rid', data: { snapshot: { snapshot_id: 'snap_empty', snapshot_time: '2026-01-01T00:00:00Z', cash: 100, total_assets: 100, cash_ratio: 1, high_risk_ratio: 0, position_count: 0 }, positions: [] } })
 
