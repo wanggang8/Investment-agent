@@ -1,0 +1,80 @@
+{
+  "qa": [
+    {
+      "file": "01-workbench-desktop.png",
+      "url": "http://127.0.0.1:14210/workbench",
+      "bodyScrollWidth": 1440,
+      "commandShell": true,
+      "h1": "用户决策工作台",
+      "hasHorizontalOverflow": false,
+      "ledgerSurface": false,
+      "manualPanel": true,
+      "navMode": true,
+      "scrollWidth": 1440,
+      "title": "web",
+      "trustStrip": true,
+      "width": 1440
+    },
+    {
+      "file": "02-data-quality-desktop.png",
+      "url": "http://127.0.0.1:14210/data-quality",
+      "bodyScrollWidth": 1440,
+      "commandShell": true,
+      "h1": "数据质量可观测",
+      "hasHorizontalOverflow": false,
+      "ledgerSurface": false,
+      "manualPanel": false,
+      "navMode": true,
+      "scrollWidth": 1440,
+      "title": "web",
+      "trustStrip": false,
+      "width": 1440
+    },
+    {
+      "file": "03-risk-alerts-desktop.png",
+      "url": "http://127.0.0.1:14210/risk-alerts",
+      "bodyScrollWidth": 1440,
+      "commandShell": true,
+      "h1": "风险预警中心",
+      "hasHorizontalOverflow": false,
+      "ledgerSurface": false,
+      "manualPanel": false,
+      "navMode": true,
+      "scrollWidth": 1440,
+      "title": "web",
+      "trustStrip": false,
+      "width": 1440
+    },
+    {
+      "file": "04-evidence-desktop.png",
+      "url": "http://127.0.0.1:14210/evidence",
+      "bodyScrollWidth": 1440,
+      "commandShell": true,
+      "h1": "情报与证据",
+      "hasHorizontalOverflow": false,
+      "ledgerSurface": true,
+      "manualPanel": false,
+      "navMode": true,
+      "scrollWidth": 1440,
+      "title": "web",
+      "trustStrip": false,
+      "width": 1440
+    },
+    {
+      "file": "05-decision-loop-desktop.png",
+      "url": "http://127.0.0.1:14210/decision-loop",
+      "bodyScrollWidth": 1440,
+      "commandShell": true,
+      "h1": "决策闭环解释",
+      "hasHorizontalOverflow": false,
+      "ledgerSurface": true,
+      "manualPanel": false,
+      "navMode": true,
+      "scrollWidth": 1440,
+      "title": "web",
+      "trustStrip": false,
+      "width": 1440
+    }
+  ],
+  "logs": []
+}

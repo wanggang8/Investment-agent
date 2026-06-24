@@ -99,7 +99,9 @@ export function EvidencePage() {
           <p>证据引用：{verification.evidence_ids.join('、') || '暂无'}</p>
         </article>
       )}
-      <EvidenceTable items={items} />
+      <div className="ledger-surface">
+        <EvidenceTable items={items} />
+      </div>
     </div>
   )
 }

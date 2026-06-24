@@ -7,7 +7,7 @@ interface Props {
 
 export function WorkbenchSignalGrid({ signals }: Props) {
   return (
-    <section className="daily-signal-grid" aria-label="今日信号摘要">
+    <section className="daily-signal-grid trust-signal-strip" aria-label="今日信号摘要">
       {signals.map((signal) => (
         <SummaryCard
           key={signal.label}

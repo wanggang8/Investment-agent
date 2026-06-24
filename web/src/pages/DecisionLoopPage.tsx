@@ -90,7 +90,7 @@ export function DecisionLoopPage() {
 
       <section className="stacked-panel" aria-label="决策闭环列表">
         {safeItems.map((item) => (
-          <article className="cockpit-card" key={item.decision_id}>
+          <article className="cockpit-card ledger-surface" key={item.decision_id}>
             <div className="state-label">{loopStatusText(item.loop_status)}</div>
             <h2>{item.symbol ? `${item.decision_id} · ${item.symbol}` : item.decision_id}</h2>
             <p>{item.final_verdict_text}</p>

@@ -127,6 +127,7 @@
 | P107 | `p107-readme-bilingual-product-intro` | `done` |
 | P108 | `p108-real-sqlite-vec-retrieval` | `done` |
 | P109 | `p109-retrieval-quality-strategy-optimization` | `done` |
+| P110 | `p110-visual-system-redesign` | `done` |
 
 状态枚举：`pending` | `in_progress` | `executed_scoped_gaps` | `ready_for_archive` | `done` | `idle`
 
@@ -222,6 +223,7 @@
 | README 双语与中文功能介绍 | P107 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p107-readme-bilingual-product-intro/`；已为 root README 增加语言切换，并新增 `README.zh-CN.md`，覆盖中文项目定位、功能模块、产品流程、安全边界、快速开始、文档入口和治理说明；不新增运行时投资能力、发布包或 GitHub Release 声明。 |
 | 真实 sqlite-vec 语义检索 | P108 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p108-real-sqlite-vec-retrieval/`；已新增独立 embedding 配置、OpenAI-compatible `/embeddings` client、sqlite-vec 辅助索引、语义 topK 检索、SQLite summary fallback、`embedding-smoke`、preflight embedding 诊断和配置/架构/README 文档；SQLite `rag_chunks` 仍为事实真源，旧 VecLite/FileVectorIndex 仅作关闭 embedding 时的兼容路径；Go/OpenSpec/frontend/package smoke/verify 均通过；不新增运行时投资能力、Docker/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
 | 检索效果策略优化 | P109 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p109-retrieval-quality-strategy-optimization/`；已在 P108 sqlite-vec 基础上新增 deterministic query rewrite、semantic candidate widening、metadata-aware rerank、关键词重叠评分、证据多样性选择、reranked output_ref 对齐和 retrieval quality evaluation 覆盖；不新增 LLM rerank、外部 search service、投资运行时能力、Docker/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
+| 视觉系统重设计 | P110 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p110-visual-system-redesign/`；已采用 Calm Command Center 为主、Ledger Pro 用于证据/闭环页的组合方向，完成 AppLayout、Workbench、Data Quality、Risk Alerts、Evidence、Decision Loop 等核心页面视觉系统升级，新增 P110 UI 验收记录和 390px/768px/1280px/桌面截图证据；不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/发布包/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
 
 全量需求真源：`docs/requirements.md`。文档地图：`docs/README.md`。分阶段任务：`docs/development-plan.md` §1.1、§3。
 

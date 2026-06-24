@@ -62,6 +62,10 @@ export function AppLayout() {
           <strong>Investment Agent</strong>
           <span>本地投资纪律工作台</span>
         </div>
+        <div className="app-topbar-status" aria-label="运行状态">
+          <span>本地运行</span>
+          <span>安全边界开启</span>
+        </div>
         <button type="button" className="nav-toggle" aria-expanded={navOpen} aria-controls="primary-navigation" onClick={() => setNavOpen((open) => !open)}>
           导航
         </button>
@@ -70,6 +74,16 @@ export function AppLayout() {
         <div className="app-brand">
           <strong>Investment Agent</strong>
           <span>本地投资纪律工作台</span>
+        </div>
+        <div className="nav-mode-panel" aria-label="本地运行边界">
+          <div>
+            <strong>本地模式</strong>
+            <span>离线优先</span>
+          </div>
+          <div>
+            <strong>只读导航</strong>
+            <span>系统只提示和记录，不会自动执行。</span>
+          </div>
         </div>
         {navGroups.map((group) => (
           <section key={group.label} className="nav-group" aria-label={group.label}>
@@ -88,7 +102,7 @@ export function AppLayout() {
           </section>
         ))}
       </nav>
-      <main className="app-main">
+      <main className="app-main command-center-shell">
         <Outlet />
       </main>
     </div>

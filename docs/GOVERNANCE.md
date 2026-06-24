@@ -77,6 +77,8 @@
 
 当前活跃变更：无。
 
+P110 已归档到 `openspec/changes/archive/2026-06-24-p110-visual-system-redesign/`。P110 已在 P102-P104 产品验收稳定基础上完成前端视觉系统重设计：采用 Calm Command Center 为主、Ledger Pro 用于证据/闭环页的组合方向，升级 AppLayout、Workbench、Data Quality、Risk Alerts、Evidence、Decision Loop 等核心页面视觉层级、tokens、导航状态、安全边界提示、人工动作队列、信号摘要、ledger surface 和 390px/768px/1280px/桌面 reflow 证据；验收记录见 `docs/release/acceptance/2026-06-24-p110-visual-system-redesign.md`，截图证据见 `docs/release/ui-audit-assets/2026-06-24-p110-visual-system-redesign/`。P110 不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/安装/发布包/物理第二机器验收、券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、自动修复、真实库覆盖或收益承诺。
+
 P107 已归档到 `openspec/changes/archive/2026-06-24-p107-readme-bilingual-product-intro/`。P107 已补齐 public README 双语入口与中文项目功能介绍：root `README.md` 新增 `English | 简体中文` 切换链接，新增 `README.zh-CN.md`，覆盖产品定位、功能模块、产品流程、安全边界、架构概览、快速开始、文档入口、CI/发布状态与治理说明；验收记录见 `docs/release/acceptance/2026-06-24-p107-readme-bilingual-product-intro.md`。P107 不修改运行时代码、CI workflow、HTTP API、SQLite schema、Eino workflow、前端路由、Docker 行为、安装器行为或发布包产物；不新增投资运行时能力，不声称 Docker/安装/物理第二机器复验或新的 GitHub Release；不声称券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。
 
 P106 已归档到 `openspec/changes/archive/2026-06-24-p106-release-v0-1-2-package-scan-fix/`。P106 已修复 `v0.1.1` 远端 Release/CI 在 release package smoke 中暴露的 prompt-payload 安全扫描误报，将当前源码发布版本推进到 `v0.1.2`，并补跑本地 release package smoke/verify，验收记录见 `docs/release/acceptance/2026-06-24-p106-v0.1.2-package-scan-fix.md`。包含 P106 归档文件的 staged 本地 package `investment-agent-v0.1.2.tar.gz` 生成与 verify 均通过，SHA256 为 `3181fe2a4c28514599699f8a6eccd817b4ff8161ea807ee98f5e5a92fa38ddca`。P106 不移动或删除已推送的 `v0.1.1` tag，不新增投资运行时能力，不处理 Docker 验证、安装/升级/卸载验证或物理第二机器复验；不声称券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、收益承诺、登录源、付费源、授权源、Level2 或高频源。

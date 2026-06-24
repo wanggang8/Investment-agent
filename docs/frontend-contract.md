@@ -936,7 +936,30 @@ API：`GET /api/v1/knowledge-readiness?symbol=...`
 - Playwright 必须真实启动本地后端和 Vite 前端，覆盖 `/data-quality`、决策详情、blocked API、390px reflow 和 forbidden affordance scan。
 - 验收记录：`docs/release/acceptance/2026-06-19-p74-built-in-knowledge-and-data-readiness.md`。
 
-## 30. 格式化规则
+## 30. P110 视觉系统重设计契约
+
+P110 将前端视觉系统从“可用后台台账”升级为冷静的投资纪律研究终端。主方向为 **Calm Command Center**，证据/闭环/审计页面吸收 **Ledger Pro** 的台账阅读感。该阶段只改变前端视觉层级、tokens、布局密度、surface 和响应式规则，不改变页面字段、API DTO、确认流程、投资规则或后端契约。
+
+### 30.1 页面覆盖
+
+- Workbench/Dashboard 必须展示今日状态、下一步人工动作、信号摘要和安全边界，不得只作为营销 hero。
+- Data Quality、Risk Alerts、Positions 必须区分事实维护、质量阻断、处置队列和人工复核入口。
+- Evidence、Decision Loop、Decision Detail、Consultation 必须强化解释链路、证据来源、规则裁决和审计 readback 的阅读层级。
+- AppLayout 必须保持原路由语义和导航名称，不得借视觉重设计新增交易、券商或自动执行入口。
+
+### 30.2 视觉与响应式门禁
+
+- 全局 token 必须包含 command center 背景、surface、accent、ink/muted 和 panel shadow；页面应复用共享 class，而不是为单个首页写孤立样式。
+- 390px、768px、1280px viewport 不得出现页面级横向溢出；表格、JSON、日志或诊断文本只能在局部容器滚动。
+- 高风险、信息不足、降级、只读、禁止动作和人工确认状态不得被渲染为普通成功。
+
+### 30.3 安全边界
+
+P110 页面不得新增或暗示券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、自动修复、真实库覆盖、收益承诺、登录源、付费源、授权源、Level2 或高频源。
+
+验收记录：`docs/release/acceptance/2026-06-24-p110-visual-system-redesign.md`。
+
+## 31. 格式化规则
 
 | 数据类型 | 格式 |
 | --- | --- |
@@ -948,7 +971,7 @@ API：`GET /api/v1/knowledge-readiness?symbol=...`
 | 规则版本 | `当前规则版本 v3.0` |
 | 内部 ID | 默认折叠，详情中展示 |
 
-## 31. 与其他文档关系
+## 32. 与其他文档关系
 
 - API 字段来源见 `docs/api.md`。
 - Eino 工作流见 `docs/workflow.md`。

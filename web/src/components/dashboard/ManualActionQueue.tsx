@@ -8,7 +8,7 @@ interface Props {
 
 export function ManualActionQueue({ actions, title = '下一步人工动作' }: Props) {
   return (
-    <section className="daily-action-queue" aria-label={title}>
+    <section className="daily-action-queue manual-action-panel" aria-label={title}>
       <div className="row-between">
         <div>
           <div className="state-label">只读导航</div>
