@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -84,6 +85,32 @@ func (deterministicEmbeddingProvider) Embed(_ context.Context, text string) ([]f
 	}
 }
 
+type recordingSemanticVectorIndex struct {
+	chunks []repository.RAGChunk
+	query  VectorSearchQuery
+}
+
+func (r *recordingSemanticVectorIndex) Upsert(context.Context, repository.RAGChunk) error { return nil }
+
+func (r *recordingSemanticVectorIndex) Search(_ context.Context, symbol string) ([]repository.RAGChunk, error) {
+	out := make([]repository.RAGChunk, 0, len(r.chunks))
+	for _, chunk := range r.chunks {
+		if symbol == "" || chunk.Symbol == "" || chunk.Symbol == symbol {
+			out = append(out, chunk)
+		}
+	}
+	return out, nil
+}
+
+func (r *recordingSemanticVectorIndex) SearchSimilar(_ context.Context, query VectorSearchQuery) ([]repository.RAGChunk, error) {
+	r.query = query
+	return r.Search(context.Background(), query.Symbol)
+}
+
+func (r *recordingSemanticVectorIndex) Health(context.Context) VectorIndexHealth {
+	return VectorIndexHealth{Status: VectorIndexHealthHealthy, Rebuildable: true, ChunkCount: len(r.chunks)}
+}
+
 func TestSQLiteVecVectorIndexSearchesByEmbeddingDistance(t *testing.T) {
 	index := NewSQLiteVecVectorIndex(SQLiteVecVectorIndexConfig{
 		Path:       filepath.Join(t.TempDir(), "vectors.db"),
@@ -140,6 +167,90 @@ func TestRetrievalAdapterUsesSemanticVectorSearchWhenAvailable(t *testing.T) {
 	}
 	if out.QualitySummary.FallbackSource != "sqlite_vec" || out.EvidenceSet.Items[0].EvidenceID != "sum_risk" {
 		t.Fatalf("expected sqlite_vec semantic retrieval to return risk first, got quality=%+v evidence=%+v", out.QualitySummary, out.EvidenceSet.Items)
+	}
+}
+
+func TestRetrievalAdapterRewritesSemanticQueryWithInvestmentIntent(t *testing.T) {
+	repo := intelligenceRepoForVectorTest{summaries: []repository.IntelligenceSummary{
+		{SummaryID: "sum_buy", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "normal", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_buy"]`, VerificationEvidenceRole: "formal", VerificationEventType: "normal", VerificationHighestSourceLevel: "A", Summary: "买入纪律与估值证据"},
+	}}
+	index := &recordingSemanticVectorIndex{chunks: []repository.RAGChunk{
+		{ChunkID: "chunk_buy", SummaryID: "sum_buy", Symbol: "510300", ChunkText: "买入纪律与估值证据", IndexStatus: "indexed"},
+	}}
+	adapter := NewRetrievalAdapter(transactorStub{repos: repository.Repositories{IntelligenceRepo: repo}}, index)
+
+	if _, err := adapter.RetrieveEvidence(context.Background(), workflow.RetrievalRequest{Symbol: "510300", Query: "今天能买吗", TopK: 2}); err != nil {
+		t.Fatalf("RetrieveEvidence: %v", err)
+	}
+	for _, want := range []string{"510300", "今天能买吗", "买入纪律", "估值", "风险", "公告"} {
+		if !strings.Contains(index.query.Text, want) {
+			t.Fatalf("expected rewritten query to contain %q, got %q", want, index.query.Text)
+		}
+	}
+}
+
+func TestRetrievalAdapterWidensSemanticCandidateWindowBeforeRerank(t *testing.T) {
+	repo := intelligenceRepoForVectorTest{summaries: []repository.IntelligenceSummary{
+		{SummaryID: "sum_1", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "normal", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_1"]`, VerificationEvidenceRole: "formal", VerificationEventType: "normal", VerificationHighestSourceLevel: "A", Summary: "正式证据"},
+	}}
+	index := &recordingSemanticVectorIndex{chunks: []repository.RAGChunk{
+		{ChunkID: "chunk_1", SummaryID: "sum_1", Symbol: "510300", ChunkText: "正式证据", IndexStatus: "indexed"},
+	}}
+	adapter := NewRetrievalAdapter(transactorStub{repos: repository.Repositories{IntelligenceRepo: repo}}, index)
+
+	if _, err := adapter.RetrieveEvidence(context.Background(), workflow.RetrievalRequest{Symbol: "510300", Query: "估值风险", TopK: 2}); err != nil {
+		t.Fatalf("RetrieveEvidence: %v", err)
+	}
+	if index.query.TopK < 8 {
+		t.Fatalf("expected widened semantic candidate window >=8, got query=%+v", index.query)
+	}
+}
+
+func TestRetrievalAdapterHybridRerankUsesKeywordOverlap(t *testing.T) {
+	repo := intelligenceRepoForVectorTest{summaries: []repository.IntelligenceSummary{
+		{SummaryID: "sum_risk", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "major_negative", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_risk"]`, VerificationEvidenceRole: "formal", VerificationEventType: "major_negative", VerificationHighestSourceLevel: "A", Summary: "公告风险提示"},
+		{SummaryID: "sum_valuation", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "normal", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_valuation"]`, VerificationEvidenceRole: "formal", VerificationEventType: "normal", VerificationHighestSourceLevel: "A", Summary: "估值 分位 低估 买入纪律"},
+	}}
+	index := &recordingSemanticVectorIndex{chunks: []repository.RAGChunk{
+		{ChunkID: "chunk_risk", SummaryID: "sum_risk", Symbol: "510300", ChunkText: "公告风险提示", IndexStatus: "indexed"},
+		{ChunkID: "chunk_valuation", SummaryID: "sum_valuation", Symbol: "510300", ChunkText: "估值 分位 低估 买入纪律", IndexStatus: "indexed"},
+	}}
+	adapter := NewRetrievalAdapter(transactorStub{repos: repository.Repositories{IntelligenceRepo: repo}}, index)
+
+	out, err := adapter.RetrieveEvidence(context.Background(), workflow.RetrievalRequest{Symbol: "510300", Query: "估值低估能买吗", TopK: 2})
+	if err != nil {
+		t.Fatalf("RetrieveEvidence: %v", err)
+	}
+	if got := out.EvidenceSet.Items[0].EvidenceID; got != "sum_valuation" {
+		t.Fatalf("expected keyword-overlap rerank to put valuation first, got %s in %+v", got, out.EvidenceSet.Items)
+	}
+	if out.OutputRef != "chunk_valuation" {
+		t.Fatalf("expected output ref to follow reranked first evidence, got %s", out.OutputRef)
+	}
+}
+
+func TestRetrievalAdapterDiversifiesAndBoundsFinalEvidence(t *testing.T) {
+	repo := intelligenceRepoForVectorTest{summaries: []repository.IntelligenceSummary{
+		{SummaryID: "sum_risk", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "major_negative", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_risk"]`, VerificationEvidenceRole: "formal", VerificationEventType: "major_negative", VerificationHighestSourceLevel: "A", Summary: "风险公告"},
+		{SummaryID: "sum_valuation", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "normal", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_valuation"]`, VerificationEvidenceRole: "formal", VerificationEventType: "normal", VerificationHighestSourceLevel: "A", Summary: "估值纪律"},
+	}}
+	index := &recordingSemanticVectorIndex{chunks: []repository.RAGChunk{
+		{ChunkID: "chunk_risk_1", SummaryID: "sum_risk", Symbol: "510300", ChunkText: "风险公告 第一段", IndexStatus: "indexed"},
+		{ChunkID: "chunk_risk_2", SummaryID: "sum_risk", Symbol: "510300", ChunkText: "风险公告 第二段", IndexStatus: "indexed"},
+		{ChunkID: "chunk_valuation", SummaryID: "sum_valuation", Symbol: "510300", ChunkText: "估值纪律", IndexStatus: "indexed"},
+	}}
+	adapter := NewRetrievalAdapter(transactorStub{repos: repository.Repositories{IntelligenceRepo: repo}}, index)
+
+	out, err := adapter.RetrieveEvidence(context.Background(), workflow.RetrievalRequest{Symbol: "510300", Query: "风险和估值", TopK: 2})
+	if err != nil {
+		t.Fatalf("RetrieveEvidence: %v", err)
+	}
+	if len(out.EvidenceSet.Items) != 2 {
+		t.Fatalf("expected bounded topK=2 evidence, got %+v", out.EvidenceSet.Items)
+	}
+	gotIDs := []string{out.EvidenceSet.Items[0].EvidenceID, out.EvidenceSet.Items[1].EvidenceID}
+	if gotIDs[0] == gotIDs[1] || !containsString(gotIDs, "sum_risk") || !containsString(gotIDs, "sum_valuation") {
+		t.Fatalf("expected diversified evidence across risk and valuation, got %+v", gotIDs)
 	}
 }
 

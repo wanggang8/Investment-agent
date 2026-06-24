@@ -1,10 +1,12 @@
 package service
 
 import (
+	"context"
 	"testing"
 
 	"investment-agent/internal/application/workflow"
 	"investment-agent/internal/domain/model"
+	"investment-agent/internal/domain/repository"
 )
 
 func TestRetrievalQualityFixtureCoversRepresentativeEvidenceClasses(t *testing.T) {
@@ -66,5 +68,27 @@ func TestRetrievalQualityFixtureCoversRepresentativeEvidenceClasses(t *testing.T
 				t.Fatalf("expected C-level background diagnostic, got %+v", got)
 			}
 		})
+	}
+}
+
+func TestRetrievalQualityEvaluationAcceptsRerankedExpectedEvidence(t *testing.T) {
+	repo := intelligenceRepoForVectorTest{summaries: []repository.IntelligenceSummary{
+		{SummaryID: "sum_background", Symbol: "510300", SourceLevel: "C", EvidenceRole: "background", EventType: "normal", VerificationStatus: "background_only", Summary: "背景材料"},
+		{SummaryID: "sum_valuation", Symbol: "510300", SourceLevel: "A", EvidenceRole: "formal", EventType: "normal", VerificationStatus: "satisfied", VerificationEvidenceIDsJSON: `["sum_valuation"]`, VerificationEvidenceRole: "formal", VerificationEventType: "normal", VerificationHighestSourceLevel: "A", Summary: "估值 分位 低估 买入纪律"},
+	}}
+	index := &recordingSemanticVectorIndex{chunks: []repository.RAGChunk{
+		{ChunkID: "chunk_background", SummaryID: "sum_background", Symbol: "510300", ChunkText: "背景材料", IndexStatus: "indexed"},
+		{ChunkID: "chunk_valuation", SummaryID: "sum_valuation", Symbol: "510300", ChunkText: "估值 分位 低估 买入纪律", IndexStatus: "indexed"},
+	}}
+	adapter := NewRetrievalAdapter(transactorStub{repos: repository.Repositories{IntelligenceRepo: repo}}, index)
+
+	result, err := adapter.RetrieveEvidence(context.Background(), workflow.RetrievalRequest{Symbol: "510300", Query: "估值低估能买吗", TopK: 1})
+	if err != nil {
+		t.Fatalf("RetrieveEvidence: %v", err)
+	}
+	evaluation := EvaluateRetrievalQuality(RetrievalQualityFixture{Query: "估值低估能买吗", Symbol: "510300", ExpectedEvidenceIDs: []string{"sum_valuation"}, FormalOnly: true}, result)
+
+	if evaluation.Status != "hit" || len(evaluation.MissingExpectedEvidenceIDs) != 0 || len(evaluation.UnexpectedBackgroundEvidenceIDs) != 0 {
+		t.Fatalf("expected reranked formal valuation evidence to satisfy retrieval quality, got %+v result=%+v", evaluation, result.EvidenceSet.Items)
 	}
 }

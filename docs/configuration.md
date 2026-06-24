@@ -328,7 +328,7 @@ curl -X POST http://127.0.0.1:8080/api/v1/evidence/rebuild-index
 
 索引是可重建辅助数据；事实数据以 SQLite 中的 `intelligence_summary`、`rag_chunks` 和相关审计记录为准。
 
-P108 后，`embedding.enabled=true` 时本地索引使用独立 sqlite-vec 文件执行真实 embedding topK 检索；`embedding.enabled=false` 时保留旧本地索引和 SQLite 摘要降级路径。索引缺失、损坏、embedding provider 不可用或维度不匹配时，可通过上面的命令由 SQLite `rag_chunks` 重新生成或降级到 SQLite summary。重建响应会返回 `indexed_count`、`skipped_count`、`last_rebuild_at` 和 `index_health`，便于前端展示索引状态与降级原因。
+P108 后，`embedding.enabled=true` 时本地索引使用独立 sqlite-vec 文件执行真实 embedding topK 检索；`embedding.enabled=false` 时保留旧本地索引和 SQLite 摘要降级路径。P109 后，semantic retrieval 会先扩宽 sqlite-vec 候选窗口，再在应用层用 query rewrite、关键词重叠、信源等级、验证状态、证据角色、标的匹配、时效权重和证据多样性做 deterministic rerank。索引缺失、损坏、embedding provider 不可用或维度不匹配时，可通过上面的命令由 SQLite `rag_chunks` 重新生成或降级到 SQLite summary。重建响应会返回 `indexed_count`、`skipped_count`、`last_rebuild_at` 和 `index_health`，便于前端展示索引状态与降级原因。
 
 Embedding 配置与 `deepseek`/chat 分析配置分离。`deepseek.model` 或其他 chat model 不能替代 embedding model；真实语义检索必须调用 provider 的 `/embeddings` 接口。
 

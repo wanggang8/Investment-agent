@@ -38,7 +38,7 @@
 | Agent 编排 | Eino | 从第一版起使用完整组件化与 Graph 编排，避免后续架构迁移。 |
 | 大模型 | DeepSeek / OpenAI-compatible chat completions | 生成分析材料，最终裁决仍由本地规则负责。 |
 | 嵌入模型 | OpenAI-compatible embeddings | 文本向量化；配置与 chat/analysis 模型分离，必须走 `/embeddings`。 |
-| 向量数据库 | sqlite-vec 辅助索引 | P108 起使用独立 sqlite-vec 本地索引文件执行 embedding topK 检索；SQLite `rag_chunks` 仍是可重建真源。 |
+| 向量数据库 | sqlite-vec 辅助索引 | P108 起使用独立 sqlite-vec 本地索引文件执行 embedding topK 检索；P109 起叠加本地 query rewrite、metadata-aware rerank 和证据多样性选择；SQLite `rag_chunks` 仍是可重建真源。 |
 | 关系数据库 | SQLite 本地版 | 统一存储账户、行情、错误案例、情报摘要和操作日志。 |
 | 数据库迁移 | GORM AutoMigrate + 手写 SQL | 开发期快速迭代，稳定后精确管理。 |
 | 配置 | YAML + 环境变量 | 轻量，减少额外框架依赖。 |
@@ -179,10 +179,11 @@ investment-agent/
 ### 6.5 向量索引使用 sqlite-vec，保留 VecLite 兼容降级
 
 - P108 起，`embedding.enabled=true` 时检索索引使用独立 sqlite-vec 本地文件和 OpenAI-compatible `/embeddings` provider 执行真实语义 topK。
+- P109 起，sqlite-vec 返回的是第一阶段候选集；应用层会扩宽候选窗口，并用 query rewrite、关键词重叠、信源等级、验证状态、证据角色、标的匹配、时间权重和证据多样性做本地 rerank。
 - 旧 VecLite/FileVectorIndex 路径保留为 `embedding.enabled=false` 时的本地兼容和测试 fallback；它不再代表真实 embedding 检索。
 - sqlite-vec 文件与主业务 SQLite 分离，避免把主库从 `modernc.org/sqlite` 切换到 CGO driver；主 SQLite 仍是事实真源。
 - SQLite 中的 `intelligence_summary` 与 `rag_chunks` 是事实基准，sqlite-vec/VecLite 索引均可由 SQLite `rag_chunks` 重建。
-- 若向量文件损坏、索引版本不兼容、embedding provider 不可用或向量维度不匹配，系统应从 SQLite 重建索引；必要时降级到 SQLite summary。
+- 若向量文件损坏、索引版本不兼容、embedding provider 不可用、向量维度不匹配或 rerank 后没有可用证据，系统应从 SQLite 重建索引；必要时降级到 SQLite summary。
 - 备份与迁移必须同时包含 SQLite 数据文件和本地向量索引文件。
 
 ## 7. RAG 模块架构
@@ -193,8 +194,8 @@ investment-agent/
 2. 大模型打标：`news/classifier.go` 提取实体、事件、影响方向、可信度等级、发布时间。
 3. 向量化：embedding provider 将文本摘要转为向量，真实路径必须走 OpenAI-compatible `/embeddings`。
 4. 双库存储：结构化小结写入 SQLite，文本摘要向量写入独立 sqlite-vec 索引；关闭 embedding 时使用旧本地索引兼容路径。
-5. 决策检索：语义检索优先使用 sqlite-vec topK，索引不可用时降级到 SQLite summary。
-6. 重排序：结合语义匹配、信源等级和时效权重，返回 Top-K 证据。
+5. 决策检索：语义检索优先使用 sqlite-vec 扩宽候选集，索引不可用时降级到 SQLite summary。
+6. 重排序：结合 query rewrite、关键词命中、信源等级、验证状态、证据角色、时效权重和多样性，返回可追溯 Top-K 证据。
 
 ### 7.2 信源分级标准
 
