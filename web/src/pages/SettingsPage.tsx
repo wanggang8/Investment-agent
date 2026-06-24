@@ -78,9 +78,6 @@ export function SettingsPage() {
   return (
     <div>
       <h1 className="page-title">设置</h1>
-      {errors.map((error) => (
-        <StatusNotice key={error.code ?? error.message} state={error.state} safeMessage={error.message} code={error.code} />
-      ))}
       <section className={`daily-hero daily-tone-${localModel.overallTone}`} aria-label="本地配置与诊断总览">
         <div className="daily-hero-main">
           <div className="state-label">本地配置与诊断状态</div>
@@ -104,6 +101,13 @@ export function SettingsPage() {
           </ul>
         </aside>
       </section>
+      {errors.length ? (
+        <section className="status-notice-grid" aria-label="设置读取提示">
+          {errors.map((error) => (
+            <StatusNotice key={error.code ?? error.message} state={error.state} safeMessage={error.message} code={error.code} />
+          ))}
+        </section>
+      ) : null}
       <CapabilitySettingsPanel
         capability={capability}
         system={system}

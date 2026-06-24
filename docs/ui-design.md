@@ -87,6 +87,19 @@ P112 固化以下高保真规则：
 
 P112 验收结论见 `docs/release/acceptance/2026-06-24-p112-reference-fidelity-detail-pass.md`。桌面和移动子 agent 复审均为 `pass_with_minor_notes`，无 P0/P1/P2 或 release-blocking 视觉问题。P112 不需要后端调整，也不新增任何投资业务能力、自动执行能力或收益承诺。
 
+### 2.7 P113 布局高保真精修
+
+P113 针对 P112 后用户继续指出的布局错位、移动端溢出和不够精致问题，补充更严格的布局验收规则：
+
+- 移动端 report hero 内的 metric/status cards 不得使用横向滚动 rail；必须在 390px 视口内以 compact grid 或列表稳定展示。
+- 桌面端 report hero 不得强行压缩五个以上状态卡导致文本裁切或卡片节奏失衡；允许换行或扩大卡片最小宽度。
+- 移动端主要 action、link、summary 控件应有清晰边框和足够点击高度，不得退化成小号文字链接。
+- 规则、设置、诊断和决策详情中的 JSON、raw threshold、路径或工程诊断材料默认折叠或移到次级层级；首屏先展示状态、解释和下一步人工动作。
+- 错误提示不能在设置/运维页把主 report hero 推出首屏；多条错误应压缩成次级提示区。
+- 决策详情必须同时验证空态和有本地决策数据的状态，避免只用空页截图代表页面完成。
+
+P113 验收结论见 `docs/release/acceptance/2026-06-24-p113-layout-fidelity-polish.md`。P113 完成 19 个产品路由桌面与 390px 移动截图、真实决策详情补充截图、no-overflow/clip/overlap/touch target DOM 指标；最终 issueCount 为 0。P113 不需要后端调整，也不新增任何投资业务能力、自动执行能力或收益承诺。
+
 ## 3. 核心界面模型：Agent 决策驾驶舱
 
 ### 3.1 主窗口定位

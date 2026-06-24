@@ -64,8 +64,8 @@ export function RuleProposalPanel({ proposals, onConfirm, onFinalConfirm }: Prop
             {proposal.reason && <p>提案理由：{proposal.reason}</p>}
             {proposal.audit_result && <p>守门人结果：{auditResultText[proposal.audit_result] ?? '未知状态'}</p>}
             {proposal.audit_summary && <p>审计摘要：{proposal.audit_summary}</p>}
-            {proposal.impact_scope !== undefined && <pre aria-label="影响范围">{detailContent(proposal.impact_scope)}</pre>}
-            {proposal.risk_notes !== undefined && <pre aria-label="风险提示">{detailContent(proposal.risk_notes)}</pre>}
+            {proposal.impact_scope !== undefined && <DetailBlock label="影响范围" content={detailContent(proposal.impact_scope)} />}
+            {proposal.risk_notes !== undefined && <DetailBlock label="风险提示" content={detailContent(proposal.risk_notes)} />}
             {proposal.effect_validation && (
               <section className="detail-section" aria-label="规则效果验证">
                 <div className="state-label">规则效果验证</div>
@@ -74,18 +74,18 @@ export function RuleProposalPanel({ proposals, onConfirm, onFinalConfirm }: Prop
                 <p>历史回放：{replayResultText[proposal.effect_validation.replay_result ?? ''] ?? (proposal.effect_validation.replay_result || '未知')}</p>
                 <p>门禁结论：{guardrailDecisionText[proposal.effect_validation.guardrail_decision ?? ''] ?? (proposal.effect_validation.guardrail_decision || '未知')}</p>
                 <p>样本窗口：{proposal.effect_validation.sample_window || '暂无'}；样本数：{proposal.effect_validation.sample_count}</p>
-                {proposal.effect_validation.source_explanation !== undefined && <pre aria-label="验证来源">{detailContent(proposal.effect_validation.source_explanation)}</pre>}
-                {proposal.effect_validation.metrics !== undefined && <pre aria-label="验证指标">{detailContent(proposal.effect_validation.metrics)}</pre>}
-                {proposal.effect_validation.risk_notes !== undefined && <pre aria-label="验证风险提示">{detailContent(proposal.effect_validation.risk_notes)}</pre>}
-                {proposal.effect_validation.related_error_cases !== undefined && <pre aria-label="关联误判案例">{detailContent(proposal.effect_validation.related_error_cases)}</pre>}
-                {proposal.effect_validation.related_decision_ids !== undefined && <pre aria-label="关联决策记录">{detailContent(proposal.effect_validation.related_decision_ids)}</pre>}
-                {proposal.effect_validation.related_risk_alert_ids !== undefined && <pre aria-label="关联风险预警">{detailContent(proposal.effect_validation.related_risk_alert_ids)}</pre>}
-                {proposal.effect_validation.related_audit_event_ids !== undefined && <pre aria-label="关联审计事件">{detailContent(proposal.effect_validation.related_audit_event_ids)}</pre>}
+                {proposal.effect_validation.source_explanation !== undefined && <DetailBlock label="验证来源" content={detailContent(proposal.effect_validation.source_explanation)} />}
+                {proposal.effect_validation.metrics !== undefined && <DetailBlock label="验证指标" content={detailContent(proposal.effect_validation.metrics)} />}
+                {proposal.effect_validation.risk_notes !== undefined && <DetailBlock label="验证风险提示" content={detailContent(proposal.effect_validation.risk_notes)} />}
+                {proposal.effect_validation.related_error_cases !== undefined && <DetailBlock label="关联误判案例" content={detailContent(proposal.effect_validation.related_error_cases)} />}
+                {proposal.effect_validation.related_decision_ids !== undefined && <DetailBlock label="关联决策记录" content={detailContent(proposal.effect_validation.related_decision_ids)} />}
+                {proposal.effect_validation.related_risk_alert_ids !== undefined && <DetailBlock label="关联风险预警" content={detailContent(proposal.effect_validation.related_risk_alert_ids)} />}
+                {proposal.effect_validation.related_audit_event_ids !== undefined && <DetailBlock label="关联审计事件" content={detailContent(proposal.effect_validation.related_audit_event_ids)} />}
                 {proposal.effect_validation.safety_note && <p>{safeRuleSafetyNote(proposal.effect_validation.safety_note)}</p>}
               </section>
             )}
-            {proposal.before_rule !== undefined && <pre aria-label="变更前规则">{ruleContent(proposal.before_rule)}</pre>}
-            {proposal.after_rule !== undefined && <pre aria-label="变更后规则">{ruleContent(proposal.after_rule)}</pre>}
+            {proposal.before_rule !== undefined && <DetailBlock label="变更前规则" content={ruleContent(proposal.before_rule)} />}
+            {proposal.after_rule !== undefined && <DetailBlock label="变更后规则" content={ruleContent(proposal.after_rule)} />}
             {proposal.status === 'pending_user_confirm' && (
               <div className="action-row">
                 <button type="button" onClick={() => onConfirm?.(proposal.proposal_id, true)}>确认送审</button>
@@ -105,6 +105,15 @@ export function RuleProposalPanel({ proposals, onConfirm, onFinalConfirm }: Prop
         ))
       )}
     </article>
+  )
+}
+
+function DetailBlock({ label, content }: { label: string; content: string }) {
+  return (
+    <details className="raw-detail">
+      <summary>查看{label}</summary>
+      <pre aria-label={label}>{content}</pre>
+    </details>
   )
 }
 

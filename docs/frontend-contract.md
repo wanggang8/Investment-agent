@@ -1,7 +1,7 @@
 # Investment Agent 前端数据契约
 
 > 文档版本：v1.0
-> 最后更新：2026-06-18
+> 最后更新：2026-06-24
 > 适用范围：React + Vite + TypeScript 前端页面、业务组件、HTTP API DTO 映射。
 
 ## 1. 契约定位
@@ -148,6 +148,23 @@ P112 对 P111 visual contract 增加以下验收约束：
 | screenshot evidence | 视觉验收截图需要覆盖桌面和 390px 移动端；若浏览器截图工具存在 sticky 拼接伪影，必须改用可验证的 Playwright 原生截图。 |
 
 P112 复审结论：18 个覆盖路由在桌面和移动端均无页面级横向溢出；子 agent 未发现需要后端调整的视觉阻断项。
+
+### 4.6 P113 Layout Fidelity Addendum
+
+P113 不新增 DTO 字段，不要求后端为 UI 布局补接口。前端必须继续只使用现有 service/API DTO，并把缺失、降级、错误和只读状态映射为安全中文说明。
+
+P113 对 P111/P112 visual contract 增加以下布局约束：
+
+| Surface | Contract |
+| --- | --- |
+| mobile report metrics | 390px 视口下不得用横向滚动 rail 承载主 metric/status cards；卡片必须在视口内稳定换行，不能裁切或离屏。 |
+| report hero density | 桌面和移动端都不得把状态卡、下一步动作或说明文字压缩到不可读；可通过更高最小列宽、换行和 compact copy 保持参考图节奏。 |
+| action targets | 页面主操作、导航 link、details summary 和 compact action 在移动端必须保持可点击高度和明确边框，不得表现为小号文字。 |
+| raw diagnostics | JSON、规则阈值、路径、raw 诊断和工程字段默认折叠或移到次级详情，不得作为首屏主信息。 |
+| settings/errors | 设置/运维页的多条错误提示不得压过本地配置 report hero；错误可在 hero 后以紧凑提示区展示。 |
+| decision detail | 决策详情必须验证空态和有本地决策数据状态；长 ID 和问题文本必须安全换行，不得导致横向溢出。 |
+
+P113 复审结论：19 个覆盖路由在桌面与 390px 移动端均无页面级横向溢出、首屏离屏元素、过小操作目标或 console 问题；补充的 populated decision detail 也通过相同指标。
 
 ## 5. 每日纪律报告页契约
 

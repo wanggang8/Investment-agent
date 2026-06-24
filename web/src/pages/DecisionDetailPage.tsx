@@ -62,9 +62,9 @@ export function DecisionDetailPage() {
   }
 
   return (
-    <div>
+    <div className="decision-detail-page">
       <h1 className="page-title">{isConsultation ? '主动咨询' : '决策详情'}</h1>
-      <section className="daily-hero daily-tone-readonly" aria-label={isConsultation ? '主动咨询首屏状态' : '决策详情首屏状态'}>
+      <section className="daily-hero daily-tone-readonly decision-detail-hero" aria-label={isConsultation ? '主动咨询首屏状态' : '决策详情首屏状态'}>
         <div className="daily-hero-main">
           <div className="state-label">{isConsultation ? '主动咨询纪律' : '决策裁决状态'}</div>
           <h2>{isConsultation ? '提交问题后生成可追踪分析材料' : (decision ? '本地裁决链路已读取' : '等待读取本地决策详情')}</h2>

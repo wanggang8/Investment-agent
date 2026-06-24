@@ -97,7 +97,10 @@ export function RulesPage() {
           <p>当前规则库：{currentRule.rule_version}</p>
           <p>状态：{currentRule.status}</p>
           <p>裁决优先级：{ruleObject?.priority?.join('、') || '暂无'}</p>
-          <pre aria-label="规则阈值">{JSON.stringify(ruleObject?.thresholds ?? currentRule.rules, null, 2)}</pre>
+          <details className="raw-detail">
+            <summary>查看规则阈值</summary>
+            <pre aria-label="规则阈值">{JSON.stringify(ruleObject?.thresholds ?? currentRule.rules, null, 2)}</pre>
+          </details>
         </article>
       )}
       <article className="cockpit-card">

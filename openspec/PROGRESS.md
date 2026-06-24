@@ -130,6 +130,7 @@
 | P110 | `p110-visual-system-redesign` | `done` |
 | P111 | `p111-high-fidelity-reference-redesign` | `done` |
 | P112 | `p112-reference-fidelity-detail-pass` | `done` |
+| P113 | `p113-layout-fidelity-polish` | `done` |
 
 状态枚举：`pending` | `in_progress` | `executed_scoped_gaps` | `ready_for_archive` | `done` | `idle`
 
@@ -228,6 +229,7 @@
 | 视觉系统重设计 | P110 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p110-visual-system-redesign/`；已采用 Calm Command Center 为主、Ledger Pro 用于证据/闭环页的组合方向，完成 AppLayout、Workbench、Data Quality、Risk Alerts、Evidence、Decision Loop 等核心页面视觉系统升级，新增 P110 UI 验收记录和 390px/768px/1280px/桌面截图证据；不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/发布包/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
 | 高保真参考图视觉重构 | P111 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p111-high-fidelity-reference-redesign/`；已把用户确认的第二套参考图作为视觉真源落到全产品 reference shell、topbar、sidebar、report hero、priority action queue、status metric grid、snapshot strip、progress tracker、evidence checklist 和 ledger surfaces，覆盖 18 个路由桌面与移动截图、mismatch ledger 和 P111 acceptance record；当前无已知 P0/P1/P2 高保真视觉 mismatch。P111 不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/发布包/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
 | 参考图高保真细节修复 | P112 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p112-reference-fidelity-detail-pass/`；已处理 P111 后用户复核指出的二级页面结构、hero 高度、主状态区位置、侧栏密度、状态/图标/ledger 细节和移动端首屏效率问题。P112 仍以第二方案参考图为唯一视觉真源，完成 18 个产品路由桌面与 390px 移动截图、mismatch ledger、桌面/移动子 agent 复审和 no-overflow 指标；结论为 `pass_with_minor_notes`，无 release-blocking UI 问题，不需要后端调整。不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/发布包/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
+| 布局高保真精修 | P113 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p113-layout-fidelity-polish/`；已修复 P112 后用户继续指出的布局错位、移动端横向溢出、卡片压缩、触控目标过小、二级页工程化内容暴露和局部不精致问题。P113 覆盖 19 个产品路由桌面与 390px 移动截图、真实决策详情补充截图、no-overflow/clip/overlap/touch target/page hierarchy 检查和 mismatch ledger，最终复审 `checked=38`、`issueCount=0`；不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/发布包/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
 
 全量需求真源：`docs/requirements.md`。文档地图：`docs/README.md`。分阶段任务：`docs/development-plan.md` §1.1、§3。
 
