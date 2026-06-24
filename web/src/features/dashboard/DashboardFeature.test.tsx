@@ -56,6 +56,12 @@ describe('DashboardFeature', () => {
 
     await waitFor(() => expect(screen.getByText('市场状态')).toBeInTheDocument())
     expect(screen.getByRole('heading', { name: '今日纪律' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: '纪律报告概览' })).toHaveClass('reference-hero')
+    expect(screen.getByRole('region', { name: '下一步人工动作' })).toHaveClass('reference-action-queue')
+    expect(screen.getByRole('region', { name: '状态总览' })).toHaveClass('reference-metric-grid')
+    expect(screen.getByRole('region', { name: '持仓与资金快照' })).toHaveClass('reference-snapshot-strip')
+    expect(screen.getByRole('region', { name: '最近咨询 · 解释预览' })).toHaveClass('reference-progress-tracker')
+    expect(screen.getByRole('region', { name: '证据与规则快照' })).toHaveClass('reference-checklist')
     expect(screen.getByRole('region', { name: '今日纪律状态' })).toHaveTextContent('维持观察')
     expect(screen.getByRole('region', { name: '下一步人工动作' })).toHaveTextContent('查看数据质量')
     expect(screen.getByRole('region', { name: '今日信号摘要' })).toHaveTextContent('数据可信度')

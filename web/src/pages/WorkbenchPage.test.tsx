@@ -142,6 +142,12 @@ describe('WorkbenchPage', () => {
     render(<MemoryRouter><WorkbenchPage /></MemoryRouter>)
 
     expect(await screen.findByRole('heading', { name: '用户决策工作台' })).toBeInTheDocument()
+    expect(screen.getByRole('region', { name: '纪律报告概览' })).toHaveClass('reference-hero')
+    expect(screen.getByRole('region', { name: '下一步人工动作' })).toHaveClass('reference-action-queue')
+    expect(screen.getByRole('region', { name: '状态总览' })).toHaveClass('reference-metric-grid')
+    expect(screen.getByRole('region', { name: '持仓与资金快照' })).toHaveClass('reference-snapshot-strip')
+    expect(screen.getByRole('region', { name: '最近咨询 · 解释预览' })).toHaveClass('reference-progress-tracker')
+    expect(screen.getByRole('region', { name: '证据与规则快照' })).toHaveClass('reference-checklist')
     expect(screen.getByRole('region', { name: '今日纪律状态' })).toHaveTextContent('继续持有，等待人工复核')
     expect(screen.getByRole('region', { name: '下一步人工动作' })).toHaveTextContent('查看决策详情')
     expect(screen.getByRole('region', { name: '下一步人工动作' })).toHaveTextContent('查看今日纪律报告')

@@ -61,6 +61,37 @@ export function EvidencePage() {
     <div>
       <h1 className="page-title">情报与证据</h1>
       {errorState && <StatusNotice state={errorState.state} safeMessage={errorState.message} code={errorState.code} />}
+      <section className={`daily-hero daily-tone-${verification?.verification_status === 'satisfied' ? 'success' : 'warning'}`} aria-label="证据首屏状态">
+        <div className="daily-hero-main">
+          <div className="state-label">证据与规则快照</div>
+          <h2>{verification?.verification_status === 'satisfied' ? '证据链满足当前核验要求' : '证据不足或尚未完成核验'}</h2>
+          <p>高等级正式证据优先进入裁决链；背景材料只辅助理解，不替代规则裁决或人工复核。</p>
+          <dl className="daily-hero-meta">
+            <div>
+              <dt>独立信源</dt>
+              <dd>{verification?.independent_source_count ?? 0}</dd>
+            </div>
+            <div>
+              <dt>高等级信源</dt>
+              <dd>{verification?.high_grade_independent_source_count ?? 0}</dd>
+            </div>
+            <div>
+              <dt>证据条数</dt>
+              <dd>{items.length}</dd>
+            </div>
+            <div>
+              <dt>最高等级</dt>
+              <dd>{verification?.highest_source_level || '暂无'}</dd>
+            </div>
+          </dl>
+        </div>
+        <aside className="daily-hero-side" aria-label="证据下一步">
+          <strong>下一步人工核查</strong>
+          <p>先核对信源等级、发布时间和引用，再进入决策闭环或审计页面。</p>
+          <strong>禁止动作</strong>
+          <p>不把背景材料伪装为正式证据，不自动生成交易指令。</p>
+        </aside>
+      </section>
       <section className="cockpit-grid" aria-label="证据解释入口">
         <article className="cockpit-card">
           <div className="state-label">证据可信度</div>

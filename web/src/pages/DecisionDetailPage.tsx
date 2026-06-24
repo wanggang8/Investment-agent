@@ -64,6 +64,33 @@ export function DecisionDetailPage() {
   return (
     <div>
       <h1 className="page-title">{isConsultation ? '主动咨询' : '决策详情'}</h1>
+      <section className="daily-hero daily-tone-readonly" aria-label={isConsultation ? '主动咨询首屏状态' : '决策详情首屏状态'}>
+        <div className="daily-hero-main">
+          <div className="state-label">{isConsultation ? '主动咨询纪律' : '决策裁决状态'}</div>
+          <h2>{isConsultation ? '提交问题后生成可追踪分析材料' : (decision ? '本地裁决链路已读取' : '等待读取本地决策详情')}</h2>
+          <p>{isConsultation ? '系统只生成分析材料、证据引用和规则裁决；最终动作仍由你线下决定。' : '本页展示裁决、证据、分析材料、确认记录和审计链路；不会自动确认或执行任何动作。'}</p>
+          <dl className="daily-hero-meta">
+            <div>
+              <dt>标的</dt>
+              <dd>{decision?.symbol || symbol || '待输入'}</dd>
+            </div>
+            <div>
+              <dt>工作流</dt>
+              <dd>{decision?.workflow_status || '本地待生成'}</dd>
+            </div>
+            <div>
+              <dt>确认状态</dt>
+              <dd>{decision?.user_confirmation?.confirmation_status || '人工待定'}</dd>
+            </div>
+          </dl>
+        </div>
+        <aside className="daily-hero-side" aria-label="决策详情下一步">
+          <strong>禁止动作</strong>
+          <p>不自动交易、不调用券商接口、不自动确认、不自动应用规则。</p>
+          <strong>下一步人工动作</strong>
+          <p>{isConsultation ? '填写问题与标的后提交咨询，再检查证据和规则裁决。' : '阅读完整裁决链路后，按需记录线下计划或执行结果。'}</p>
+        </aside>
+      </section>
       {isConsultation && (
         <article className="cockpit-card">
           <div className="state-label">咨询输入</div>

@@ -186,19 +186,6 @@ export function DataQualityPage() {
   return (
     <div>
       <h1 className="page-title">数据质量可观测</h1>
-      <p className="page-placeholder">只读聚合 source health、证据、检索、LLM 与诊断状态；这里只展示质量事实和导航，不发起后台变更或规则确认。</p>
-      <section className="cockpit-card" aria-label="数据质量标的筛选">
-        <div className="state-label">当前标的</div>
-        <div className="quality-symbol-filter">
-          <label>
-            标的代码
-            <input aria-label="数据质量标的" value={selectedSymbol} placeholder={activeSymbol || '默认最新标的'} onChange={(event) => setSelectedSymbol(event.target.value)} />
-          </label>
-          <Button onClick={handleApplySymbol}>切换标的</Button>
-        </div>
-        <p>当前查看：{activeSymbol || '默认最新本地市场事实'}</p>
-      </section>
-
       <section className={`daily-hero daily-tone-${qualityModel.overallTone}`} aria-label="数据质量总览">
         <div className="daily-hero-main">
           <div className="state-label">数据质量总览</div>
@@ -221,6 +208,23 @@ export function DataQualityPage() {
             ))}
           </ul>
         </aside>
+      </section>
+
+      <section className="reference-ledger-surface quality-symbol-surface" aria-label="数据质量标的筛选">
+        <div className="reference-panel-heading">
+          <div>
+            <h2>当前标的</h2>
+            <small>只读聚合 source health、证据、检索、LLM 与诊断状态，不发起后台变更或规则确认。</small>
+          </div>
+          <span>当前查看：{activeSymbol || '默认最新本地市场事实'}</span>
+        </div>
+        <div className="quality-symbol-filter">
+          <label>
+            标的代码
+            <input aria-label="数据质量标的" value={selectedSymbol} placeholder={activeSymbol || '默认最新标的'} onChange={(event) => setSelectedSymbol(event.target.value)} />
+          </label>
+          <Button onClick={handleApplySymbol}>切换标的</Button>
+        </div>
       </section>
 
       <section className="cockpit-grid" aria-label="知识与数据准备度">

@@ -9,6 +9,7 @@ import { UserConfirmationPanel } from '../../components/dashboard/UserConfirmati
 import { DailyDecisionHero } from '../../components/dashboard/DailyDecisionHero'
 import { ManualActionQueue } from '../../components/dashboard/ManualActionQueue'
 import { WorkbenchSignalGrid } from '../../components/dashboard/WorkbenchSignalGrid'
+import { EvidenceChecklist, ProgressTracker, SnapshotStrip } from '../../components/reference'
 import { StatusNotice } from '../../components/status/StatusNotice'
 import { CockpitLayout } from '../../components/layout/CockpitLayout'
 import { getDashboardToday } from '../../services/dashboard'
@@ -18,7 +19,7 @@ import { buildDailyWorkbenchModel } from './dailyWorkbenchModel'
 import { buildDashboardChartData } from '../../shared/mappers/charts'
 import { marketStateText, textOrRaw } from '../../shared/mappers'
 import type { PageErrorState } from '../../shared/utils'
-import { toPageErrorState } from '../../shared/utils'
+import { formatCurrency, formatPercent, toPageErrorState } from '../../shared/utils'
 import type { DashboardTodayResponse } from '../../types/dashboard'
 import type { DailyDisciplineReport } from '../../types/dailyDisciplineReport'
 
@@ -155,8 +156,47 @@ export function DashboardFeature() {
     <div>
       <h1 className="page-title">今日纪律</h1>
       <DailyDecisionHero model={dailyModel} />
-      <ManualActionQueue actions={dailyModel.nextActions} />
-      <WorkbenchSignalGrid signals={dailyModel.signals} />
+      <section className="reference-command-grid" aria-label="今日纪律首屏">
+        <ManualActionQueue actions={dailyModel.nextActions} />
+        <div className="reference-side-stack">
+          <WorkbenchSignalGrid signals={dailyModel.signals} />
+          <SnapshotStrip
+            title="持仓与资金快照"
+            updatedAt={dashboard.data_updated_at || dailyModel.updatedAtText}
+            items={[
+              { label: '总资产（估）', value: formatCurrency(dashboard.portfolio_summary.total_assets) },
+              { label: '现金占比', value: formatPercent(dashboard.portfolio_summary.cash_ratio) },
+              { label: '持仓数量', value: dashboard.portfolio_summary.position_count },
+              { label: '高风险占比', value: formatPercent(dashboard.portfolio_summary.high_risk_ratio), status: dashboard.portfolio_summary.high_risk_ratio > 0.3 ? '需关注' : '正常' },
+            ]}
+          />
+        </div>
+      </section>
+      <section className="reference-lower-grid" aria-label="今日解释与证据">
+        <ProgressTracker
+          title="最近咨询 · 解释预览"
+          steps={[
+            { label: '输入假设', status: 'done' },
+            { label: '信息核查', status: todayReport ? 'done' : 'pending', detail: todayReport ? `${todayReport.evidence.evidence_count} 条证据` : '待检查' },
+            { label: 'LLM 分析材料', status: 'done', detail: '只作分析材料' },
+            { label: '规则裁决', status: dashboard.decision_summary.final_verdict_status ? 'active' : 'pending' },
+            { label: '最终建议', status: dashboard.decision_summary.verdict ? 'done' : 'pending' },
+            { label: '等待人工确认', status: dashboard.decision_summary.action_required ? 'active' : 'pending' },
+          ]}
+        >
+          <p>规则裁决进行中时，页面只展示解释与证据，不会发起任何交易或自动确认。</p>
+        </ProgressTracker>
+        <EvidenceChecklist
+          title="证据与规则快照"
+          items={[
+            { label: '信息核查来源', value: todayReport ? `${todayReport.evidence.independent_source_count}/${todayReport.evidence.evidence_count} 覆盖` : '待检查', status: todayReport ? 'done' : 'pending' },
+            { label: 'LLM 分析材料', value: '只作材料', status: 'done' },
+            { label: '关键规则通过率', value: dashboard.triggered_rules.length ? `${dashboard.triggered_rules.length} 条命中` : '已通过', status: dashboard.triggered_rules.length ? 'active' : 'done' },
+            { label: '审计只读记录', value: todayReport?.audit_link ? '可查看' : '待记录', status: todayReport?.audit_link ? 'done' : 'pending' },
+          ]}
+          action={{ label: '查看详情', href: '/evidence' }}
+        />
+      </section>
       {dailyModel.warnings.length > 0 ? (
         <section className="stacked-panel" aria-label="今日状态提示">
           {dailyModel.warnings.map((warning) => (

@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { AppLayout } from './AppLayout'
 
 describe('AppLayout', () => {
-  it('renders the P110 command-center navigation with local-only safety context', () => {
+  it('renders the P111 reference navigation with topbar status controls and local-only safety context', () => {
     render(
       <MemoryRouter initialEntries={['/workbench']}>
         <Routes>
@@ -17,6 +17,11 @@ describe('AppLayout', () => {
 
     expect(screen.getAllByText('Investment Agent').length).toBeGreaterThanOrEqual(1)
     expect(screen.getAllByText('本地投资纪律工作台').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getByRole('banner')).toHaveClass('reference-topbar')
+    expect(screen.getByRole('navigation', { name: '主导航' })).toHaveClass('reference-sidebar')
+    expect(screen.getByRole('group', { name: '页面状态工具栏' })).toHaveTextContent('本地模式')
+    expect(screen.getByRole('group', { name: '页面状态工具栏' })).toHaveTextContent('数据截至')
+    expect(screen.getByRole('button', { name: '刷新摘要' })).toBeInTheDocument()
     expect(screen.getByText('本地模式')).toBeInTheDocument()
     expect(screen.getByText('离线优先')).toBeInTheDocument()
     expect(screen.getByText('只读导航')).toBeInTheDocument()

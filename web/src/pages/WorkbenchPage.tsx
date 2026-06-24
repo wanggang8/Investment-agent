@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { DailyDecisionHero } from '../components/dashboard/DailyDecisionHero'
 import { ManualActionQueue } from '../components/dashboard/ManualActionQueue'
 import { WorkbenchSignalGrid } from '../components/dashboard/WorkbenchSignalGrid'
+import { EvidenceChecklist, ProgressTracker, SnapshotStrip } from '../components/reference'
 import { StatusNotice } from '../components/status/StatusNotice'
 import { buildDailyWorkbenchModel } from '../features/dashboard/dailyWorkbenchModel'
 import { getTodayDailyDisciplineReport } from '../services/dailyDisciplineReport'
@@ -92,8 +93,48 @@ export function WorkbenchPage() {
       <p className="page-intro">聚合今日纪律、本地事实、风险和复盘入口；这里只做只读提示和导航，最终动作仍由你线下决定。</p>
 
       <DailyDecisionHero model={dailyModel} />
-      <ManualActionQueue actions={dailyModel.nextActions} />
-      <WorkbenchSignalGrid signals={dailyModel.signals} />
+      <section className="reference-command-grid" aria-label="工作台首屏">
+        <ManualActionQueue actions={dailyModel.nextActions} />
+        <div className="reference-side-stack">
+          <WorkbenchSignalGrid signals={dailyModel.signals} />
+          <SnapshotStrip
+            title="持仓与资金快照"
+            updatedAt={snapshot?.snapshot_time || dailyModel.updatedAtText}
+            items={[
+              { label: '总资产（估）', value: formatCurrency(snapshot?.total_assets ?? state.dashboard.data?.portfolio_summary.total_assets ?? 0) },
+              { label: '可用资金', value: formatCurrency(snapshot?.cash ?? 0) },
+              { label: '持仓数量', value: snapshot?.position_count ?? state.dashboard.data?.portfolio_summary.position_count ?? 0 },
+              { label: '仓位水平', value: formatPercent(1 - (snapshot?.cash_ratio ?? state.dashboard.data?.portfolio_summary.cash_ratio ?? 0)), status: riskCount > 0 ? '需关注' : '正常' },
+            ]}
+          />
+        </div>
+      </section>
+      <section className="reference-lower-grid" aria-label="工作台解释与证据">
+        <ProgressTracker
+          title="最近咨询 · 解释预览"
+          actions={<Link to="/decision-loop">查看全部记录</Link>}
+          steps={[
+            { label: '输入假设', status: 'done' },
+            { label: '信息核查', status: state.report.data ? 'done' : 'pending', detail: state.report.data ? `${state.report.data.evidence.evidence_count} 条证据` : '待检查' },
+            { label: 'LLM 分析材料', status: 'done', detail: '只作分析材料' },
+            { label: '规则裁决', status: state.dashboard.data?.decision_summary?.final_verdict_status ? 'active' : 'pending' },
+            { label: '最终建议', status: state.dashboard.data?.decision_summary?.verdict ? 'done' : 'pending' },
+            { label: '等待人工确认', status: state.dashboard.data?.decision_summary?.action_required ? 'active' : 'pending' },
+          ]}
+        >
+          <p>当前进展：系统只生成解释、证据和规则裁决记录；最终动作仍由你线下完成。</p>
+        </ProgressTracker>
+        <EvidenceChecklist
+          title="证据与规则快照"
+          items={[
+            { label: '信息核查来源', value: state.report.data ? `${state.report.data.evidence.independent_source_count}/${state.report.data.evidence.evidence_count} 覆盖` : '待检查', status: state.report.data ? 'done' : 'pending' },
+            { label: 'LLM 分析材料', value: '只作材料', status: 'done' },
+            { label: '关键规则通过率', value: pendingRuleCount > 0 ? `${pendingRuleCount} 项待确认` : '已通过', status: pendingRuleCount > 0 ? 'active' : 'done' },
+            { label: '审计只读记录', value: `${reviewCount} 条复盘`, status: reviewCount > 0 ? 'done' : 'pending' },
+          ]}
+          action={{ label: '查看详情', href: '/evidence' }}
+        />
+      </section>
 
       {dailyModel.warnings.length > 0 ? (
         <section className="stacked-panel" aria-label="工作台状态提示">

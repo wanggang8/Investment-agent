@@ -116,6 +116,23 @@ P58 CTA 安全边界：
 - 允许：查看、进入、维护本地账户与持仓、查看数据质量、处理风险预警、查看决策详情、查看每日纪律报告、发起主动咨询。
 - 禁止：券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、自动修复、覆盖真实库或收益承诺入口。
 
+### 4.4 P111 Reference Visual Contract
+
+P111 前端视觉重构不新增 DTO 字段，但要求所有页面把现有 DTO 映射到统一 reference 组件语言：
+
+| UI 模块 | 数据来源 | 契约 |
+| --- | --- | --- |
+| reference topbar | 路由、当前本地日期、已知数据更新时间 | 桌面显示页面标题、本地日期、本地模式、数据截至、刷新摘要；移动端仅保留可读标题、日期和导航按钮。 |
+| reference sidebar | 既有路由清单 | 深色侧栏按今日、决策、组合、证据、治理、系统分组；不得新增交易、下单或券商入口。 |
+| reference hero / daily hero | 页面主状态、report/decision/evidence/review/risk/settings 摘要 | 首屏主面板必须展示状态、解释、禁止动作和下一步人工动作；缺数据时展示安全缺口，不伪造成功。 |
+| priority action queue | `DailyWorkbenchViewModel.nextActions` 或页面本地导航动作 | 只允许本地查看、维护、处理、咨询、记录类动作，不得自动执行。 |
+| status metric grid | evidence/risk/rule/portfolio/review/system 摘要 | 数值必须有文字标签和状态说明，不只依赖颜色。 |
+| snapshot strip | portfolio/report/system summary | 横向展示关键 readback；移动端折叠为单列，不产生页面级横向滚动。 |
+| progress tracker | consultation/decision-loop/report lifecycle | 只展示分析和追踪阶段，不暗示自动下单或自动确认。 |
+| evidence checklist / ledger surface | evidence、rules、audit、source health、table/list DTO | 所有来源、规则、审计和长表格使用台账密度；长文本必须换行或在明确容器内滚动。 |
+
+P111 完成门禁：每个覆盖路由需要桌面和移动截图、console/reflow JSON、mismatch ledger；未解决 P0/P1/P2 visual mismatch 时页面不得标记完成。
+
 ## 5. 每日纪律报告页契约
 
 页面：`web/src/pages/DailyDisciplineReportsPage.tsx`、`web/src/pages/DailyDisciplineReportDetailPage.tsx`

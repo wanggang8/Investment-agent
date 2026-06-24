@@ -49,7 +49,33 @@ export function DecisionLoopPage() {
   return (
     <div>
       <h1 className="page-title">决策闭环解释</h1>
-      <p className="page-placeholder">{safetyNote}</p>
+      <section className={`daily-hero daily-tone-${incompleteCount > 0 ? 'warning' : 'success'}`} aria-label="决策闭环首屏状态">
+        <div className="daily-hero-main">
+          <div className="state-label">闭环追踪状态</div>
+          <h2>{incompleteCount > 0 ? '存在待补齐闭环，请先人工复核' : '本地决策闭环只读可追踪'}</h2>
+          <p>{safetyNote}</p>
+          <dl className="daily-hero-meta">
+            <div>
+              <dt>闭环条数</dt>
+              <dd>{safeItems.length}</dd>
+            </div>
+            <div>
+              <dt>未闭合</dt>
+              <dd>{incompleteCount}</dd>
+            </div>
+            <div>
+              <dt>当前聚焦</dt>
+              <dd>{latest ? '已选最近一条' : (focusedDecisionId ? '已按参数聚焦' : '暂无')}</dd>
+            </div>
+          </dl>
+        </div>
+        <aside className="daily-hero-side" aria-label="决策闭环下一步">
+          <strong>禁止动作</strong>
+          <p>不创建确认、不记录交易、不改变风险状态、不应用规则。</p>
+          <strong>下一步人工动作</strong>
+          <p>{latest ? '打开决策详情或复盘记录，补齐人工记录和审计线索。' : '先完成一次本地咨询或决策记录。'}</p>
+        </aside>
+      </section>
       {errorState && <StatusNotice state={errorState.state} safeMessage={errorState.message} code={errorState.code} />}
 
       <section className="cockpit-grid" aria-label="决策闭环概览">
