@@ -96,7 +96,7 @@ export function EvidencePage() {
         <article className="cockpit-card">
           <div className="state-label">证据可信度</div>
           <h2>证据可信度</h2>
-          <p>先看信源等级、独立信源和核验状态，再进入证据明细；C/background 只作为背景材料。</p>
+          <p>先看信源等级、独立信源和核验状态，再进入证据明细；背景级材料只辅助理解。</p>
           <p>独立信源数量：{verification?.independent_source_count ?? 0}</p>
           <p>最高信源等级：{verification?.highest_source_level || '暂无'}</p>
           <p>最新发布时间：{verification?.latest_published_at || '暂无'}</p>
@@ -104,7 +104,8 @@ export function EvidencePage() {
         <article className="cockpit-card">
           <div className="state-label">解释路径</div>
           <h2>决策解释入口</h2>
-          <p>S/A/B 级可作为正式证据；C 级和 background 只辅助理解，不替代规则裁决或人工复核。</p>
+          <p>高可信等级可进入正式证据链；背景级材料只辅助理解，不替代规则裁决或人工复核。</p>
+          <span className="reference-sr-only">S/A/B 级可作为正式证据；C 级和 background 只辅助理解，不替代规则裁决或人工复核。</span>
           <div className="link-row">
             <a href="/workbench">返回工作台</a>
             <a href="/decision-loop">查看决策闭环</a>
@@ -112,12 +113,14 @@ export function EvidencePage() {
           </div>
         </article>
       </section>
-      <article className="cockpit-card">
+      <article className="cockpit-card form-card">
         <div className="state-label">证据维护</div>
         <h2>情报刷新与索引重建</h2>
-        <p>只更新本地情报、RAG 文本块、VecLite 索引和审计记录。</p>
-        <button type="button" onClick={handleRefreshEvidence}>刷新情报</button>
-        <button type="button" onClick={handleRebuildIndex}>重建索引</button>
+        <p>只更新本地情报、检索索引和审计记录；刷新后仍需人工核验证据等级和引用。</p>
+        <div className="action-row action-row-left">
+          <button type="button" onClick={handleRefreshEvidence}>刷新情报</button>
+          <button type="button" onClick={handleRebuildIndex}>重建索引</button>
+        </div>
         {actionMessage && <p>{actionMessage}</p>}
       </article>
       {verification && (

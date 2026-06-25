@@ -131,6 +131,14 @@
 | P111 | `p111-high-fidelity-reference-redesign` | `done` |
 | P112 | `p112-reference-fidelity-detail-pass` | `done` |
 | P113 | `p113-layout-fidelity-polish` | `done` |
+| P114 | `p114-visual-productization-alignment-fixes` | `done` |
+| P115 | `p115-real-user-scenario-acceptance` | `done` |
+| P116 | `p116-multi-fund-transaction-ledger-acceptance` | `done` |
+| P117 | `p117-continuous-product-usability-acceptance` | `done` |
+| P118 | `p118-product-usability-edge-scenario-acceptance` | `done` |
+| P119 | `p119-full-ui-control-and-affordance-acceptance` | `done` |
+| P120 | `p120-p114-p119-final-closure-summary` | `done` |
+| P121 | `p121-final-review-and-v0-1-3-tag-release` | `done` |
 
 状态枚举：`pending` | `in_progress` | `executed_scoped_gaps` | `ready_for_archive` | `done` | `idle`
 
@@ -230,6 +238,14 @@
 | 高保真参考图视觉重构 | P111 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p111-high-fidelity-reference-redesign/`；已把用户确认的第二套参考图作为视觉真源落到全产品 reference shell、topbar、sidebar、report hero、priority action queue、status metric grid、snapshot strip、progress tracker、evidence checklist 和 ledger surfaces，覆盖 18 个路由桌面与移动截图、mismatch ledger 和 P111 acceptance record；当前无已知 P0/P1/P2 高保真视觉 mismatch。P111 不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/发布包/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
 | 参考图高保真细节修复 | P112 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p112-reference-fidelity-detail-pass/`；已处理 P111 后用户复核指出的二级页面结构、hero 高度、主状态区位置、侧栏密度、状态/图标/ledger 细节和移动端首屏效率问题。P112 仍以第二方案参考图为唯一视觉真源，完成 18 个产品路由桌面与 390px 移动截图、mismatch ledger、桌面/移动子 agent 复审和 no-overflow 指标；结论为 `pass_with_minor_notes`，无 release-blocking UI 问题，不需要后端调整。不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/发布包/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
 | 布局高保真精修 | P113 `done` | 已归档到 `openspec/changes/archive/2026-06-24-p113-layout-fidelity-polish/`；已修复 P112 后用户继续指出的布局错位、移动端横向溢出、卡片压缩、触控目标过小、二级页工程化内容暴露和局部不精致问题。P113 覆盖 19 个产品路由桌面与 390px 移动截图、真实决策详情补充截图、no-overflow/clip/overlap/touch target/page hierarchy 检查和 mismatch ledger，最终复审 `checked=38`、`issueCount=0`；不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/发布包/物理第二机器验收或任何交易/外推/自动确认/自动规则能力。 |
+| 视觉产品化与对齐残留修复 | P114 `done` | 已归档到 `openspec/changes/archive/2026-06-25-p114-visual-productization-alignment-fixes/`；已修复 P113 后用户继续指出的表单与按钮错位、同层级卡片高低不一、动作区基线不稳、首层内容不够产品化、`/decisions` 空白和 `/api-diagnostics` 裸 404 问题。子 agent 复审结论为 `pass`，无 P0/P1/P2 阻断；不新增投资运行时能力、交易/外推/自动确认/自动规则能力或发布包/安装/物理第二机器验收声明。 |
+| 真实用户场景全链路验收 | P115 `done` | 已归档到 `openspec/changes/archive/2026-06-25-p115-real-user-scenario-acceptance/`；P115 runner 覆盖 34 个场景，28 个 `fresh_pass`、6 个 `scoped_pass`、0 个 `blocked`，浏览器 console/page/API 5xx 均为 0；执行中修复 `DecisionTrace` 重复 React key 前端运行时问题。P92 check 通过，P93 stale 边界已记录；不新增投资运行时能力、Docker/安装/发布包/物理第二机器或任何交易/自动能力声明。 |
+| 多基金复杂交易账本验收 | P116 `done` | 已归档到 `openspec/changes/archive/2026-06-25-p116-multi-fund-transaction-ledger-acceptance/`；16 个场景、14 个 `fresh_pass`、2 个 `scoped_pass`，覆盖多个基金/ETF、本地线下 buy/sell/reduce、多日期费用、混合批量导入、非法交易拒绝、决策人工执行确认、错误标注、风险/通知/数据质量/复盘/审计聚合读回和移动端组合页；浏览器 console/page/API 5xx 错误均为 0。 |
+| 连续产品可用性验收 | P117 `done` | 已归档到 `openspec/changes/archive/2026-06-25-p117-continuous-product-usability-acceptance/`；17/17 runner 场景通过，16 个 `fresh_pass`、1 个 `scoped_pass`，覆盖 7 天用户故事、错误恢复、跨页面一致性、重启持久化、移动端可用性和安全负证据；浏览器 console/page/API 5xx 错误均为 0，重启持久化探针通过。 |
+| 产品可用性边界场景验收 | P118 `done` | 已归档到 `openspec/changes/archive/2026-06-25-p118-product-usability-edge-scenario-acceptance/`；18/18 runner 场景通过，16 个 `fresh_pass`、2 个 `scoped_pass`，覆盖 30 天本地事实积累、异常导入/非法交易恢复、数据源降级处置、多账户/家庭账本、多页面累积状态读回、重启持久化、390px 移动端和安全负证据；明确排除发布/安装/升级/发布包/GitHub Release/物理第二机器验收。 |
+| 全页面 UI 控件与切换验收 | P119 `done` | 已归档到 `openspec/changes/archive/2026-06-25-p119-full-ui-control-and-affordance-acceptance/`；覆盖 22 个生产路由、603 个桌面可见控件、8 个移动页面、24 个上游/轻交互切换，未命名/未分类/布局/产品文案/console/page/API 5xx/toggle issue 均为 0；关键 UI 写操作经 SQLite readback 通过。 |
+| P114-P119 最终收口汇总 | P120 `done` | 已归档到 `openspec/changes/archive/2026-06-25-p120-p114-p119-final-closure-summary/`；新增 `docs/release/acceptance/2026-06-25-p114-p119-final-closure-summary.md`，汇总 P114-P119 scoped 验收范围内无已知 release-blocking 问题，同时保留 P93 stale 与发布/安装/物理第二机器/券商/自动交易/fresh real LLM/provider/收益准确性等范围边界。 |
+| v0.1.3 最终复核与 tag 发布 | P121 `done` | 已归档到 `openspec/changes/archive/2026-06-25-p121-final-review-and-v0-1-3-tag-release/`；完成 P114-P120 后 fresh 发布复核、版本同步、release notes、P121 验收记录和 local release package smoke/verify。包 `investment-agent-v0.1.3.tar.gz` SHA256 为 `ba08fb46606688239f67ea5534b8b038f389969ae1c8e8e66a7ff83e8a895bbc`；保留 P93 stale 边界，不新增投资运行时能力或 Docker/安装/物理第二机器验收声明。 |
 
 全量需求真源：`docs/requirements.md`。文档地图：`docs/README.md`。分阶段任务：`docs/development-plan.md` §1.1、§3。
 

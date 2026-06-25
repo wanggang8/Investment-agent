@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { StatusNotice } from '../components/status/StatusNotice'
 import { Button, Field, SummaryCard, type UITone } from '../components/ui'
-import { buildLocalOpsModel } from '../features/governance'
+import { buildLocalOpsModel, localOpsMetricTitle } from '../features/governance'
 import {
   confirmLocalKnowledgeImport,
   validateLocalKnowledgeImport,
@@ -117,7 +117,7 @@ export function LocalKnowledgePage() {
           <p>{localModel.safetyNotes[0]}</p>
           <div className="daily-signal-grid quality-signal-grid">
             {localModel.metrics.map((metric) => (
-              <SummaryCard key={metric.label} title={metric.label} value={metric.value} detail={metric.detail} tone={(metric.tone ?? 'unknown') as UITone} />
+              <SummaryCard key={metric.label} title={localOpsMetricTitle(metric.label)} value={metric.value} detail={metric.detail} tone={(metric.tone ?? 'unknown') as UITone} />
             ))}
           </div>
         </div>
@@ -138,28 +138,41 @@ export function LocalKnowledgePage() {
       </p>
 
       <section className="cockpit-grid" aria-label="本地知识导入区域">
-        <article className="cockpit-card">
+        <article className="cockpit-card form-card">
           <div className="state-label">导入草稿</div>
           <h2>来源与内容</h2>
-          <Field id="local-knowledge-source-label" label="来源标签" hint="只作为本地背景材料来源标记。">
-            <input value={form.sourceLabel} onChange={(event) => updateField('sourceLabel', event.target.value)} />
-          </Field>
-          <Field id="local-knowledge-default-symbol" label="默认标的">
-            <input value={form.defaultSymbol} onChange={(event) => updateField('defaultSymbol', event.target.value)} />
-          </Field>
-          <Field id="local-knowledge-rows-json" label="记录 JSON" hint="字段支持 title、text、symbol、as_of_date、tags。提交前会先做本地预览校验。" error={parseError || undefined}>
-            <textarea
-              value={form.rowsText}
-              rows={12}
-              onChange={(event) => updateField('rowsText', event.target.value)}
-            />
-          </Field>
+          <p>先用来源、标的和记录数量建立导入摘要；结构化记录可在高级详情中编辑。</p>
+          <div className="product-summary-grid" aria-label="本地知识草稿摘要">
+            <div className="product-summary-card"><span>来源标签</span><strong>{sourceLabelText(form.sourceLabel)}</strong></div>
+            <div className="product-summary-card"><span>默认标的</span><strong>{form.defaultSymbol || '待填写'}</strong></div>
+            <div className="product-summary-card"><span>记录数量</span><strong>{parsedRows.error ? '需修正' : `${parsedRows.rows.length} 条`}</strong></div>
+          </div>
+          <details className="product-detail">
+            <summary>编辑结构化记录</summary>
+            <div className="product-detail-body">
+              <div className="form-grid form-grid-compact">
+                <Field id="local-knowledge-source-label" label="来源标签" hint="只作为本地背景材料来源标记。">
+                  <input value={form.sourceLabel} onChange={(event) => updateField('sourceLabel', event.target.value)} />
+                </Field>
+                <Field id="local-knowledge-default-symbol" label="默认标的">
+                  <input value={form.defaultSymbol} onChange={(event) => updateField('defaultSymbol', event.target.value)} />
+                </Field>
+              </div>
+              <Field id="local-knowledge-rows-json" label="记录 JSON" hint="字段支持 title、text、symbol、as_of_date、tags。提交前会先做本地预览校验。" error={parseError || undefined}>
+                <textarea
+                  value={form.rowsText}
+                  rows={12}
+                  onChange={(event) => updateField('rowsText', event.target.value)}
+                />
+              </Field>
+            </div>
+          </details>
           <div className="action-row">
             <Button onClick={handleValidate} isWorking={isValidating} workingLabel="校验中">校验预览</Button>
           </div>
         </article>
 
-        <article className="cockpit-card">
+        <article className="cockpit-card form-card">
           <div className="state-label">脱敏预览</div>
           <h2>校验结果</h2>
           {apiError ? <StatusNotice state={apiError.state} safeMessage={apiError.message} code={apiError.code} /> : null}
@@ -204,7 +217,7 @@ export function LocalKnowledgePage() {
           )}
         </article>
 
-        <article className="cockpit-card">
+        <article className="cockpit-card form-card">
           <div className="state-label">索引计划</div>
           <h2>背景事实写入</h2>
           {validation ? (
@@ -266,6 +279,10 @@ function parseRows(input: string): { rows: LocalKnowledgeImportRow[]; error?: st
 
 function safeString(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
+}
+
+function sourceLabelText(value: string) {
+  return value === 'local_research_notes' ? '本地研究记录' : value || '待填写'
 }
 
 function statusText(status: string) {

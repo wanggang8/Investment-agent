@@ -116,7 +116,7 @@ export function WorkbenchPage() {
           steps={[
             { label: '输入假设', status: 'done' },
             { label: '信息核查', status: state.report.data ? 'done' : 'pending', detail: state.report.data ? `${state.report.data.evidence.evidence_count} 条证据` : '待检查' },
-            { label: 'LLM 分析材料', status: 'done', detail: '只作分析材料' },
+            { label: '分析材料', status: 'done', detail: '只作分析材料' },
             { label: '规则裁决', status: state.dashboard.data?.decision_summary?.final_verdict_status ? 'active' : 'pending' },
             { label: '最终建议', status: state.dashboard.data?.decision_summary?.verdict ? 'done' : 'pending' },
             { label: '等待人工确认', status: state.dashboard.data?.decision_summary?.action_required ? 'active' : 'pending' },
@@ -128,7 +128,7 @@ export function WorkbenchPage() {
           title="证据与规则快照"
           items={[
             { label: '信息核查来源', value: state.report.data ? `${state.report.data.evidence.independent_source_count}/${state.report.data.evidence.evidence_count} 覆盖` : '待检查', status: state.report.data ? 'done' : 'pending' },
-            { label: 'LLM 分析材料', value: '只作材料', status: 'done' },
+            { label: '分析材料', value: '只作材料', status: 'done' },
             { label: '关键规则通过率', value: pendingRuleCount > 0 ? `${pendingRuleCount} 项待确认` : '已通过', status: pendingRuleCount > 0 ? 'active' : 'done' },
             { label: '审计只读记录', value: `${reviewCount} 条复盘`, status: reviewCount > 0 ? 'done' : 'pending' },
           ]}
@@ -239,7 +239,7 @@ export function WorkbenchPage() {
           <div className="state-label">主动咨询入口</div>
           <h2>带着问题进入咨询</h2>
           <p>主动咨询由你提交问题，系统只生成分析材料；最终动作仍由你线下决定。</p>
-          <p>遇到数据缺失、source health 降级、LLM/RAG/VecLite 不可用时，页面只展示安全状态与现有规则事实。</p>
+          <p>遇到数据缺失、数据源健康降级、分析模型或检索索引不可用时，页面只展示安全状态与现有规则事实。</p>
           <div className="link-row">
             <Link to="/consultation">发起主动咨询</Link>
           </div>

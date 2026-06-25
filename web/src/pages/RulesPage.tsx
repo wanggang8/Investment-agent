@@ -33,7 +33,7 @@ export function RulesPage() {
     confirmRuleProposal(proposalId, { confirm })
       .then(() => {
         setMessage(confirm ? '已确认送审。' : '已拒绝提案。')
-        refresh()
+        refresh(false)
       })
       .catch((error: unknown) => setMessage(error instanceof APIClientError ? error.message : '提案确认提交失败。'))
   }
@@ -42,7 +42,7 @@ export function RulesPage() {
     finalConfirmRuleProposal(proposalId, { confirm })
       .then(() => {
         setMessage(confirm ? '已提交最终确认。' : '已拒绝应用。')
-        refresh()
+        refresh(false)
       })
       .catch((error: unknown) => setMessage(error instanceof APIClientError ? error.message : '最终确认提交失败。'))
   }

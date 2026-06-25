@@ -178,7 +178,7 @@ export function DashboardFeature() {
           steps={[
             { label: '输入假设', status: 'done' },
             { label: '信息核查', status: todayReport ? 'done' : 'pending', detail: todayReport ? `${todayReport.evidence.evidence_count} 条证据` : '待检查' },
-            { label: 'LLM 分析材料', status: 'done', detail: '只作分析材料' },
+            { label: '分析材料', status: 'done', detail: '只作分析材料' },
             { label: '规则裁决', status: dashboard.decision_summary.final_verdict_status ? 'active' : 'pending' },
             { label: '最终建议', status: dashboard.decision_summary.verdict ? 'done' : 'pending' },
             { label: '等待人工确认', status: dashboard.decision_summary.action_required ? 'active' : 'pending' },
@@ -190,7 +190,7 @@ export function DashboardFeature() {
           title="证据与规则快照"
           items={[
             { label: '信息核查来源', value: todayReport ? `${todayReport.evidence.independent_source_count}/${todayReport.evidence.evidence_count} 覆盖` : '待检查', status: todayReport ? 'done' : 'pending' },
-            { label: 'LLM 分析材料', value: '只作材料', status: 'done' },
+            { label: '分析材料', value: '只作材料', status: 'done' },
             { label: '关键规则通过率', value: dashboard.triggered_rules.length ? `${dashboard.triggered_rules.length} 条命中` : '已通过', status: dashboard.triggered_rules.length ? 'active' : 'done' },
             { label: '审计只读记录', value: todayReport?.audit_link ? '可查看' : '待记录', status: todayReport?.audit_link ? 'done' : 'pending' },
           ]}

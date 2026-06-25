@@ -32,7 +32,7 @@ export function DailyDisciplineReportDetailPage() {
     <section className="page-card">
       <header className="page-header">
         <div>
-          <h1>每日纪律报告详情</h1>
+          <h1 className="page-title">每日纪律报告详情</h1>
           <p>查看单日报告摘要、证据覆盖、趋势和追踪链接。</p>
         </div>
         <strong>{report ? dailyDisciplineReportStatusLabels[report.status] : '加载中'}</strong>

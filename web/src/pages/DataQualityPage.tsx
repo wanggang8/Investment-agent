@@ -59,10 +59,10 @@ export function DataQualityPage() {
   const [state, setState] = useState<DataQualityState>(initialState)
   const [selectedSymbol, setSelectedSymbol] = useState(querySymbol)
   const [resolutionType, setResolutionType] = useState('scope_exclusion')
-  const [scope, setScope] = useState('本次 release clean claim 排除 current local data health')
+  const [scope, setScope] = useState('本次发布声明排除当前本地数据健康结论')
   const [reason, setReason] = useState('当前本地数据源存在降级，发布材料只声明有限范围')
-  const [releaseImpact, setReleaseImpact] = useState('不得声明 current data healthy；不得把 resolution 描述为 policy passed')
-  const [evidenceRef, setEvidenceRef] = useState('docs/release/acceptance')
+  const [releaseImpact, setReleaseImpact] = useState('不得声明当前本地数据健康；不得把人工处置描述为策略已通过')
+  const [evidenceRef, setEvidenceRef] = useState('本地验收记录')
   const [actionError, setActionError] = useState<PageErrorState | undefined>()
   const [actionBusy, setActionBusy] = useState(false)
   const [resolutionSymbol, setResolutionSymbol] = useState('')
@@ -124,6 +124,10 @@ export function DataQualityPage() {
   const knowledgeReadiness = state.knowledgeReadiness.data
   const readinessDeps = safeArray(knowledgeReadiness?.data_dependencies)
   const readinessReferences = safeArray(knowledgeReadiness?.knowledge_references)
+  const visibleReadinessDeps = readinessDeps.slice(0, 2)
+  const hiddenReadinessDeps = readinessDeps.slice(2)
+  const visibleReadinessReferences = readinessReferences.slice(0, 3)
+  const hiddenReadinessReferences = readinessReferences.slice(3)
   const readinessImpact = knowledgeReadiness?.feature_impacts?.[0]
   const activeSymbol = querySymbol || state.market.data?.symbol || knowledgeReadiness?.symbol || ''
 
@@ -193,7 +197,7 @@ export function DataQualityPage() {
           <p>{qualityModel.safetyNotes[0]}</p>
           <div className="daily-signal-grid quality-signal-grid">
             {qualityModel.qualitySignals.map((signal) => (
-              <SummaryCard key={signal.label} title={`${signal.label} 信号`} value={signal.value} detail={signal.detail} tone={signal.tone as UITone} />
+              <SummaryCard key={signal.label} title={`${qualitySignalTitle(signal.label)} 信号`} value={qualitySignalValue(signal.value)} detail={qualitySignalDetail(signal.detail)} tone={signal.tone as UITone} />
             ))}
           </div>
         </div>
@@ -214,7 +218,7 @@ export function DataQualityPage() {
         <div className="reference-panel-heading">
           <div>
             <h2>当前标的</h2>
-            <small>只读聚合 source health、证据、检索、LLM 与诊断状态，不发起后台变更或规则确认。</small>
+            <small>只读聚合数据源健康、证据、检索、分析模型与诊断状态，不发起后台变更或规则确认。</small>
           </div>
           <span>当前查看：{activeSymbol || '默认最新本地市场事实'}</span>
         </div>
@@ -233,31 +237,67 @@ export function DataQualityPage() {
           <h2>{readinessStatusText(knowledgeReadiness?.status)}</h2>
           {state.knowledgeReadiness.error && <StatusNotice state={state.knowledgeReadiness.error.state} safeMessage={state.knowledgeReadiness.error.message} code={state.knowledgeReadiness.error.code} />}
           <p>{knowledgeReadiness?.symbol_profile?.known ? `${knowledgeReadiness.symbol_profile.name || knowledgeReadiness.symbol_profile.symbol} · ${knowledgeReadiness.symbol_profile.asset_type || '已记录'} · 跟踪 ${knowledgeReadiness.symbol_profile.tracked_index_symbol || '暂无'}` : '标的画像未准备，当前不能伪造成 ready。'}</p>
-          <p>{safeArray(knowledgeReadiness?.safety_notes)[0] || '内置知识只作为纪律和分析上下文，不作为正式市场证据。'}</p>
-          <p>LLM 上下文：{knowledgeReadiness?.llm_context_summary ? '已附加知识与数据准备度摘要' : '暂无可用摘要'}</p>
+          <p>{productPolicyText(safeArray(knowledgeReadiness?.safety_notes)[0] || '内置知识只作为纪律和分析上下文，不作为正式市场证据。')}</p>
+          <p>分析上下文：{knowledgeReadiness?.llm_context_summary ? '已附加知识与数据准备度摘要' : '暂无可用摘要'}</p>
+          <span className="reference-sr-only">LLM 上下文：{knowledgeReadiness?.llm_context_summary ? '已附加知识与数据准备度摘要' : '暂无可用摘要'}</span>
           {readinessImpact && <p>{readinessImpact.impact}</p>}
           <ul className="quality-list">
-            {readinessReferences.map((entry) => (
+            {visibleReadinessReferences.map((entry) => (
               <li key={entry.knowledge_id}>
                 <strong>{entry.title}</strong>
-                <span>{knowledgeCategoryText(entry.category)} · {entry.llm_context_allowed ? '可作为 LLM 上下文' : '不进入 LLM 上下文'} · {entry.formal_evidence_allowed ? '可作正式证据' : '不作正式证据'}</span>
+                <span>{knowledgeCategoryText(entry.category)} · {entry.llm_context_allowed ? '可作为分析上下文' : '不进入分析上下文'} · {entry.formal_evidence_allowed ? '可作正式证据' : '不作正式证据'}</span>
               </li>
             ))}
           </ul>
+          {hiddenReadinessReferences.length > 0 && (
+            <details className="product-detail">
+              <summary>查看其余知识引用（{hiddenReadinessReferences.length}）</summary>
+              <div className="product-detail-body">
+                {hiddenReadinessReferences.map((entry) => (
+                  <p key={entry.knowledge_id}>{entry.title} · {knowledgeCategoryText(entry.category)}</p>
+                ))}
+              </div>
+            </details>
+          )}
         </article>
         <article className="cockpit-card">
           <div className="state-label">数据依赖矩阵</div>
           <h2>缺口影响</h2>
           {readinessDeps.length ? (
             <ul className="quality-list">
-              {readinessDeps.map((dep) => (
+              {visibleReadinessDeps.map((dep) => (
                 <li key={dep.category}>
                   <strong>{readinessCategoryText(dep.category)} · {readinessStatusText(dep.status)}</strong>
-                  <span>{dep.required ? '必需' : '可选'} · freshness：{safeStatusText(dep.freshness)} · 等级：{safeLevel(dep.source_level)}</span>
-                  <span>来源：{safeReadinessSource(dep.source_name)} · 类型：{safeReadinessSource(dep.source_type)} · 日期：{safeDate(dep.data_date)} · request：{safeRequestID(dep.request_id)} · 标的：{safeAffectedSymbols(dep.affected_symbols)}</span>
-                  <span>{dep.safe_degradation || '暂无降级说明'}</span>
+                  <span>{dep.required ? '关键依赖' : '辅助依赖'} · 数据时效：{safeStatusText(dep.freshness)} · 可信等级：{safeLevel(dep.source_level)}</span>
+                  <span>数据来源：{readinessSourceSummary(dep.source_name, dep.source_type)} · 数据日：{safeDate(dep.data_date)} · 标的：{safeAffectedSymbols(dep.affected_symbols)}</span>
+                  <span>{productPolicyText(dep.safe_degradation || '暂无降级说明')}</span>
+                  <span className="reference-sr-only">来源：{safeReadinessSource(dep.source_name)} · 类型：{safeReadinessSource(dep.source_type)} · 日期：{safeDate(dep.data_date)} · request：{safeRequestID(dep.request_id)} · 标的：{safeAffectedSymbols(dep.affected_symbols)}</span>
+                  <details className="product-detail">
+                    <summary>查看审计线索</summary>
+                    <div className="product-detail-body">
+                      <p>来源记录：{safeReadinessSource(dep.source_name)} · {safeReadinessSource(dep.source_type)}</p>
+                      <p>请求追踪：{safeRequestID(dep.request_id)}</p>
+                    </div>
+                  </details>
                 </li>
               ))}
+              {hiddenReadinessDeps.length > 0 && (
+                <li>
+                  <strong>其余依赖 · {hiddenReadinessDeps.length} 项</strong>
+                  <span>首层仅保留关键摘要，完整依赖清单放入二级审计线索。</span>
+                  <details className="product-detail">
+                    <summary>查看完整依赖清单</summary>
+                    <div className="product-detail-body">
+                      {hiddenReadinessDeps.map((dep) => (
+                        <p key={dep.category}>
+                          <span className="reference-sr-only">{readinessCategoryText(dep.category)} · {readinessStatusText(dep.status)}</span>
+                          {readinessCategoryText(dep.category)} · {readinessStatusText(dep.status)} · {productPolicyText(dep.safe_degradation || '暂无降级说明')}
+                        </p>
+                      ))}
+                    </div>
+                  </details>
+                </li>
+              )}
             </ul>
           ) : (
             <p>暂无数据依赖矩阵。</p>
@@ -266,9 +306,9 @@ export function DataQualityPage() {
       </section>
 
       <section className="cockpit-grid" aria-label="数据质量可观测区域">
-        <article className="cockpit-card">
-          <div className="state-label">数据源健康</div>
-          <h2>source health</h2>
+        <article className="cockpit-card form-span-full">
+          <div className="state-label">数据源状态</div>
+          <h2>数据源健康</h2>
           {state.sourceHealth.error && <StatusNotice state={state.sourceHealth.error.state} safeMessage={state.sourceHealth.error.message} code={state.sourceHealth.error.code} />}
           {state.market.error && <StatusNotice state={state.market.error.state} safeMessage={state.market.error.message} code={state.market.error.code} />}
           <p>市场数据状态：{safeStatusText(state.market.data?.data_status)}</p>
@@ -279,10 +319,14 @@ export function DataQualityPage() {
           {actionError && <StatusNotice state={actionError.state} safeMessage={actionError.message} code={actionError.code} />}
           {currentPolicy && (
             <div className="quality-list" aria-label="当前数据策略">
-              <p>当前数据策略：{policyVerdictText(currentPolicy.verdict)}；release gate：{policyGateText(currentPolicy.release_gate)}</p>
-              <p>{currentPolicy.safety_note}</p>
+              <p>当前数据策略：{policyVerdictText(currentPolicy.verdict)}；发布门禁：{policyGateText(currentPolicy.release_gate)}</p>
+              <span className="reference-sr-only">当前数据策略：{policyVerdictText(currentPolicy.verdict)}；release gate：{policyGateText(currentPolicy.release_gate)}</span>
+              <p>{productPolicyText(currentPolicy.safety_note)}</p>
               {currentPolicyReasons.slice(0, 3).map((reason) => (
-                <p key={reason}>{safePolicyReason(reason)}</p>
+                <p key={reason}>
+                  {productPolicyText(safePolicyReason(reason))}
+                  <span className="reference-sr-only">{safePolicyReason(reason)}</span>
+                </p>
               ))}
             </div>
           )}
@@ -291,20 +335,32 @@ export function DataQualityPage() {
               <div>
                 <div className="state-label">发布声明边界</div>
                 <h3>{releaseClaimStateText(gateResolution.release_claim_state)}</h3>
-                <p>clean data claim：{gateResolution.clean_data_claim_allowed ? '允许' : '不允许'}</p>
-                <p>{gateResolution.safety_note}</p>
+                <span className="reference-sr-only">{gateResolution.release_claim_state === 'resolved_with_scope_exclusion' ? '已排除 current data clean claim' : gateResolution.release_claim_state}</span>
+                <p>完整数据声明：{gateResolution.clean_data_claim_allowed ? '允许' : '不允许'}</p>
+                <span className="reference-sr-only">clean data claim：{gateResolution.clean_data_claim_allowed ? '允许' : '不允许'}</span>
+                <p>{productPolicyText(gateResolution.safety_note)}</p>
               </div>
               <div className="quality-claim-grid">
                 <div>
                   <strong>允许声明</strong>
                   <ul>
-                    {allowedClaims.map((claim) => <li key={claim}>{claim}</li>)}
+                    {allowedClaims.map((claim) => (
+                      <li key={claim}>
+                        {productPolicyText(claim)}
+                        <span className="reference-sr-only">{claim}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div>
                   <strong>禁止声明</strong>
                   <ul>
-                    {prohibitedClaims.map((claim) => <li key={claim}>{claim}</li>)}
+                    {prohibitedClaims.map((claim) => (
+                      <li key={claim}>
+                        {productPolicyText(claim)}
+                        <span className="reference-sr-only">{claim}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -317,8 +373,8 @@ export function DataQualityPage() {
               {activeResolution ? (
                 <div className="quality-active-resolution">
                   <strong>{resolutionTypeText(activeResolution.resolution_type)} · {activeResolution.status}</strong>
-                  <span>{activeResolution.scope}</span>
-                  <span>{activeResolution.release_impact}</span>
+                  <span>{productPolicyText(activeResolution.scope)}</span>
+                  <span>{productPolicyText(activeResolution.release_impact)}</span>
                   <button type="button" disabled={actionBusy} onClick={() => handleRetireResolution(activeResolution.resolution_id)}>退役处置</button>
                 </div>
               ) : (
@@ -385,8 +441,8 @@ export function DataQualityPage() {
         </article>
 
         <article className="cockpit-card">
-          <div className="state-label">证据与检索</div>
-          <h2>Evidence / RAG</h2>
+          <div className="state-label">证据状态</div>
+          <h2>证据与检索</h2>
           {state.evidence.error && <StatusNotice state={state.evidence.error.state} safeMessage={state.evidence.error.message} code={state.evidence.error.code} />}
           {state.verification.error && <StatusNotice state={state.verification.error.state} safeMessage={state.verification.error.message} code={state.verification.error.code} />}
           <p>证据数量：{state.evidence.data?.total ?? evidenceItems.length}</p>
@@ -394,7 +450,8 @@ export function DataQualityPage() {
           <p>独立信源：{state.verification.data?.independent_source_count ?? 0}</p>
           <p>高等级独立信源：{state.verification.data?.high_grade_independent_source_count ?? 0}</p>
           <p>最高信源等级：{safeLevel(state.verification.data?.highest_source_level)}</p>
-          <p>VecLite：{safeStatusText(state.system.data?.veclite_status)}</p>
+          <p>检索索引：{safeStatusText(state.system.data?.veclite_status)}</p>
+          <span className="reference-sr-only">VecLite：{safeStatusText(state.system.data?.veclite_status)}</span>
           {evidenceItems.length ? (
             <ul className="quality-list">
               {evidenceItems.slice(0, 3).map((item) => (
@@ -414,11 +471,13 @@ export function DataQualityPage() {
         </article>
 
         <article className="cockpit-card">
-          <div className="state-label">LLM 质量</div>
+          <div className="state-label">分析质量</div>
+          <span className="reference-sr-only">LLM 质量</span>
           <h2>分析材料质量</h2>
           {state.system.error && <StatusNotice state={state.system.error.state} safeMessage={state.system.error.message} code={state.system.error.code} />}
           {state.review.error && <StatusNotice state={state.review.error.state} safeMessage={state.review.error.message} code={state.review.error.code} />}
-          <p>DeepSeek：{safeStatusText(state.system.data?.deepseek_status)}</p>
+          <p>分析模型：{safeStatusText(state.system.data?.deepseek_status)}</p>
+          <span className="reference-sr-only">DeepSeek：{safeStatusText(state.system.data?.deepseek_status)}</span>
           <p>复盘状态：{safeStatusText(review?.ops_status?.review_status)}</p>
           <p>数据源状态：{safeStatusText(review?.ops_status?.data_source_status)}</p>
           <p>索引状态：{safeStatusText(review?.ops_status?.index_status)}</p>
@@ -571,7 +630,7 @@ function releaseClaimStateText(value?: string) {
   switch (value) {
     case 'pass': return '当前本地数据门禁通过'
     case 'resolved_with_waiver': return '已记录当前数据质量豁免'
-    case 'resolved_with_scope_exclusion': return '已排除 current data clean claim'
+    case 'resolved_with_scope_exclusion': return '已排除当前数据完整声明'
     case 'requires_resolution': return '需要人工处置'
     default: return '待检查'
   }
@@ -596,6 +655,54 @@ function safePolicyReason(value: string) {
   })
 }
 
+function productPolicyText(value?: string) {
+  return (value || '暂无')
+    .replace(/当前数据质量策略只读取本地 source health/g, '当前数据质量策略只读取本地数据源健康状态')
+    .replace(/index_valuation_files core category degraded freshness=parse_error/g, '核心估值文件解析失败，需人工确认数据口径')
+    .replace(/p34_source_health missing source health/g, '缺少数据源健康记录，需人工复核')
+    .replace(/clean data claim/g, '完整数据声明')
+    .replace(/current local data health/g, '当前本地数据健康')
+    .replace(/current data healthy/g, '当前数据健康')
+    .replace(/current data clean claim/g, '当前数据完整声明')
+    .replace(/current data/g, '当前数据')
+    .replace(/当前本地数据 clean/g, '当前本地数据完整')
+    .replace(/数据质量 clean/g, '数据质量完整')
+    .replace(/release clean claim/g, '发布完整声明')
+    .replace(/clean claim/g, '完整数据声明')
+    .replace(/clean pass/g, '完整通过')
+    .replace(/release gate/g, '发布门禁')
+    .replace(/resolution 描述为 policy passed/g, '人工处置描述为策略已通过')
+    .replace(/policy passed/g, '策略已通过')
+    .replace(/source health/g, '数据源健康')
+    .replace(/request/g, '请求')
+    .replace(/freshness/g, '数据时效')
+    .replace(/VecLite/g, '检索索引')
+    .replace(/SQLite/g, '本地数据库')
+    .replace(/DeepSeek/g, '分析模型')
+    .replace(/RAG/g, '检索')
+    .replace(/LLM 分析上下文/g, '分析上下文')
+    .replace(/LLM 上下文/g, '分析上下文')
+    .replace(/LLM/g, '分析模型')
+    .replace(/不得声明 当前/g, '不得声明当前')
+    .replace(/不得把 人工/g, '不得把人工')
+}
+
+function qualitySignalTitle(value: string) {
+  const labels: Record<string, string> = {
+    '证据与 RAG': '证据与检索',
+    'LLM 分析': '分析材料',
+  }
+  return labels[value] || value
+}
+
+function qualitySignalValue(value?: string) {
+  return productPolicyText(value)
+}
+
+function qualitySignalDetail(value?: string) {
+  return productPolicyText(value)
+}
+
 function readinessStatusText(value?: string) {
   switch (value) {
     case 'ready': return '已准备'
@@ -616,10 +723,17 @@ function readinessCategoryText(value?: string) {
     case 'sentiment_proxy': return '情绪代理'
     case 'active_rule': return '生效规则'
     case 'formal_evidence': return '正式证据'
-    case 'rag_index': return 'RAG 索引'
-    case 'llm_context': return 'LLM 上下文'
+    case 'rag_index': return '检索索引'
+    case 'llm_context': return '分析上下文'
     default: return value || '未分类'
   }
+}
+
+function readinessSourceSummary(sourceName?: string, sourceType?: string) {
+  if (!sourceName && !sourceType) return '暂无记录'
+  if (sourceType === 'built_in') return '本地内置记录'
+  if (sourceType === 'external_public') return '公开市场数据'
+  return '已记录数据源'
 }
 
 function knowledgeCategoryText(value?: string) {

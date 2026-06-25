@@ -98,7 +98,7 @@ export function AppLayout() {
         <div className="app-topbar-status reference-topbar-actions" role="group" aria-label="页面状态工具栏">
           <span><Waves size={15} aria-hidden="true" />本地模式</span>
           <span><Database size={15} aria-hidden="true" />数据截至 {dataCutoff}</span>
-          <button type="button"><RefreshCw size={15} aria-hidden="true" />刷新摘要</button>
+          <button type="button" onClick={() => window.location.reload()} aria-label="刷新摘要" title="刷新当前页面摘要"><RefreshCw size={15} aria-hidden="true" />刷新摘要</button>
         </div>
         <button type="button" className="nav-toggle" aria-expanded={navOpen} aria-controls="primary-navigation" onClick={() => setNavOpen((open) => !open)}>
           导航

@@ -1,12 +1,26 @@
 # Release Materials
 
-> Updated: 2026-06-24
+> Updated: 2026-06-25
 
 This directory contains release-facing materials derived from actual acceptance runs. It does not contain temporary SQLite databases, raw logs, full prompts, raw HTTP responses, private paths, or complete API keys.
 
-Current source release version: `v0.1.2`.
+Current source release version: `v0.1.3`.
 
-`v0.1.0` remains the initial local release version marker recorded by P99. `v0.1.1` was pushed by P105 but its remote CI/Release workflows failed at the release package smoke scan. `v0.1.2` is the current patch release prepared by P106 to fix that package-scan false positive while preserving P100-P104 local-source acceptance, config compatibility, product acceptance, UX linkage fixes, and operation-linkage acceptance. P106 does not by itself claim Docker validation, installer validation, physical second-machine validation, or successful remote GitHub Release workflow completion unless separately verified after push.
+`v0.1.0` remains the initial local release version marker recorded by P99. `v0.1.1` was pushed by P105 but its remote CI/Release workflows failed at the release package smoke scan. `v0.1.2` fixed that package-scan false positive. `v0.1.3` is the current post-redesign source release prepared by P121 after P114-P120 product/UI/real-use/control acceptance closure and fresh P121 release review. P121 does not claim fresh P93 pass after P114-P120, Docker validation, installer validation, upgrade validation, physical second-machine validation, or successful remote GitHub Release workflow completion unless separately verified after push.
+
+## 2026-06-25 v0.1.3 Source Release
+
+| Document | Purpose |
+| --- | --- |
+| `docs/release/release-v0.1.3.md` | Release notes for the P121 `v0.1.3` source release and tag content. |
+| `docs/release/acceptance/2026-06-25-p121-final-review-and-v0.1.3-tag-release.md` | P121 final release review, validation gates, package identity, and release boundaries. |
+| `docs/release/acceptance/2026-06-25-p114-p119-final-closure-summary.md` | P120 closure summary for P114-P119 scoped UI/product/real-use acceptance. |
+| `docs/release/acceptance/2026-06-25-p119-full-ui-control-and-affordance-acceptance.md` | P119 all production UI controls and upstream/light toggle acceptance. |
+| `docs/release/acceptance/2026-06-25-p118-product-usability-edge-scenario-acceptance.md` | P118 product usability edge scenario acceptance. |
+| `docs/release/acceptance/2026-06-25-p117-continuous-product-usability-acceptance.md` | P117 continuous product usability acceptance. |
+| `docs/release/acceptance/2026-06-25-p116-multi-fund-transaction-ledger-acceptance.md` | P116 multi-fund transaction ledger acceptance. |
+| `docs/release/acceptance/2026-06-25-p115-real-user-scenario-acceptance.md` | P115 real user scenario acceptance. |
+| `docs/release/acceptance/2026-06-24-p114-visual-productization-alignment-fixes.md` | P114 visual productization and alignment fixes. |
 
 ## 2026-06-18 Release Candidate And Package
 

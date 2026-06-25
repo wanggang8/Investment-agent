@@ -61,7 +61,7 @@ export function buildDataQualityExperienceModel(input: DataQualityExperienceInpu
 
   const sourceSignal: DataQualitySignal = degradedSources.length || isDegraded(input.market?.data_status) || dataSourceNeedsInspection
     ? { label: '数据源健康', value: `${Math.max(degradedSources.length, isDegraded(input.market?.data_status) || dataSourceNeedsInspection ? 1 : 0)} 项需检查`, detail: '存在过期、缺失或解析失败的数据源事实。', tone: 'warning' }
-    : { label: '数据源健康', value: '当前可用', detail: '未发现 source health 降级记录。', tone: sourceHealth.length ? 'success' : 'unknown' }
+    : { label: '数据源健康', value: '当前可用', detail: '未发现数据源健康降级记录。', tone: sourceHealth.length ? 'success' : 'unknown' }
 
   const evidenceSignal: DataQualitySignal = evidenceTotal > 0 && input.verification?.verification_status === 'satisfied' && !isDegraded(input.system?.veclite_status) && !indexNeedsInspection
     ? { label: '证据与 RAG', value: `${evidenceTotal} 条证据`, detail: `${input.verification.independent_source_count} 个独立信源，VecLite ${input.system?.veclite_status ?? '暂无'}` , tone: 'success' }
@@ -98,7 +98,7 @@ function buildPolicySignal(currentRegression?: DataSourceQualityRegression, gate
   if (!policy) return undefined
   switch (gateResolution?.release_claim_state) {
     case 'pass':
-      return { label: '当前数据策略', value: '通过', detail: '当前 source health 满足 release gate。', tone: 'success' }
+      return { label: '当前数据策略', value: '通过', detail: '当前数据源健康满足发布门禁。', tone: 'success' }
     case 'resolved_with_waiver':
       return { label: '当前数据策略', value: '已记录豁免', detail: '存在 waiver 记录；不得描述为 clean pass。', tone: 'warning' }
     case 'resolved_with_scope_exclusion':
@@ -106,7 +106,7 @@ function buildPolicySignal(currentRegression?: DataSourceQualityRegression, gate
   }
   switch (policy.release_gate) {
     case 'pass':
-      return { label: '当前数据策略', value: '通过', detail: '当前 source health 满足 release gate。', tone: 'success' }
+      return { label: '当前数据策略', value: '通过', detail: '当前数据源健康满足发布门禁。', tone: 'success' }
     case 'waiver_required':
       return { label: '当前数据策略', value: '需豁免记录', detail: `需记录 ${policy.waiver_count} 项 waiver；不得描述为 clean pass。`, tone: 'warning' }
     case 'block':
@@ -146,7 +146,7 @@ function resolveOverallTone(signals: DataQualitySignal[], errors?: PageErrorStat
 function buildDataQualityActions(impactedDecisionID?: string, hasPolicy?: boolean): DataQualityAction[] {
   const actions: DataQualityAction[] = [
     { label: '查看数据源设置', detail: '检查本地数据源启用状态和配置。', href: '/settings' },
-    { label: '查看证据', detail: '核对证据来源等级、核验状态和 RAG 索引。', href: '/evidence' },
+    { label: '查看证据', detail: '核对证据来源等级、核验状态和检索索引。', href: '/evidence' },
     { label: '查看质量复盘', detail: '回到本地复盘摘要确认缺证据和降级工作流。', href: '/review' },
     { label: '查看风险预警', detail: '确认数据降级是否触发本地风险 SOP。', href: '/risk-alerts' },
   ]
@@ -154,7 +154,7 @@ function buildDataQualityActions(impactedDecisionID?: string, hasPolicy?: boolea
     actions.splice(1, 0, { label: '查看受影响决策', detail: '从降级工作流回到具体决策解释。', href: `/decisions/${encodeURIComponent(impactedDecisionID)}` })
   }
   if (hasPolicy) {
-    actions.unshift({ label: '查看当前数据策略', detail: '复核 policy verdict、release gate 和 waiver/blocking reason。', href: '/data-quality' })
+    actions.unshift({ label: '查看当前数据策略', detail: '复核策略结论、发布门禁和人工处置原因。', href: '/data-quality' })
   }
   return actions
 }

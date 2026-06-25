@@ -23,7 +23,7 @@ export function EvidenceTable({ items }: Props) {
         </select>
       </label>
       {filteredItems.length === 0 ? (
-        <p className="muted-text">暂无匹配证据。VecLite 不可用或证据不足时，请查看刷新状态。</p>
+        <p className="muted-text">暂无匹配证据。检索索引不可用或证据不足时，请查看刷新状态。</p>
       ) : (
         <div className="table-wrap">
           <table className="responsive-table">

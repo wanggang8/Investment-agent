@@ -1,7 +1,7 @@
 {
   "status": "passed",
   "change": "p104-full-product-operation-linkage-acceptance",
-  "generated_at": "2026-06-24T03:23:58Z",
+  "generated_at": "2026-06-25T01:33:38Z",
   "base_url": "http://127.0.0.1:18104",
   "sqlite_path": "/Users/vick/Desktop/project/Investment-agent/tmp/p104-product-operation-linkage/investment-agent-p104.db",
   "operation_steps": [
@@ -11,7 +11,7 @@
     },
     {
       "step": "portfolio_adjustment_readback",
-      "snapshot_id": "snap_d75cd5fa3e8eacca",
+      "snapshot_id": "snap_936295b9cb8e055b",
       "status": "passed"
     },
     {

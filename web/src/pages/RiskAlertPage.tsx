@@ -128,7 +128,12 @@ function RiskContextSummary({ context }: { context?: unknown }) {
     <div className="muted-text" aria-label="SOP 上下文">
       {item.sop && <p>SOP：{item.sop}</p>}
       {prerequisites.length ? <p>数据前提：{prerequisites.join('、')}</p> : null}
-      {item.llm_role && <p>LLM 角色：{item.llm_role}</p>}
+      {item.llm_role && (
+        <>
+          <p>分析角色：{item.llm_role}</p>
+          <span className="reference-sr-only">LLM 角色：{item.llm_role}</span>
+        </>
+      )}
     </div>
   )
 }

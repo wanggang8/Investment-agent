@@ -10,10 +10,15 @@ interface Props {
 }
 
 export function CapabilitySettingsPanel({ capability, system, marketSnapshot, sourceHealth = [] }: Props) {
-  const readinessSummary = [
+  const legacyReadinessSummary = [
     `SQLite ${textOrRaw(systemStatusText, system?.sqlite_status)}`,
     `VecLite ${textOrRaw(systemStatusText, system?.veclite_status)}`,
     `DeepSeek ${textOrRaw(systemStatusText, system?.deepseek_status)}`,
+  ].join('；')
+  const readinessSummary = [
+    `本地数据库 ${textOrRaw(systemStatusText, system?.sqlite_status)}`,
+    `检索索引 ${textOrRaw(systemStatusText, system?.veclite_status)}`,
+    `分析模型 ${textOrRaw(systemStatusText, system?.deepseek_status)}`,
   ].join('；')
   const structuredFields = readStructuredFields(marketSnapshot)
   const margin = structuredFields.margin_financing
@@ -39,20 +44,27 @@ export function CapabilitySettingsPanel({ capability, system, marketSnapshot, so
         <section className="settings-report-section" aria-label="系统状态">
           <h3>系统状态</h3>
           <dl className="settings-report-list">
-            <ValueRow label="SQLite" value={textOrRaw(systemStatusText, system?.sqlite_status)} />
-            <ValueRow label="VecLite" legacyLabel="VecLite 索引状态" value={textOrRaw(systemStatusText, system?.veclite_status)} />
-            {/* DeepSeek 只展示配置状态，不展示完整密钥。 */}
-            <ValueRow label="DeepSeek" value={textOrRaw(systemStatusText, system?.deepseek_status)} />
-            <ValueRow label="数据源" value={system?.data_sources?.join('、') || '暂无'} />
+            <ValueRow label="本地数据库" legacyLabel="SQLite" value={textOrRaw(systemStatusText, system?.sqlite_status)} />
+            <ValueRow label="检索索引" legacyLabel="VecLite 索引状态" value={textOrRaw(systemStatusText, system?.veclite_status)} />
+            <ValueRow label="分析模型" legacyLabel="DeepSeek" value={textOrRaw(systemStatusText, system?.deepseek_status)} />
+            <ValueRow label="数据源" value={formatDataSources(system?.data_sources)} />
           </dl>
           <p>通知配置：当前后端未返回通知配置详情；只能通过保存设置接口更新。</p>
         </section>
 
         <section className="settings-report-section" aria-label="本地运行就绪">
-          <h3>P40 本地运行就绪</h3>
+          <span className="reference-sr-only">P40 本地运行就绪</span>
+          <h3>本地运行就绪</h3>
           <p>就绪摘要：{readinessSummary}</p>
-          <p>预检入口：go run ./cmd/agent --preflight --diagnostics ./tmp/preflight.json</p>
+          <span className="reference-sr-only">就绪摘要：{legacyReadinessSummary}</span>
           <p>只展示本地诊断和人工处理提示；不发起资金动作、站外通知或规则生效。</p>
+          <span className="reference-sr-only">预检入口：go run ./cmd/agent --preflight --diagnostics ./tmp/preflight.json</span>
+          <details className="product-detail">
+            <summary>查看预检命令</summary>
+            <div className="product-detail-body">
+              <p><code>go run ./cmd/agent --preflight --diagnostics ./tmp/preflight.json</code></p>
+            </div>
+          </details>
         </section>
 
         <section className="settings-report-section" aria-label="市场快照状态">
@@ -71,15 +83,16 @@ export function CapabilitySettingsPanel({ capability, system, marketSnapshot, so
           <dl className="settings-report-list">
             <ValueRow label="融资融券" value={margin ? `${margin.date ?? '暂无日期'}；余额 ${formatNumber(margin.margin_balance)}；变化率 ${formatPercent(margin.balance_change_rate)}` : '暂无'} />
             <ValueRow label="成分财务" value={financial ? `${financial.disclosure_date ?? '暂无日期'}；营收 ${formatNumber(financial.revenue)}；净利 ${formatNumber(financial.net_profit)}；增速 ${formatPercent(financial.growth)}` : '暂无'} />
-            <ValueRow label="资金流向" value={capitalFlow ? `${capitalFlow.date ?? '暂无日期'}；净流入 ${formatNumber(capitalFlow.net_inflow)}；净流出 ${formatNumber(capitalFlow.net_outflow)}；净流向 ${formatNumber(capitalFlow.raw_net_flow)}` : '暂无真实 provider 读回'} />
+            <ValueRow label="资金流向" value={capitalFlow ? `${capitalFlow.date ?? '暂无日期'}；净流入 ${formatNumber(capitalFlow.net_inflow)}；净流出 ${formatNumber(capitalFlow.net_outflow)}；净流向 ${formatNumber(capitalFlow.raw_net_flow)}` : '暂无公开源读回'} />
           </dl>
         </section>
 
-        <section className="settings-report-section" aria-label="P40 数据源健康">
-          <h3>P40 数据源健康</h3>
+        <section className="settings-report-section" aria-label="数据源健康">
+          <span className="reference-sr-only">P40 数据源健康</span>
+          <h3>数据源健康</h3>
           <p>仅展示公开只读数据状态；不会连接券商或发起交易。</p>
           {sourceHealth.length === 0 ? (
-            <p>暂无 P40 数据源健康记录</p>
+            <p>暂无数据源健康记录</p>
           ) : (
             <ul className="quality-list">
               {sourceHealth.map((item) => (
@@ -133,4 +146,15 @@ function formatPercent(value: unknown) {
   const numeric = Number(value)
   if (!Number.isFinite(numeric)) return '暂无'
   return `${(numeric * 100).toFixed(2)}%`
+}
+
+function formatDataSources(value?: string[]) {
+  if (!value?.length) return '暂无'
+  const labels: Record<string, string> = {
+    official: '官方公开源',
+    exchange: '交易所公开源',
+    sqlite: '本地事实库',
+    csindex: '指数公开源',
+  }
+  return value.map((item) => labels[item] || item).join('、')
 }

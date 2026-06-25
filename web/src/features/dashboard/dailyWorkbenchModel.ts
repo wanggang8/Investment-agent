@@ -100,7 +100,7 @@ export function buildDailyWorkbenchModel(input: DailyWorkbenchInput): DailyWorkb
 
   const explanationLinks: DailyAction[] = [
     { label: '查看证据', href: '/evidence', detail: '核对今日结论引用的本地证据。', priority: 'follow_up' },
-    { label: '查看数据质量', href: '/data-quality', detail: '确认数据源、RAG 与 LLM 质量状态。', priority: 'follow_up' },
+    { label: '查看数据质量', href: '/data-quality', detail: '确认数据源、检索索引与分析质量状态。', priority: 'follow_up' },
     { label: '查看决策闭环', href: '/decision-loop', detail: '追踪建议、人工记录、风险和复盘链路。', priority: 'follow_up' },
     { label: '查看审计', href: '/audit', detail: '只读检查本地审计事件。', priority: 'follow_up' },
   ]

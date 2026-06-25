@@ -30,7 +30,7 @@ export function buildLocalOpsModel(input: {
     overallTone: blockingRows ? 'danger' : needsCheck ? 'warning' : 'success',
     metrics: buildMetrics(input, degradedSources.length),
     nextActions: buildLocalActions(degradedSources.length, input.validation),
-    safetyNotes: ['系统页只展示本地配置、诊断、脱敏预览和人工复验路径，不展示密钥、私有路径或 raw 诊断材料。'],
+    safetyNotes: ['系统页只展示本地配置、诊断摘要、脱敏预览和人工复验路径；敏感配置、私有路径和底层诊断材料仅在二级详情中脱敏呈现。'],
   }
 }
 
@@ -61,4 +61,13 @@ function buildLocalActions(degradedSourceCount: number, validation?: LocalKnowle
   if (validation) actions.push({ label: '复核知识导入', detail: '确认脱敏预览、阻断项和索引计划。', href: '/local-knowledge' })
   actions.push({ label: '查看设置', detail: '检查能力圈、系统状态和本地市场刷新入口。', href: '/settings' })
   return actions
+}
+
+export function localOpsMetricTitle(label: string) {
+  const titles: Record<string, string> = {
+    SQLite: '本地数据库',
+    VecLite: '检索索引',
+    DeepSeek: '分析模型',
+  }
+  return titles[label] || label
 }

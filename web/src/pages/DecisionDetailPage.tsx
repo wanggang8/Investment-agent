@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { DecisionTrace } from '../components/decision/DecisionTrace'
+import { Button, Field } from '../components/ui'
 import { APIClientError } from '../services/client'
 import { getDecision, createConfirmation, consultDecision } from '../services/decision'
 import type { ConfirmationRequest, DecisionDetailResponse } from '../types/decision'
@@ -92,26 +93,34 @@ export function DecisionDetailPage() {
         </aside>
       </section>
       {isConsultation && (
-        <article className="cockpit-card">
+        <article className="cockpit-card form-card">
           <div className="state-label">咨询输入</div>
           <h2>输入假设</h2>
           <p>填写标的、场景和问题后，系统只生成本地分析材料和规则裁决记录；不会自动交易、自动确认或自动应用规则。</p>
-          <div className="form-grid">
-            <label>标的代码<input value={symbol} onChange={(event) => setSymbol(event.target.value)} /></label>
-            <label>咨询场景
+          <div className="form-grid form-grid-wide">
+            <Field id="consult-symbol" label="标的代码">
+              <input value={symbol} onChange={(event) => setSymbol(event.target.value)} />
+            </Field>
+            <Field id="consult-scenario" label="咨询场景">
               <select value={scenario} onChange={(event) => setScenario(event.target.value)}>
                 <option value="hold_review">持有评估</option>
                 <option value="buy_review">买入评估</option>
                 <option value="sell_review">卖出评估</option>
                 <option value="rebalance_review">再平衡评估</option>
               </select>
-            </label>
-            <label>上一轮基准情景中枢（%）<input inputMode="decimal" value={previousBaseMidpointPercent} onChange={(event) => setPreviousBaseMidpointPercent(event.target.value)} placeholder="可选" /></label>
-            <label>目标收益率（%）<input inputMode="decimal" value={targetReturnPercent} onChange={(event) => setTargetReturnPercent(event.target.value)} placeholder="可选" /></label>
+            </Field>
+            <Field id="consult-previous-base" label="上一轮基准情景中枢（%）">
+              <input inputMode="decimal" value={previousBaseMidpointPercent} onChange={(event) => setPreviousBaseMidpointPercent(event.target.value)} placeholder="可选" />
+            </Field>
+            <Field id="consult-target-return" label="目标收益率（%）">
+              <input inputMode="decimal" value={targetReturnPercent} onChange={(event) => setTargetReturnPercent(event.target.value)} placeholder="可选" />
+            </Field>
+            <Field id="consult-question" label="咨询问题" className="form-span-full">
+              <textarea value={question} onChange={(event) => setQuestion(event.target.value)} />
+            </Field>
           </div>
-          <label>咨询问题<textarea value={question} onChange={(event) => setQuestion(event.target.value)} /></label>
           <div className="action-row">
-            <button type="button" onClick={handleConsult}>提交咨询</button>
+            <Button onClick={handleConsult}>提交咨询</Button>
           </div>
         </article>
       )}

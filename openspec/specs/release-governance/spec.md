@@ -1198,3 +1198,157 @@ P107 SHALL make the public README entrypoint understandable to both English and 
 - **GIVEN** the README language switch and documentation links are updated
 - **WHEN** local Markdown links are checked
 - **THEN** linked local files and diagram assets SHALL resolve within the repository.
+
+### Requirement: P115 Real User Scenario Acceptance
+The project SHALL maintain a repeatable real-user-scenario acceptance gate that verifies broad product journeys through visible UI entry points, HTTP APIs, SQLite side effects, downstream readback, audit traceability, degradation behavior, and forbidden automation absence.
+
+#### Scenario: Scenario matrix covers visible product operations
+- **GIVEN** P115 validation is prepared
+- **WHEN** the P115 scenario matrix is written
+- **THEN** it SHALL cover first launch, empty account onboarding, portfolio initialization, holding maintenance, batch import, offline transactions, local fact correction, rebalance review, consultation, decision detail, manual confirmation, decision error marking, decision loop, evidence refresh, RAG/index readiness, local knowledge import, market refresh, data-quality resolution, risk lifecycle, rule governance, notifications, daily reports, daily auto-run status, dashboard/workbench summaries, review, audit, settings updates, forbidden settings-based rule/SOP mutation, API diagnostics, local install diagnostics, mobile operation, browser-level interaction parity, and failure/degradation cases
+- **AND** each scenario SHALL specify expected UI/browser or API evidence, SQLite readback, downstream readback, and safety negative evidence
+- **AND** actual pass/fail status SHALL remain pending until execution evidence exists.
+
+#### Scenario: Runner records scenario-level evidence
+- **GIVEN** the repository source tree is available locally
+- **WHEN** the P115 runner is executed
+- **THEN** it SHALL use an isolated temporary SQLite database and local backend/frontend where required
+- **AND** it SHALL produce a scenario-level summary with statuses such as `fresh_pass`, `scoped_pass`, `degraded_expected`, or `blocked`
+- **AND** it SHALL record config mode, runtime mode, stub/provider/LLM mode, HTTP method/path/status/request ids, SQLite table/field before-after readback, downstream page or endpoint, screenshots or DOM checks when used, console errors, redaction results, and safety counters
+- **AND** it SHALL preserve separate evidence for API/SQLite, browser, and degradation layers.
+
+#### Scenario: Safety boundary remains explicit
+- **GIVEN** P115 validation has completed
+- **WHEN** the acceptance record is written
+- **THEN** it SHALL fail or explicitly block release claims if broker/order/push capability, automatic trading, automatic confirmation, automatic rule application, or return-guarantee evidence is present
+- **AND** it SHALL not treat stub, fixture, deterministic-local, single-symbol, or degraded-provider evidence as proof of future external provider availability
+- **AND** P104-derived local seeded evidence SHALL be labeled as local functional linkage evidence rather than external provider or real LLM evidence.
+
+### Requirement: P116 Multi-Fund Transaction Ledger Acceptance
+
+The project SHALL provide a repeatable local acceptance change for complex multi-fund transaction ledger scenarios.
+
+#### Scenario: Multi-fund ledger coverage
+
+- **WHEN** P116 is executed
+- **THEN** it SHALL validate multiple fund/ETF-like symbols, multiple offline transaction types, mixed batch import, invalid transaction rejection, decision confirmation linkage, downstream readback, and safety negative evidence.
+
+#### Scenario: No expanded runtime claims
+
+- **WHEN** P116 passes
+- **THEN** release materials SHALL describe it only as local-source functional reality evidence and SHALL NOT claim broker integration, automatic trading, external push, automatic confirmation, automatic rule application, release package refresh, physical second-machine validation, future provider availability, or fresh real LLM output.
+
+### Requirement: Continuous Product Usability Acceptance Evidence
+
+The release governance evidence SHALL include a repeatable continuous-use acceptance pass before declaring the local product broadly usable for real user workflows.
+
+#### Scenario: Seven-day local usability journey
+
+- **WHEN** an acceptance runner simulates a seven-day local user journey
+- **THEN** it SHALL cover cold start, account onboarding, daily routine, offline transaction updates, invalid input recovery, data-quality degradation handling, manual decision confirmation, marked-error review, cross-page readback and restart persistence
+- **AND** it SHALL write API/SQLite/browser evidence and a usability interpretation report
+- **AND** it SHALL distinguish local seeded evidence from external provider, LLM quality, broker execution, release packaging or physical second-machine claims.
+
+#### Scenario: Continuous-use safety boundaries
+
+- **WHEN** the continuous-use acceptance completes
+- **THEN** it SHALL report negative evidence for broker/order/push tables, automatic confirmation rows, automatic rule-application audit events, trading affordances, return guarantee claims and secret/raw prompt leakage
+- **AND** any stale historical audit check SHALL be recorded as stale rather than treated as a fresh pass.
+
+### Requirement: Product Usability Edge Scenario Acceptance Evidence
+
+The release governance evidence SHALL include a repeatable product-usability edge scenario acceptance pass before declaring the local product resilient for accumulated real-use workflows beyond the primary happy path.
+
+#### Scenario: Long-cycle and abnormal-use acceptance
+
+- **WHEN** an acceptance runner simulates accumulated local use beyond the primary continuous-use path
+- **THEN** it SHALL cover long-history data accumulation, abnormal input recovery, data-quality degradation handling, context-sensitive decision interpretation, multi-account household ledger facts, cross-page readback and restart persistence
+- **AND** it SHALL write API/SQLite/browser evidence and a product-usability interpretation report
+- **AND** it SHALL exclude release/install/upgrade claims unless a separate release deployment change explicitly covers them.
+
+#### Scenario: Edge-scenario safety boundaries
+
+- **WHEN** the edge scenario acceptance completes
+- **THEN** it SHALL report negative evidence for broker/order/push tables, automatic confirmation rows, automatic rule-application audit events, trading affordances, return guarantee claims and secret/raw prompt leakage
+- **AND** stale historical audit checks SHALL be recorded as stale rather than treated as fresh passes.
+
+### Requirement: P119 Full UI Control And Affordance Acceptance
+
+The product SHALL provide repeatable evidence that every production route has been reviewed for visible controls, form alignment, productized UI state, backend consistency, and forbidden investment-action affordances before claiming the P119 UI/control acceptance layer.
+
+#### Scenario: All visible route controls are inventoried and classified
+
+- **WHEN** the P119 browser runner visits the production routes from `web/src/App.tsx`
+- **THEN** it SHALL collect visible buttons, links, inputs, selects, textareas, details summaries, and navigation controls
+- **AND** every collected interactive control SHALL have a non-empty accessible or visible name
+- **AND** every control SHALL be classified as navigation, light interaction, read action, local fact write, governance confirmation, expected disabled, or boundary notice.
+
+#### Scenario: Key visible write controls are backed by real local state
+
+- **WHEN** P119 exercises safe-to-automate UI write operations
+- **THEN** portfolio facts, offline transaction facts, decision confirmations, risk SOP lifecycle updates, notification read state, data-quality resolutions, rule proposals, local knowledge imports, evidence maintenance, or market refresh actions SHALL have API and SQLite readback evidence
+- **AND** unsupported broker/order/auto paths SHALL remain absent.
+
+#### Scenario: Productized visual layout and copy pass
+
+- **WHEN** P119 captures desktop and mobile UI evidence
+- **THEN** routes SHALL not be blank
+- **AND** visible controls SHALL not overflow the viewport
+- **AND** pages SHALL not expose raw debug, mock, placeholder, secret, stack trace, undefined, null, or NaN UI copy outside explicitly allowed product boundary language
+- **AND** browser console errors, page errors, and API 5xx responses SHALL be zero.
+
+#### Scenario: Upstream toggle interactions are exercised
+
+- **WHEN** P119 classifies visible navigation toggles, details summaries, row expanders, filters, selects, and read-refresh controls as light or upstream interactions
+- **THEN** the browser runner SHALL exercise a representative cross-route sweep of those controls with before/after assertions
+- **AND** the final evidence SHALL include toggle interaction count and zero toggle issues.
+
+#### Scenario: Safety boundary remains explicit
+
+- **WHEN** P119 scans visible UI and SQLite schema/effects
+- **THEN** the product SHALL not expose one-click trading, broker order placement, order delegation, external push execution, automatic confirmation, automatic rule application, or return-guarantee affordances
+- **AND** any local-only operation SHALL continue to state or imply local fact recording rather than trade execution.
+
+### Requirement: P120 P114-P119 Final Closure Summary
+
+The project SHALL provide a single governance-only closure summary before archiving the P114-P119 acceptance chain.
+
+#### Scenario: Closure summary separates evidence from scope boundaries
+
+- **WHEN** P120 summarizes P114-P119
+- **THEN** it SHALL list each phase, its evidence source, its current status, and its user-facing conclusion
+- **AND** it SHALL state that P114-P119 remain unarchived until explicit user confirmation
+- **AND** it SHALL state that P93 remains stale after P114-P120 source/evidence changes if the P93 checker still returns stale
+- **AND** it SHALL not claim install, upgrade, release package, physical second-machine, broker, automatic trading, automatic confirmation, automatic rule application, prediction accuracy, return guarantee, fresh real LLM, or fresh provider validation.
+
+### Requirement: P121 final review gates v0.1.3 tag publication
+
+The repository SHALL publish `v0.1.3` only after a fresh P121 final review validates the current source tree and release-facing materials.
+
+#### Scenario: Fresh release review passes before tagging
+
+- **GIVEN** P114-P120 have been archived and the current source version is being advanced to `v0.1.3`
+- **WHEN** P121 release verification is executed
+- **THEN** OpenSpec strict validation, Go tests, Go vet, frontend tests, frontend build, P92 audit check, P121 final release review, whitespace checks, and local release package smoke/verify SHALL pass before the tag is created.
+
+#### Scenario: P93 stale boundary stays explicit
+
+- **GIVEN** P93 was completed before the P114-P120 post-redesign acceptance layer
+- **WHEN** `v0.1.3` release notes describe final review status
+- **THEN** they SHALL NOT claim fresh P93 pass after P114-P120
+- **AND** they SHALL record that P121 is the fresh release-governance review for the current tree.
+
+#### Scenario: v0.1.3 release claims stay bounded
+
+- **GIVEN** `v0.1.3` is described in release materials and tag content
+- **WHEN** release readiness is communicated
+- **THEN** the project MAY claim the scoped P114-P120 product/UI/real-use/control acceptance layer and P121 release gates
+- **AND** it SHALL NOT claim new Docker installation validation, upgrade validation, physical second-machine validation, broker connectivity, trading, one-click trading, order delegation, external push, automatic confirmation, automatic rule application, future provider availability, prediction accuracy, or investment returns unless separately validated.
+
+#### Scenario: Release package does not expose local workstation paths
+
+- **GIVEN** historical design and acceptance materials may mention local generated-image or workspace paths in source
+- **WHEN** the local release package script copies text files into the archive
+- **THEN** local absolute paths SHALL be replaced with stable placeholders before forbidden-content scanning and package inclusion
+- **AND** the package smoke and verify gates SHALL fail if any forbidden local path remains in included text files.
+

@@ -321,11 +321,11 @@ export function PortfolioPage() {
           <p>现金占比：{formatPercent(portfolio.snapshot.cash_ratio)}</p>
         </div>
       )}
-      <article className="cockpit-card">
+      <article className="cockpit-card form-card">
         <div className="state-label">首次使用引导</div>
         <h2>初始化/校准</h2>
         <p>这里只记录账户与持仓事实，不提供自动下单能力，也不连接交易接口。</p>
-        <div className="form-grid">
+        <div className="form-grid form-grid-wide">
           <Field id="portfolio-cash" label="现金" hint="本地账户现金事实，不连接交易接口。">
             <input inputMode="decimal" value={form.cash} onChange={(event) => updateForm('cash', event.target.value)} />
           </Field>
@@ -372,7 +372,7 @@ export function PortfolioPage() {
         </div>
         {calibrationMessage && <p>{calibrationMessage}</p>}
       </article>
-      <article className="cockpit-card">
+      <article className="cockpit-card form-card">
         <div className="state-label">持仓维护</div>
         <p>编辑、移除、修正都只产生本地审计事实。</p>
         <div className="action-row">
@@ -380,7 +380,7 @@ export function PortfolioPage() {
           <Button variant="danger" onClick={handleRemoveHolding} disabled={!firstPosition}>移除当前持仓</Button>
         </div>
       </article>
-      <article className="cockpit-card">
+      <article className="cockpit-card form-card">
         <div className="state-label">线下交易记录</div>
         <p>用于补记已由用户自行完成的线下买入、卖出或减仓。</p>
         <div className="form-grid">
@@ -396,7 +396,7 @@ export function PortfolioPage() {
           <Button onClick={handleOfflineTransaction}>记录线下交易</Button>
         </div>
       </article>
-      <article className="cockpit-card">
+      <article className="cockpit-card form-card">
         <div className="state-label">季度再平衡复核</div>
         <p>按核心 50%、卫星 20%、现金 30% 和 +/-15% 偏离阈值生成离线人工计划。</p>
         <div className="action-row">
@@ -419,7 +419,7 @@ export function PortfolioPage() {
           </section>
         )}
       </article>
-      <article className="cockpit-card">
+      <article className="cockpit-card form-card">
         <div className="state-label">批量导入与错误修正</div>
         <div className="action-row">
           <Button onClick={handleValidateImport}>校验批量导入</Button>

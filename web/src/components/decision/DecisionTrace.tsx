@@ -25,6 +25,18 @@ function textList(value: unknown) {
   return Array.isArray(value) && value.length ? value.filter(Boolean).join('、') : '暂无'
 }
 
+function productFallbackSourceText(value: string) {
+  return value.replace(/VecLite 索引/g, '检索索引').replace(/RAG/g, '检索')
+}
+
+function productAnalysisText(value: string) {
+  return value
+    .replace(/暂无可展示的 LLM 分析材料/g, '暂无可展示的分析材料')
+    .replace(/LLM 材料/g, '分析材料')
+    .replace(/LLM 分析材料/g, '分析材料')
+    .replace(/LLM 材料只作为分析输入/g, '分析材料只作为分析输入')
+}
+
 function holdingClassText(value?: string) {
   const mapped: Record<string, string> = {
     broad_index_etf: '宽基指数 ETF',
@@ -125,7 +137,7 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
             {explanation.missingDataWarnings.length ? (
               <ul className="quality-list">
                 {explanation.missingDataWarnings.map((warning, index) => (
-                  <li key={`warning-${index}-${warning}`}><strong>需复核</strong><span>{warning}</span></li>
+                  <li key={`warning-${index}-${warning}`}><strong>需复核</strong><span>{productAnalysisText(warning)}</span></li>
                 ))}
               </ul>
             ) : null}
@@ -135,9 +147,9 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
             <div className="state-label">可信度</div>
             <h2>可信度</h2>
             <ul>
-              {explanation.trustSummary.map((item, index) => <li key={`trust-${index}-${item}`}>{item}</li>)}
+              {explanation.trustSummary.map((item, index) => <li key={`trust-${index}-${item}`}>{productAnalysisText(item)}</li>)}
             </ul>
-            <p className="muted-text">{explanation.safetyNotes[1]}</p>
+            <p className="muted-text">{productAnalysisText(explanation.safetyNotes[1])}</p>
           </article>
         </section>
       </section>
@@ -192,14 +204,15 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
 
       {decision.retrieval_quality && (
         <article className="cockpit-card">
-          <div className="state-label">RAG / VecLite</div>
+          <div className="state-label">证据检索</div>
           <h3>检索质量</h3>
           <p>检索状态：{textOrRaw(retrievalQualityStatusText, decision.retrieval_quality.status)}</p>
           <p>查询摘要：{decision.retrieval_quality.query_summary || '暂无'}</p>
           <p>召回数量：{decision.retrieval_quality.top_k}</p>
           <p>索引健康：{textOrRaw(sourceHealthStatusText, decision.retrieval_quality.index_health)}</p>
           <p>索引新鲜度：{textOrRaw(sourceHealthStatusText, decision.retrieval_quality.index_freshness)}</p>
-          <p>Fallback 来源：{textOrRaw(retrievalFallbackSourceText, decision.retrieval_quality.fallback_source)}</p>
+          <p>备用来源：{productFallbackSourceText(textOrRaw(retrievalFallbackSourceText, decision.retrieval_quality.fallback_source))}</p>
+          <span className="reference-sr-only">Fallback 来源：{textOrRaw(retrievalFallbackSourceText, decision.retrieval_quality.fallback_source)}</span>
           <p>引用一致性：{textOrRaw(sourceConsistencyStatusText, decision.retrieval_quality.source_consistency_status)}</p>
           <p>降级原因：{decision.retrieval_quality.degraded_reason || '无'}</p>
           {decision.retrieval_quality.status === 'empty' && (
@@ -228,7 +241,8 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
               <p>置信度：{textOrRaw(confidenceText, report.confidence)}</p>
               {hasKnowledgeReadinessContext(report.input_summary) && (
                 <>
-                  <p>LLM 已参考知识与数据准备度摘要</p>
+                  <p>分析模型已参考知识与数据准备度摘要</p>
+                  <span className="reference-sr-only">LLM 已参考知识与数据准备度摘要</span>
                   <p>prompt {safePromptVersion(report.prompt_version)}；仅展示脱敏摘要。</p>
                 </>
               )}
@@ -258,8 +272,8 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
           <p>{expectedReturn.reason || '暂无说明'}</p>
           <p>{expectedReturn.disclaimer || '预期收益仅为情景分析，不构成收益承诺。'}</p>
           <ul>
-            {expectedReturnScenarios.length ? expectedReturnScenarios.map((scenario) => (
-              <li key={scenario.scenario}>
+            {expectedReturnScenarios.length ? expectedReturnScenarios.map((scenario, index) => (
+              <li key={`${index}-${scenario.scenario || 'scenario'}`}>
                 {scenarioText(scenario.scenario)}：{scenario.return_range}，概率 {probabilityText(expectedReturn, scenario.probability)}{scenario.trigger ? `，触发条件：${scenario.trigger}` : ''}
               </li>
             )) : <li>暂无预期收益情景。</li>}
@@ -268,8 +282,8 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
             <section className="proposal-item">
               <h3>持仓类别覆盖</h3>
               <ul>
-                {safeArray(expectedReturn.holding_class_coverage).map((item) => (
-                  <li key={`${item.holding_class}-${item.symbol}`}>{holdingClassText(item.holding_class)}：{item.symbol}，{item.status}</li>
+                {safeArray(expectedReturn.holding_class_coverage).map((item, index) => (
+                  <li key={`${index}-${item.holding_class || 'holding'}-${item.symbol || 'symbol'}`}>{holdingClassText(item.holding_class)}：{item.symbol}，{item.status}</li>
                 ))}
               </ul>
             </section>
@@ -278,8 +292,8 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
             <section className="proposal-item">
               <h3>假设监控</h3>
               <ul>
-                {safeArray(expectedReturn.assumption_checks).map((item) => (
-                  <li key={`${item.name}-${item.months_below}`}>{item.name}：预期 {formatPercent(item.expected)}，实际 {formatPercent(item.actual)}，低于预期 {item.months_below} 个月</li>
+                {safeArray(expectedReturn.assumption_checks).map((item, index) => (
+                  <li key={`${index}-${item.name || 'assumption'}-${item.months_below ?? 'months'}`}>{item.name}：预期 {formatPercent(item.expected)}，实际 {formatPercent(item.actual)}，低于预期 {item.months_below} 个月</li>
                 ))}
               </ul>
             </section>
@@ -288,8 +302,8 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
             <section className="proposal-item">
               <h3>历史相似场景</h3>
               <ul>
-                {safeArray(expectedReturn.historical_contexts).map((item) => (
-                  <li key={`${item.label}-${item.window}`}>
+                {safeArray(expectedReturn.historical_contexts).map((item, index) => (
+                  <li key={`${index}-${item.label || 'history'}-${item.window || 'window'}`}>
                     {item.label}：{item.window}，样本 {item.sample_count}，结果：{item.outcome}，最大回撤 {percentText(item.max_drawdown)}，修复：{item.recovery}，来源：{item.source || '暂无'}
                   </li>
                 ))}
@@ -320,8 +334,8 @@ export function DecisionTrace({ decision, onConfirm }: Props) {
       <article className="cockpit-card">
         <div className="state-label">裁决链</div>
         <ol>
-          {arbitrationChain.length ? arbitrationChain.map((step) => (
-            <li key={`${step.priority}-${step.rule_id}`}>{step.priority}. {step.rule_id}：{step.result}</li>
+          {arbitrationChain.length ? arbitrationChain.map((step, index) => (
+            <li key={`${index}-${step.priority ?? 'priority'}-${step.rule_id || 'rule'}`}>{step.priority}. {step.rule_id}：{step.result}</li>
           )) : <li>暂无裁决链。</li>}
         </ol>
       </article>

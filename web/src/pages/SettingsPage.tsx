@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { CapabilitySettingsPanel } from '../components/settings/CapabilitySettingsPanel'
 import { StatusNotice } from '../components/status/StatusNotice'
 import { Button, SummaryCard, type UITone } from '../components/ui'
-import { buildLocalOpsModel } from '../features/governance'
+import { buildLocalOpsModel, localOpsMetricTitle } from '../features/governance'
 import { getLatestMarketSnapshot, getMarketSourceHealth, refreshMarket } from '../services/market'
 import { getCapabilitySettings, getSystemSettings } from '../services/settings'
 import type { PageErrorState } from '../shared/utils'
@@ -85,7 +85,7 @@ export function SettingsPage() {
           <p>{localModel.safetyNotes[0]}</p>
           <div className="daily-signal-grid quality-signal-grid">
             {localModel.metrics.map((metric) => (
-              <SummaryCard key={metric.label} title={metric.label} value={metric.value} detail={metric.detail} tone={(metric.tone ?? 'unknown') as UITone} />
+              <SummaryCard key={metric.label} title={localOpsMetricTitle(metric.label)} value={metric.value} detail={metric.detail} tone={(metric.tone ?? 'unknown') as UITone} />
             ))}
           </div>
         </div>

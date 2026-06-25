@@ -1,7 +1,7 @@
 # 文档治理规范
 
 > 版本：v1.0  
-> 最后更新：2026-06-24
+> 最后更新：2026-06-25
 > 配套：`openspec/project.md`、`docs/development-plan.md`
 
 ## 1. 目标
@@ -76,6 +76,22 @@
 ## 7. 当前活跃变更
 
 当前活跃变更：无。
+
+P121 已归档到 `openspec/changes/archive/2026-06-25-p121-final-review-and-v0-1-3-tag-release/`：在 P114-P120 归档后完成 fresh 发布复核，源码版本推进到 `v0.1.3`，生成 release notes `docs/release/release-v0.1.3.md` 与验收记录 `docs/release/acceptance/2026-06-25-p121-final-review-and-v0.1.3-tag-release.md`。P121 验证通过 OpenSpec、Go test/vet、前端 test/build、P92、P121 final release review、whitespace 和 local release package smoke/verify；本地包 `investment-agent-v0.1.3.tar.gz` SHA256 为 `ba08fb46606688239f67ea5534b8b038f389969ae1c8e8e66a7ff83e8a895bbc`。P121 保留 P93 stale 边界，不把 P93 伪称为 P114-P120 之后的 fresh pass；P121 不新增投资运行时能力、后端 API、SQLite schema、Eino workflow、前端功能、Docker/安装/升级/卸载/物理第二机器验收声明，不声称券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、fresh real LLM/provider 质量、收益预测准确性或收益承诺。
+
+P120 已归档到 `openspec/changes/archive/2026-06-25-p120-p114-p119-final-closure-summary/`：用户确认后已按顺序归档 P114-P120，并生成治理型 closure summary `docs/release/acceptance/2026-06-25-p114-p119-final-closure-summary.md`。P120 汇总结论为：P114-P119 scoped 产品/UI/真实使用/账本/连续可用性/边界场景/全控件切换验收范围内无已知 release-blocking 问题；P93 在 P114-P120 之后仍应按 stale 边界记录，不得伪称 fresh P93 pass；P120 不修改运行时代码、后端 API、SQLite schema、Eino workflow、前端行为、发布包、安装/升级/卸载、Docker/GitHub Release 或物理第二机器验收，不声称券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、fresh real LLM/provider 质量、收益预测准确性或收益承诺。
+
+P119 已归档到 `openspec/changes/archive/2026-06-25-p119-full-ui-control-and-affordance-acceptance/`：全页面 UI 控件与 affordance 验收层覆盖 `web/src/App.tsx` 当前 22 个生产路由、603 个桌面可见控件和 8 个移动页面。P119 runner 确认未命名控件 0、未分类控件 0、布局问题 0、产品化文案问题 0、浏览器 console/page/API 5xx 错误均为 0；并追加上游/轻交互切换扫测，覆盖全局刷新、移动导航、details summaries、证据/审计行展开、筛选器、select 切换和所有桌面可见 details summary 逐实例开关，共 24 个切换交互、0 个切换问题。关键 UI 写操作经 SQLite readback 覆盖持仓/线下交易、决策确认、错误标注、风险 SOP、通知已读、数据质量处置、规则提案、本地知识导入、证据维护和设置刷新。P119 不新增投资运行时能力，不处理 Docker/安装/发布包/物理第二机器验收。
+
+P118 已归档到 `openspec/changes/archive/2026-06-25-p118-product-usability-edge-scenario-acceptance/`：产品真实使用边界验收覆盖 30 天长周期本地事实积累、异常导入/非法交易恢复、数据源 stale/missing 降级处置、三类决策解释差异、多账户/家庭账本本地备注、多页面累积状态读回、重启持久化、390px 移动端和安全负证据。P118 runner 结果为 18/18 场景通过，16 个 `fresh_pass`、2 个 `scoped_pass`，浏览器 console/page/API 5xx 错误均为 0。P118 明确排除发布/安装/升级/卸载/发布包/GitHub Release/物理第二机器验收。
+
+P117 已归档到 `openspec/changes/archive/2026-06-25-p117-continuous-product-usability-acceptance/`：7 天连续使用验收覆盖冷启动、账户入门、日常纪律、交易补记、错误恢复、数据质量降级处置、人工决策确认、错误标注、跨页面一致性、重启持久化、移动端可用性和安全负证据。P117 runner 结果为 17/17 场景通过，16 个 `fresh_pass`、1 个 `scoped_pass`，重启持久化探针通过。
+
+P116 已归档到 `openspec/changes/archive/2026-06-25-p116-multi-fund-transaction-ledger-acceptance/`：复杂多基金交易账本验收覆盖多个基金/ETF、本地线下 buy/sell/reduce、多日期费用、混合批量导入、非法交易拒绝、决策人工执行确认、错误标注、风险/通知/数据质量/复盘/审计聚合读回和移动端组合页。P116 runner 结果为 16 个场景、14 个 `fresh_pass`、2 个 `scoped_pass`，浏览器 console/page/API 5xx 错误均为 0。
+
+P115 已归档到 `openspec/changes/archive/2026-06-25-p115-real-user-scenario-acceptance/`：真实用户场景全链路验收覆盖 34 个场景，28 个 `fresh_pass`、6 个 `scoped_pass`、0 个 `blocked`，浏览器 console/page/API 5xx 均为 0；并修复 `DecisionTrace` 重复 React key 前端运行时问题。P115 是验收型 change，不新增投资运行时能力。
+
+P114 已归档到 `openspec/changes/archive/2026-06-25-p114-visual-productization-alignment-fixes/`：完成 P113 后表单与按钮错位、同层级卡片高低不一、动作区基线不稳、首层内容不够产品化、`/decisions` 空白和 `/api-diagnostics` 裸 404 的视觉产品化与对齐残留修复；子 agent 复审结论为 `pass`，无 P0/P1/P2 阻断；P114 不新增投资运行时能力、交易/外推/自动确认/自动规则能力或发布包/安装/物理第二机器验收声明。
 
 P113 已归档到 `openspec/changes/archive/2026-06-24-p113-layout-fidelity-polish/`。P113 已完成 P112 后用户继续指出的布局错位、移动端溢出、卡片压缩、触控目标过小、二级页工程化内容暴露和局部不精致问题的全产品布局高保真精修；仍以第二方案参考图为视觉真源，覆盖 19 个路由桌面与 390px 移动截图、no-overflow/clip/overlap/touch target/page hierarchy 检查、真实决策详情补充截图、mismatch ledger 和 acceptance record `docs/release/acceptance/2026-06-24-p113-layout-fidelity-polish.md`。P113 复审后 `checked=38`、`issueCount=0`，无已知 P0/P1/P2 布局问题。P113 不新增后端 API、SQLite schema、Eino workflow、LLM 能力、投资规则、数据源、Docker/安装/发布包/物理第二机器验收、券商接口、自动交易、一键交易、代下单、外部推送、自动确认、自动规则应用、自动修复、真实库覆盖或收益承诺。
 

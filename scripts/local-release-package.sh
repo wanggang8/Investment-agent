@@ -199,22 +199,30 @@ for raw in untracked:
     else:
         excluded.append(f"{rel}\t(untracked_not_release_allowlisted)")
 
-def scan_content(rel: str, source: Path) -> None:
+def sanitize_text(text: str) -> str:
+    text = re.sub(r"/Users/[A-Za-z0-9._-]+/Desktop/project/Investment-agent", "<repo>", text)
+    text = re.sub(r"/Users/[A-Za-z0-9._-]+/\.codex/generated_images/", "<codex-generated-images>/", text)
+    text = re.sub(r"/Users/[A-Za-z0-9._-]+/", "<user-home>/", text)
+    return text
+
+def scan_and_sanitize_content(rel: str, source: Path):
     try:
         data = source.read_bytes()
     except OSError as exc:
         errors.append(f"failed to read {rel}: {exc}")
-        return
+        return None
     if b"\x00" in data:
-        return
+        return None
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError:
-        return
+        return None
+    text = sanitize_text(text)
     for pattern in forbidden_content:
         if pattern.search(text):
             errors.append(f"forbidden content pattern in {rel}: {pattern.pattern}")
-            return
+            return text
+    return text
 
 for raw in tracked + allowed_untracked:
     rel = raw.strip("\n")
@@ -236,10 +244,12 @@ for raw in tracked + allowed_untracked:
     if not source.is_file():
         excluded.append(rel)
         continue
-    scan_content(rel, source)
+    sanitized_text = scan_and_sanitize_content(rel, source)
     target = package_root / rel
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source, target)
+    if sanitized_text is not None:
+        target.write_text(sanitized_text, encoding="utf-8")
     included.append(rel)
 
 if errors:

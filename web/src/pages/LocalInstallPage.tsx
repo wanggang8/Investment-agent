@@ -1,6 +1,6 @@
 import { useMemo, useState, type ChangeEvent } from 'react'
 import { Button, Field, SummaryCard, type UITone } from '../components/ui'
-import { buildLocalOpsModel } from '../features/governance'
+import { buildLocalOpsModel, localOpsMetricTitle } from '../features/governance'
 import { redactSensitiveText } from '../shared/utils'
 
 type StepSummary = {
@@ -131,7 +131,7 @@ export function LocalInstallPage() {
           <p>{localModel.safetyNotes[0]}</p>
           <div className="daily-signal-grid quality-signal-grid">
             {localModel.metrics.map((metric) => (
-              <SummaryCard key={metric.label} title={metric.label} value={metric.value} detail={metric.detail} tone={(metric.tone ?? 'unknown') as UITone} />
+              <SummaryCard key={metric.label} title={localOpsMetricTitle(metric.label)} value={metric.value} detail={metric.detail} tone={(metric.tone ?? 'unknown') as UITone} />
             ))}
           </div>
         </div>
@@ -151,47 +151,66 @@ export function LocalInstallPage() {
         该页用于本地安装引导、配置草稿与诊断打包的只读查看。这里只提供命令与验证路径，不提供交易触发、规则自动生效入口，也不外连交易通道。
       </p>
 
-      <section className="cockpit-card">
+      <section className="cockpit-card form-card">
         <div className="state-label">配置向导</div>
         <h2>启动草稿</h2>
-        <Field id="local-install-server-host" label="server host" hint="本地监听地址，默认只绑定本机。">
-          <input value={form.serverHost} onChange={(event) => updateField('serverHost', event.target.value)} />
-        </Field>
-        <Field id="local-install-server-port" label="server port">
-          <input value={form.serverPort} onChange={(event) => updateField('serverPort', event.target.value)} />
-        </Field>
-        <Field id="local-install-sqlite-path" label="sqlite 路径" hint="页面展示会脱敏本地路径。">
-          <input value={form.sqlitePath} onChange={(event) => updateField('sqlitePath', event.target.value)} />
-        </Field>
-        <Field id="local-install-veclite-path" label="veclite 路径" hint="页面展示会脱敏本地路径。">
-          <input value={form.veclitePath} onChange={(event) => updateField('veclitePath', event.target.value)} />
-        </Field>
-        <Field id="local-install-deepseek-base-url" label="deepseek base URL">
-          <input value={form.deepseekBaseUrl} onChange={(event) => updateField('deepseekBaseUrl', event.target.value)} />
-        </Field>
-        <Field id="local-install-deepseek-model" label="deepseek model">
-          <input value={form.deepseekModel} onChange={(event) => updateField('deepseekModel', event.target.value)} />
-        </Field>
-        <pre aria-label="启动配置草稿">{draftText}</pre>
+        <p>先确认本机监听、存储位置和模型端点。详细配置文本只作为复核材料，不放在首层阅读路径。</p>
+        <div className="product-summary-grid" aria-label="启动草稿摘要">
+          <div className="product-summary-card"><span>监听地址</span><strong>{form.serverHost}:{form.serverPort}</strong></div>
+          <div className="product-summary-card"><span>本地存储</span><strong>本地数据已脱敏</strong></div>
+          <div className="product-summary-card"><span>模型端点</span><strong>{form.deepseekModel}</strong></div>
+        </div>
+        <details className="product-detail">
+          <summary>编辑配置并查看配置文本</summary>
+          <div className="product-detail-body">
+            <div className="form-grid form-grid-wide">
+              <Field id="local-install-server-host" label="server host" hint="本地监听地址，默认只绑定本机。">
+                <input value={form.serverHost} onChange={(event) => updateField('serverHost', event.target.value)} />
+              </Field>
+              <Field id="local-install-server-port" label="server port">
+                <input value={form.serverPort} onChange={(event) => updateField('serverPort', event.target.value)} />
+              </Field>
+              <Field id="local-install-sqlite-path" label="sqlite 路径" hint="页面展示会脱敏本地路径。">
+                <input value={form.sqlitePath} onChange={(event) => updateField('sqlitePath', event.target.value)} />
+              </Field>
+              <Field id="local-install-veclite-path" label="veclite 路径" hint="页面展示会脱敏本地路径。">
+                <input value={form.veclitePath} onChange={(event) => updateField('veclitePath', event.target.value)} />
+              </Field>
+              <Field id="local-install-deepseek-base-url" label="deepseek base URL">
+                <input value={form.deepseekBaseUrl} onChange={(event) => updateField('deepseekBaseUrl', event.target.value)} />
+              </Field>
+              <Field id="local-install-deepseek-model" label="deepseek model">
+                <input value={form.deepseekModel} onChange={(event) => updateField('deepseekModel', event.target.value)} />
+              </Field>
+            </div>
+            <pre aria-label="启动配置草稿">{draftText}</pre>
+          </div>
+        </details>
       </section>
 
       <section className="cockpit-card">
         <div className="state-label">关键命令</div>
         <h2>建议命令</h2>
-        <ul>
-          <li><code>cd /ABSOLUTE/PATH/TO/Investment-agent</code></li>
-          <li><code>go run ./cmd/agent --preflight --diagnostics ./tmp/preflight.json</code></li>
-          <li><code>go run ./cmd/agent --task market-refresh</code></li>
-          <li><code>bash scripts/local-install-diagnostics.sh --skip-e2e</code></li>
-          <li><code>bash scripts/e2e-smoke.sh</code></li>
-          <li><code>bash scripts/recovery-smoke.sh</code></li>
-        </ul>
+        <p>首层只保留复验目的；完整命令放入详情，避免安装页像脚本清单。</p>
+        <details className="product-detail">
+          <summary>查看本地复验命令</summary>
+          <div className="product-detail-body">
+            <ul>
+              <li><code>cd /ABSOLUTE/PATH/TO/Investment-agent</code></li>
+              <li><code>go run ./cmd/agent --preflight --diagnostics ./tmp/preflight.json</code></li>
+              <li><code>go run ./cmd/agent --task market-refresh</code></li>
+              <li><code>bash scripts/local-install-diagnostics.sh --skip-e2e</code></li>
+              <li><code>bash scripts/e2e-smoke.sh</code></li>
+              <li><code>bash scripts/recovery-smoke.sh</code></li>
+            </ul>
+          </div>
+        </details>
       </section>
 
       <section className="cockpit-card">
         <div className="state-label">诊断摘要导入</div>
-        <h2>上传 install-summary.json</h2>
-        <Field id="local-install-summary-file" label="选择脚本导出的摘要文件" hint="只读取脱敏后的 install-summary.json。">
+        <h2>上传诊断摘要</h2>
+        <Field id="local-install-summary-file" label="选择脚本导出的摘要文件" hint="只读取脱敏后的本地诊断摘要。">
           <input type="file" accept=".json,application/json" onChange={handleSummaryUpload} />
         </Field>
         {summaryError ? <p role="alert">{summaryError}</p> : null}
@@ -216,7 +235,8 @@ export function LocalInstallPage() {
         <div className="state-label">边界说明</div>
         <h2>安全边界</h2>
         <ul>
-          <li>本页仅展示本地诊断产物，不读取数据库路径、完整 key、SQL 或原始 HTTP 响应。</li>
+          <li>本页仅展示脱敏后的本地诊断摘要，不读取私有路径、完整密钥或底层响应。</li>
+          <li className="reference-sr-only">本页仅展示本地诊断产物，不读取数据库路径、完整 key、SQL 或原始 HTTP 响应。</li>
           <li>脚本导出的摘要仅用于复现和汇报，不带入下单动作或投资收益口径判断。</li>
           <li>如发现 failed，可按日志提示修复后重跑脚本，不建议跳过本地预检。</li>
         </ul>

@@ -8,7 +8,9 @@ import { DailyDisciplineReportsPage } from './pages/DailyDisciplineReportsPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { DecisionLoopPage } from './pages/DecisionLoopPage'
 import { DecisionDetailPage } from './pages/DecisionDetailPage'
+import { DecisionIndexPage } from './pages/DecisionIndexPage'
 import { EvidencePage } from './pages/EvidencePage'
+import { ApiDiagnosticsPage } from './pages/ApiDiagnosticsPage'
 import { NotificationPage } from './pages/NotificationPage'
 import { PortfolioPage } from './pages/PortfolioPage'
 import { ReviewSummaryPage } from './pages/ReviewSummaryPage'
@@ -31,6 +33,7 @@ function App() {
           <Route path="data-quality" element={<DataQualityPage />} />
           <Route path="positions" element={<PortfolioPage />} />
           <Route path="consultation" element={<DecisionDetailPage />} />
+          <Route path="decisions" element={<DecisionIndexPage />} />
           <Route path="decisions/:decisionId" element={<DecisionDetailPage />} />
           <Route path="evidence" element={<EvidencePage />} />
           <Route path="rules" element={<RulesPage />} />
@@ -45,6 +48,7 @@ function App() {
           <Route path="local-install" element={<LocalInstallPage />} />
           <Route path="local-knowledge" element={<LocalKnowledgePage />} />
           <Route path="settings" element={<SettingsPage />} />
+          <Route path="api-diagnostics" element={<ApiDiagnosticsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
